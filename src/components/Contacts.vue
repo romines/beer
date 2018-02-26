@@ -5,8 +5,26 @@
       <button @click="init">Initialize app base state</button>
     </div> -->
     <ul class="contact-group-list">
-      <li class="contact-group" v-for="group in contactGroups" :key="group.section">
-        {{group.section}}
+      <li
+        class="contact-group"
+        v-for="group in contactGroups"
+        :key="group.section">
+        <div
+          class="group-header"
+          @click="detailGroup = group.section">
+          {{ group.section }}
+        </div>
+        <div
+          class="group-detail"
+          v-show="detailGroup === group.section">
+
+          <ul class="contact-list">
+            <li
+              class="contact"
+              v-for="contact in group.list">{{ contact.name }}</li>
+          </ul>
+
+        </div>
       </li>
     </ul>
   </div>
@@ -20,6 +38,7 @@ export default {
   },
   data () {
     return {
+      detailGroup: ''
     }
   },
   computed: {
@@ -39,17 +58,7 @@ export default {
 </script>
 
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+  .contact-group {
+    border: 1px solid blue;
+  }
 </style>
