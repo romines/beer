@@ -15,6 +15,9 @@ const state = {
   contactGroups: []
 }
 
+const resortsRef = state.db.collection('resorts')
+const myId = 'jackson_hole'
+
 export default new Vuex.Store({
   state,
   mutations: {
@@ -24,18 +27,20 @@ export default new Vuex.Store({
   },
   actions: {
 
-    listen ({commit, rootState}) {
-      let resortsRef = rootState.db.collection('resorts')
-      const myId = 'jackson_hole'
+    listen ({commit}) {
       resortsRef.doc(myId)
-      .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
+        .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
     },
-    seed ({ rootState }) {
-      let resortsRef = rootState.db.collection('resorts')
-      resortsRef.doc('jackson_hole').set({name: 'Jackson Hole', contactGroups: jHContacts.contactGroups, keys: jHContacts.keys, resortId: 'jackson_hole'})
-      resortsRef.doc('r_l').set({name: 'RL', contactGroups: rLContacts.contactGroups, keys: rLContacts.keys, resortId: 'r_l'})
+    seed () {
 
     },
+    saveContact ({commit, rootState}, payload) {
+      let groups = rootState.contactGroups.slice()
+      groups[payload.groupIndex].list[payload.contactIndex] = payload.updatedContact
+      resortsRef.doc(myId).update({
+        contactGroups: groups
+      })
+    }
 
   },
   modules: {
