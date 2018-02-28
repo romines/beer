@@ -29,7 +29,7 @@ export default new Vuex.Store({
   actions: {
 
     listen ({commit}) {
-      resortsRef.doc(myId)
+      return resortsRef.doc(myId)
         .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
     },
     seed ({ rootState }) {

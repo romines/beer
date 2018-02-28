@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <!-- temp -->
-    <div class="re-seed" @click="$store.dispatch('seed')">reset</div>
+    <div class="top-nav">
+      <router-link to="/">home</router-link>
+      <router-link to="json">JSON</router-link>
+      <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
+    </div>
     <!-- end temp -->
     <router-view/>
   </div>
@@ -16,13 +20,16 @@ export default {
 <style lang="scss">
 @import '../node_modules/bulma/bulma.sass';
 // temp
-.re-seed {
-  color: blue;
-  text-decoration: underline;
-  cursor: pointer;
+.top-nav {
   position: fixed;
   top: 0;
-  left: 22%;
+  right: 22%;
+  & > * {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
 }
 // end temp
 #app {
