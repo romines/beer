@@ -70,6 +70,11 @@ export default {
     }
 
   },
+  watch: {
+    isOpen(open) {
+      if (!open) this.editingContactAtIndex = -1
+    }
+  },
   created () {
   },
   methods: {
@@ -81,5 +86,7 @@ export default {
   .contact-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
   }
 </style>

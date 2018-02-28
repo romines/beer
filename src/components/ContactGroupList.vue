@@ -3,7 +3,7 @@
     class="contact-group-list"
     v-model="myList"
     :options="{handle:'.group-header'}"
-    @start="drag=true"
+    @start="drag=true; editingNameOfGroupAtIndex = -1;"
     @end="drag=false">
 
     <div
@@ -15,8 +15,25 @@
       <div
         class="group-header"
         :class="detailGroup === group.section ? '' : 'box'"
-        @click="detailGroup = (detailGroup === group.section) ? '' : group.section; editingContactAtIndex = -1">
-        <span class="name">{{ group.section }}</span>
+        @click.self="detailGroup = (detailGroup === group.section) ? '' : group.section">
+
+        <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
+          <span class="name">{{ group.section }}</span>
+          <span class="icon is-small" @click.stop="editGroupTitle(groupIndex)">
+            <i class="fas fa-edit"/>
+          </span>
+        </span>
+
+        <div class="name-editor field is-grouped" v-show="editingNameOfGroupAtIndex === groupIndex">
+          <p class="control is-expanded">
+            <input class="input" v-model="groupNameDraft" placeholder="Group title">
+          </p>
+          <p class="control">
+            <button class="button is-primary" @click.stop="saveGroupName">Save</button>
+            <button class="button" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
+          </p>
+        </div>
+
         <span class="icon is-small" v-show="detailGroup !== group.section">
           <i class="fas fa-chevron-down"/>
         </span>
@@ -51,7 +68,9 @@ export default {
   },
   data () {
     return {
-      detailGroup: ''
+      detailGroup: '',
+      editingNameOfGroupAtIndex: -1,
+      groupNameDraft: ''
     }
   },
   computed: {
@@ -68,14 +87,33 @@ export default {
   created () {
   },
   methods: {
+    editGroupTitle(groupIndex) {
+      this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section;
+      this.editingNameOfGroupAtIndex = groupIndex;
+    },
+    saveGroupName() {
+      this.$store.dispatch('saveContactGroupName', { groupIndex: this.editingNameOfGroupAtIndex, updatedName: this.groupNameDraft })
+      this.editingNameOfGroupAtIndex = -1
+    }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .group-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    .name-and-edit {
+      display: inline-flex;
+      align-items: center;
+      .icon {
+        opacity: .7;
+        font-size: .88em;
+        margin-left: .5em;
+      }
+    }
+    .name-editor { margin-bottom: 0; }
   }
 </style>
