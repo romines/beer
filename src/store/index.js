@@ -4,6 +4,8 @@ import 'babel-polyfill'
 import firebase from 'firebase'
 import 'firebase/firestore'
 import jHContacts from '../assets/JH_contacts.json'
+// import contactSpec from '../assets/ContactSpec_rev_2-28.json'
+// console.log({contactSpec, jHContacts});
 
 import config from '../firebaseConfig.js'
 
@@ -50,7 +52,13 @@ export default new Vuex.Store({
     },
     saveContact ({commit, rootState}, payload) {
       let groups = rootState.contactGroups.slice()
-      groups[payload.groupIndex].list[payload.contactIndex] = payload.updatedContact
+      if (payload.contactIndex === -1) {
+        // new contact
+        groups[payload.groupIndex].list.push(payload.updatedContact)
+      } else {
+        // existing contact
+        groups[payload.groupIndex].list[payload.contactIndex] = payload.updatedContact
+      }
       resortsRef.doc(myId).update({
         contactGroups: groups
       })

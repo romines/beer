@@ -105,6 +105,7 @@ export default {
       }
     }
   },
+
   watch: {
     // re-initialize when received again as prop
     contact () {

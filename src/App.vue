@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <!-- temp -->
-    <div class="top-nav">
-      <router-link to="/">home</router-link>
-      <router-link to="json">JSON</router-link>
-      <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
+    <div class="top-nav-container">
+      <span class="top-nav">
+        <router-link to="/">home</router-link>
+        <router-link to="json">JSON</router-link>
+        <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
+      </span>
     </div>
     <!-- end temp -->
     <router-view/>
@@ -18,12 +20,28 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../node_modules/bulma/bulma.sass';
+@import '~bulma/bulma.sass';
+@import 'sharedStyles.scss';
+
+// global bulma overrides
+.box {
+  padding: .85rem;
+  &:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+
 // temp
-.top-nav {
+.top-nav-container {
   position: fixed;
   top: 0;
-  right: 22%;
+  width: 100%;
+  background-color: $boneGrey;
+  text-align: right;
+}
+
+.top-nav {
+  margin-right: 2.2em;
   & > * {
     color: blue;
     text-decoration: underline;
@@ -32,6 +50,7 @@ export default {
 
 }
 // end temp
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

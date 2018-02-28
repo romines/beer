@@ -15,7 +15,7 @@
       <div
         class="group-header"
         :class="detailGroup === group.section ? '' : 'box'"
-        @click.self="detailGroup = (detailGroup === group.section) ? '' : group.section">
+        @click="detailGroup = (detailGroup === group.section) ? '' : group.section">
 
         <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
           <span class="name">{{ group.section }}</span>
@@ -49,6 +49,21 @@
 
         <contact-list :group-index="groupIndex" :is-open="detailGroup === group.section"/>
         <!-- end .group-detail -->
+        <div class="add-new-contact-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
+          <span class="text">Add New</span>
+          <span class="icon is-small">
+            <i class="fas fa-plus"/>
+          </span>
+        </div>
+
+        <div class="add-new-contact box" v-show="addingContactAtIndex === groupIndex">
+          <edit-contact
+            :group-index="groupIndex"
+            :contact-index="-1"
+            :contact="initializeNewContact()"
+            @cancelEdits="addingContactAtIndex = -1"/>
+        </div>
+
       </div>
 
       <!-- end .contact-group -->
@@ -60,16 +75,19 @@
 <script>
 import draggable from 'vuedraggable'
 import ContactList from './ContactList'
+import EditContact from './EditContact'
 
 export default {
   components: {
     draggable,
-    ContactList
+    ContactList,
+    EditContact
   },
   data () {
     return {
       detailGroup: '',
       editingNameOfGroupAtIndex: -1,
+      addingContactAtIndex: -1,
       groupNameDraft: ''
     }
   },
@@ -94,12 +112,26 @@ export default {
     saveGroupName() {
       this.$store.dispatch('saveContactGroupName', { groupIndex: this.editingNameOfGroupAtIndex, updatedName: this.groupNameDraft })
       this.editingNameOfGroupAtIndex = -1
+    },
+    initializeNewContact () {
+      return {
+        mailto: '',
+        name: '',
+        number: '',
+        rect: '',
+        url: '',
+        z_reservations: ''
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  @import '../sharedStyles.scss';
+  .contact-group {
+    background-color: $boneGrey;
+  }
   .group-header {
     display: flex;
     justify-content: space-between;
@@ -115,5 +147,17 @@ export default {
       }
     }
     .name-editor { margin-bottom: 0; }
+
+  }
+  .add-new-contact-bar, .add-new-contact {
+    margin-top: 1rem;
+  }
+  .add-new-contact-bar {
+    background: $mildNavy;
+    color: $notQuiteWhite;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
   }
 </style>

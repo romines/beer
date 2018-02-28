@@ -7,9 +7,14 @@
     @end="drag=false">
 
     <div
-      class="contact"
+      class="contact contact-margin-setter"
       v-for="(contact, index) in myList" :key="contact.name"
       :class="isOpen ? 'box' : ''">
+      <!--
+        To increase clickable surface area,
+        contact header is .box if contact is closed
+         . . . otherwise whole contact
+                                                -->
 
       <div class="contact-header"
            :class="isOpen ? '' : 'box'"
@@ -83,6 +88,9 @@ export default {
 </script>
 
 <style scoped>
+  .contact-list {
+    margin-top: .6em;
+  }
   .contact-header {
     display: flex;
     justify-content: space-between;
