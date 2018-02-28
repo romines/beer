@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <!-- temp -->
+    <div class="re-seed" @click="$store.dispatch('seed')">reset</div>
+    <!-- end temp -->
     <router-view/>
   </div>
 </template>
@@ -12,6 +15,16 @@ export default {
 
 <style lang="scss">
 @import '../node_modules/bulma/bulma.sass';
+// temp
+.re-seed {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+  position: fixed;
+  top: 0;
+  left: 22%;
+}
+// end temp
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

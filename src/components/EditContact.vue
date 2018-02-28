@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-contact box">
+  <div class="edit-contact">
 
     <div class="field is-horizontal">
       <div class="field-label is-normal">
@@ -106,6 +106,7 @@ export default {
     }
   },
   watch: {
+    // re-initialize when received again as prop
     contact () {
       this.initializeContact()
     }

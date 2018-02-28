@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import 'babel-polyfill'
 import firebase from 'firebase'
 import 'firebase/firestore'
+import jHContacts from '../assets/JH_contacts.json'
 
 import config from '../firebaseConfig.js'
 
@@ -31,8 +32,14 @@ export default new Vuex.Store({
       resortsRef.doc(myId)
         .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
     },
-    seed () {
-
+    seed ({ rootState }) {
+      let resortsRef = rootState.db.collection('resorts')
+      resortsRef.doc(myId).set({name: 'Jackson Hole', contactGroups: jHContacts.contactGroups, keys: jHContacts.keys, resortId: 'jackson_hole'})
+    },
+    saveContactGroupList ({commit, rootState}, { updatedList }) {
+      resortsRef.doc(myId).update({
+        contactGroups: updatedList
+      })
     },
     saveContact ({commit, rootState}, payload) {
       let groups = rootState.contactGroups.slice()
@@ -40,7 +47,15 @@ export default new Vuex.Store({
       resortsRef.doc(myId).update({
         contactGroups: groups
       })
-    }
+    },
+    saveContactList ({commit, rootState}, payload) {
+      let groups = rootState.contactGroups.slice()
+      groups[payload.groupIndex].list = payload.updatedList
+      resortsRef.doc(myId).update({
+        contactGroups: groups
+      })
+    },
+
 
   },
   modules: {
