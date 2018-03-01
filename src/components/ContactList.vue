@@ -2,7 +2,7 @@
   <draggable
     class="contact-list"
     v-model="myList"
-    :options="{handle:'.contact-header'}"
+    :options="{handle:'.grippy'}"
     @start="drag=true; editingContactAtIndex = -1;"
     @end="drag=false">
 
@@ -18,19 +18,22 @@
 
       <div class="contact-header"
            :class="isOpen ? '' : 'box'"
-           @click.stop="(editingContactAtIndex === index) ? editingContactAtIndex = -1 : editingContactAtIndex = index">
-        <span class="name">{{ contact.name }}</span>
-        <span class="icon is-small" v-show="true">
+           @click.stop="contactOpen(index) ? editingContactAtIndex = -1 : editingContactAtIndex = index">
+        <span class="name">
+          <span class="grippy" />
+          {{ contact.name }}
+        </span>
+        <span class="icon is-small" v-show="!contactOpen(index)">
           <i class="fas fa-chevron-down"/>
         </span>
-        <span class="icon is-small" v-show="false">
+        <span class="icon is-small" v-show="contactOpen(index)">
           <i class="fas fa-chevron-up"/>
         </span>
       <!-- end .contact-header -->
       </div>
 
       <edit-contact
-        v-show="editingContactAtIndex === index"
+        v-show="contactOpen(index)"
         :group-index="groupIndex"
         :contact-index="index"
         :contact="contact"
@@ -83,6 +86,9 @@ export default {
   created () {
   },
   methods: {
+    contactOpen (index) {
+      return index === this.editingContactAtIndex;
+    }
   }
 }
 </script>

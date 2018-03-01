@@ -63,6 +63,13 @@ export default new Vuex.Store({
         contactGroups: groups
       })
     },
+    deleteContact ({commit, rootState}, { groupIndex, contactIndex}) {
+      let groups = rootState.contactGroups.slice()
+      groups[groupIndex].list.splice(contactIndex, 1)
+      resortsRef.doc(myId).update({
+        contactGroups: groups
+      })
+    },
     saveContactList ({commit, rootState}, payload) {
       let groups = rootState.contactGroups.slice()
       groups[payload.groupIndex].list = payload.updatedList

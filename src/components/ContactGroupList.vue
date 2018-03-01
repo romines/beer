@@ -2,7 +2,7 @@
   <draggable
     class="contact-group-list"
     v-model="myList"
-    :options="{handle:'.group-header'}"
+    :options="{handle:'.grippy'}"
     @start="drag=true; editingNameOfGroupAtIndex = -1;"
     @end="drag=false">
 
@@ -15,9 +15,10 @@
       <div
         class="group-header"
         :class="detailGroup === group.section ? '' : 'box'"
-        @click="detailGroup = (detailGroup === group.section) ? '' : group.section">
+        @click="onGroupHeaderClick(group.section, $event)">
 
         <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
+          <span class="grippy" />
           <span class="name">{{ group.section }}</span>
           <span class="icon is-small" @click.stop="editGroupTitle(groupIndex)">
             <i class="fas fa-edit"/>
@@ -105,6 +106,10 @@ export default {
   created () {
   },
   methods: {
+    onGroupHeaderClick (section, event) {
+      if (event.target.nodeName === 'INPUT') return;
+      this.detailGroup = (this.detailGroup === section) ? '' : section
+    },
     editGroupTitle(groupIndex) {
       this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section;
       this.editingNameOfGroupAtIndex = groupIndex;

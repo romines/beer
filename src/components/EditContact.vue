@@ -72,6 +72,14 @@
           Cancel
         </a>
       </p>
+      <p class="control no-expando" v-show="contactIndex !== -1">
+        <a class="button is-danger is-outlined" @click="deleteContact">
+          <span>Delete</span>
+          <span class="icon is-small">
+            <i class="fas fa-trash-alt" />
+          </span>
+        </a>
+      </p>
     </div>
 
   </div>
@@ -107,7 +115,7 @@ export default {
   },
 
   watch: {
-    // re-initialize when received again as prop
+    // re-initialize localState when 'contact' prop changes
     contact () {
       this.initializeContact()
     }
@@ -116,21 +124,33 @@ export default {
     this.initializeContact()
   },
   methods: {
+    initializeContact () {
+      this.localState.contact = Object.assign({}, this.contact)
+    },
     saveContact () {
       this.$store.dispatch('saveContact', {
         groupIndex: this.groupIndex,
         contactIndex: this.contactIndex,
         updatedContact: this.localState.contact
       })
+      this.$emit('cancelEdits')
     },
-    initializeContact () {
-      this.localState.contact = Object.assign({}, this.contact)
+    deleteContact () {
+      const payload = {
+        groupIndex: this.groupIndex,
+        contactIndex: this.contactIndex
+      }
+      this.$store.dispatch('deleteContact', payload)
+      this.$emit('cancelEdits')
     }
   }
 }
 </script>
 
 <style scoped>
+  .edit-contact {
+    padding-top: .6em;
+  }
   .field .control:not(.no-expando) {
     flex-grow: 1;
   }
