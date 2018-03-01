@@ -38,6 +38,16 @@ export default new Vuex.Store({
       let resortsRef = rootState.db.collection('resorts')
       resortsRef.doc(myId).set({name: 'Jackson Hole', contactGroups: jHContacts.contactGroups, keys: jHContacts.keys, resortId: 'jackson_hole'})
     },
+    saveNewEmptyGroup ({rootState}, groupName) {
+      let groups = rootState.contactGroups.slice()
+      groups.push({
+        section: groupName,
+        list: []
+      })
+      return resortsRef.doc(myId).update({
+        contactGroups: groups
+      })
+    },
     saveContactGroupName ({commit, rootState}, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName

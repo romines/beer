@@ -27,7 +27,7 @@ export default {
 .box {
   padding: .85rem;
   &:not(:last-child) {
-    margin-bottom: 1rem;
+    margin-bottom: .88rem;
   }
 }
 
@@ -84,6 +84,17 @@ export default {
 .grippy::after {
   content: '.. .. .. ..';
 }
+
+.add-new-bar {
+  background: $mildNavy;
+  color: $notQuiteWhite;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-top: .88rem;
+}
+
 
 h1, h2 {
   font-weight: normal;

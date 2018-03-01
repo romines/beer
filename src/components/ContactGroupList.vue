@@ -27,11 +27,11 @@
 
         <div class="name-editor field is-grouped" v-show="editingNameOfGroupAtIndex === groupIndex">
           <p class="control is-expanded">
-            <input class="input" v-model="groupNameDraft" placeholder="Group title">
+            <input class="input is-small" v-model="groupNameDraft" placeholder="Group title">
           </p>
           <p class="control">
-            <button class="button is-primary" @click.stop="saveGroupName">Save</button>
-            <button class="button" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
+            <button class="button is-primary is-small" @click.stop="saveGroupName">Save</button>
+            <button class="button is-small" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
           </p>
         </div>
 
@@ -50,8 +50,8 @@
 
         <contact-list :group-index="groupIndex" :is-open="detailGroup === group.section"/>
         <!-- end .group-detail -->
-        <div class="add-new-contact-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
-          <span class="text">Add New</span>
+        <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
+          <span class="text">Add New Contact</span>
           <span class="icon is-small">
             <i class="fas fa-plus"/>
           </span>
@@ -84,12 +84,17 @@ export default {
     ContactList,
     EditContact
   },
+  props: {
+    newGroupIdentifier: {
+      type: String
+    }
+  },
   data () {
     return {
       detailGroup: '',
       editingNameOfGroupAtIndex: -1,
       addingContactAtIndex: -1,
-      groupNameDraft: ''
+      groupNameDraft: '',
     }
   },
   computed: {
@@ -103,7 +108,10 @@ export default {
     }
 
   },
-  created () {
+  watch: {
+    newGroupIdentifier (value) {
+      this.detailGroup = value
+    }
   },
   methods: {
     onGroupHeaderClick (section, event) {
@@ -129,6 +137,8 @@ export default {
       }
     }
   }
+
+
 }
 </script>
 
@@ -152,17 +162,7 @@ export default {
       }
     }
     .name-editor { margin-bottom: 0; }
+  }
 
-  }
-  .add-new-contact-bar, .add-new-contact {
-    margin-top: 1rem;
-  }
-  .add-new-contact-bar {
-    background: $mildNavy;
-    color: $notQuiteWhite;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
+
 </style>
