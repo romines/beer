@@ -136,12 +136,30 @@ export default {
       this.$emit('cancelEdits')
     },
     deleteContact () {
-      const payload = {
-        groupIndex: this.groupIndex,
-        contactIndex: this.contactIndex
+
+      const onConfirm = () => {
+        this.$emit('cancelEdits') // why won't this work in the .then cb below??
+        this.$store.commit('SHOW_MODAL', { loading: true, heading: 'Are you sure you want to delete this contact?' })
+        this.$store.dispatch('deleteContact', {
+          groupIndex: this.groupIndex,
+          contactIndex: this.contactIndex
+        }).then(() => {
+          // this.$emit('cancelEdits')      // ...nerp..doesn't do shit here
+          this.$store.commit('SHOW_MODAL', {
+            heading: 'Contact deleted successfully',
+            buttonLess: true
+          })
+          setTimeout(() => {
+            this.$store.commit('CLOSE_MODAL')
+          }, 1500);
+        })
       }
-      this.$store.dispatch('deleteContact', payload)
-      this.$emit('cancelEdits')
+
+      this.$store.commit('SHOW_MODAL', {
+        heading: 'Are you sure you want to delete this contact?',
+        onConfirm
+      })
+
     }
   }
 }

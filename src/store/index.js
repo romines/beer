@@ -15,7 +15,18 @@ Vue.use(Vuex)
 
 const state = {
   db: firebase.firestore(),
-  contactGroups: []
+  contactGroups: [],
+  modal: {
+    show: false,
+    contents: {
+      heading: '',
+      body: '',
+      onConfirm: () => {return},
+      onCancel: () => {return},
+      buttonLess: false,
+      loading: false
+    }
+  }
 }
 
 const resortsRef = state.db.collection('resorts')
@@ -26,6 +37,13 @@ export default new Vuex.Store({
   mutations: {
     'SET_CONTACT_GROUPS' (state, { contactGroups }) {
       state.contactGroups = contactGroups
+    },
+    'SHOW_MODAL' (state, contents) {
+      state.modal.show = true
+      state.modal.contents = {...contents}
+    },
+    'CLOSE_MODAL' (state) {
+      state.modal.show = false
     }
   },
   actions: {
@@ -76,7 +94,7 @@ export default new Vuex.Store({
     deleteContact ({commit, rootState}, { groupIndex, contactIndex}) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].list.splice(contactIndex, 1)
-      resortsRef.doc(myId).update({
+      return resortsRef.doc(myId).update({
         contactGroups: groups
       })
     },

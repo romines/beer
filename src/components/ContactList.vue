@@ -37,7 +37,7 @@
         :group-index="groupIndex"
         :contact-index="index"
         :contact="contact"
-        @cancelEdits="editingContactAtIndex = -1"/>
+        @cancelEdits="cancelEditsHandler"/>
 
     <!-- end .contact -->
     </div>
@@ -88,6 +88,10 @@ export default {
   methods: {
     contactOpen (index) {
       return index === this.editingContactAtIndex;
+    },
+    cancelEditsHandler () {
+      console.log('*cancelEdits* was emitted . . .');
+      this.editingContactAtIndex = -1
     }
   }
 }

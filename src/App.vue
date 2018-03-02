@@ -8,19 +8,24 @@
         <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
       </span>
     </div>
+
+    <modal />
     <!-- end temp -->
     <router-view/>
   </div>
 </template>
 
 <script>
+import Modal from './components/Modal.vue'
 export default {
   name: 'App',
+  components: { Modal }
 }
 </script>
 
 <style lang="scss">
 @import '~bulma/bulma.sass';
+@import '~animate.css/animate.css';
 @import 'sharedStyles.scss';
 
 // global bulma overrides
