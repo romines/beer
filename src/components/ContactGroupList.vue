@@ -23,6 +23,9 @@
           <span class="icon is-small" @click.stop="editGroupTitle(groupIndex)">
             <i class="fas fa-edit"/>
           </span>
+          <span class="icon is-small" @click.stop="deleteGroup(groupIndex)">
+            <i class="fas fa-trash-alt"/>
+          </span>
         </span>
 
         <div class="name-editor field is-grouped" v-show="editingNameOfGroupAtIndex === groupIndex">
@@ -118,13 +121,38 @@ export default {
       if (event.target.nodeName === 'INPUT') return;
       this.detailGroup = (this.detailGroup === section) ? '' : section
     },
-    editGroupTitle(groupIndex) {
+    editGroupTitle (groupIndex) {
       this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section;
       this.editingNameOfGroupAtIndex = groupIndex;
     },
-    saveGroupName() {
+    saveGroupName () {
       this.$store.dispatch('saveContactGroupName', { groupIndex: this.editingNameOfGroupAtIndex, updatedName: this.groupNameDraft })
       this.editingNameOfGroupAtIndex = -1
+    },
+    deleteGroup (groupIndex) {
+      const onConfirm = () => {
+        this.$store.commit('SHOW_MODAL', {
+          loading: true,
+          heading: 'Are you sure you want to delete this contact group?',
+          message: 'This will also delete all contacts in group.'
+        })
+        this.$store.dispatch('deleteContactGroup', groupIndex).then(() => {
+          this.detailGroup = '',
+          this.$store.commit('SHOW_MODAL', {
+            heading: 'Contact group deleted successfully',
+            buttonLess: true
+          })
+          setTimeout(() => {
+            this.$store.commit('CLOSE_MODAL')
+          }, 1500);
+        })
+      }
+
+      this.$store.commit('SHOW_MODAL', {
+        heading: 'Are you sure you want to delete this contact group?',
+        message: 'This will also delete all contacts in group.',
+        onConfirm
+      })
     },
     initializeNewContact () {
       return {

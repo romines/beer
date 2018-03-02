@@ -20,7 +20,7 @@ const state = {
     show: false,
     contents: {
       heading: '',
-      body: '',
+      message: '',
       onConfirm: () => {return},
       onCancel: () => {return},
       buttonLess: false,
@@ -70,6 +70,13 @@ export default new Vuex.Store({
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
       resortsRef.doc(myId).update({
+        contactGroups: groups
+      })
+    },
+    deleteContactGroup ({rootState}, groupIndex) {
+      let groups = rootState.contactGroups.slice()
+      groups.splice(groupIndex, 1)
+      return resortsRef.doc(myId).update({
         contactGroups: groups
       })
     },

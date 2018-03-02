@@ -8,7 +8,7 @@
           {{ contents.heading }}
         </div>
         <div class="body">
-          {{ contents.message }}
+          <div class="contents">{{ contents.message }}</div>
           <div class="field is-grouped" v-show="!contents.buttonLess">
             <p class="control">
               <a class="button is-primary" @click="onConfirm" :class="{ 'is-loading': contents.loading }">
@@ -81,6 +81,8 @@ export default {
 </script>
 
 <style lang="scss">
-
+  .contents {
+    margin-bottom: 1em;
+  }
 
 </style>
