@@ -1,5 +1,6 @@
 {
   "projects": {
-    "tapped": "resorts-tapped-admin"
+    "tapped": "resorts-tapped-admin",
+    "default": "beer-93ee7"
   }
 }
