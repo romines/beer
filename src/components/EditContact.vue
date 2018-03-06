@@ -3,7 +3,7 @@
 
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Name</label>
+        <label class="label">Name - X: {{ xOffset }}, Y: {{ yOffset }}</label>
       </div>
       <div class="control has-icons-left">
         <input
@@ -61,6 +61,21 @@
       </div>
     </div>
 
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Map Coordinates</label>
+      </div>
+      <div class="control">
+
+        <viewer :options="viewerOptions.options" :images="viewerOptions.images"
+                @inited="inited"
+                class="viewer" ref="viewer">
+          <img v-for="src in viewerOptions.images" :src="src" :key="src">
+        </viewer>
+      </div>
+    </div>
+
+
     <div class="field is-grouped is-grouped-right">
       <p class="control no-expando">
         <a class="button is-primary" @click="saveContact">
@@ -86,9 +101,16 @@
 </template>
 
 <script>
+// import ImageViewer from './ImageViewer.vue'
+import Viewer from "v-viewer/src/component.vue"
+// import jh_village from '../assets/pixel_grid.png'
+import jh_village from '../assets/jh_village.png'
+let $viewerContainer
+let $tooltip
 
 export default {
   components: {
+    Viewer
   },
   props: {
     contact: {
@@ -103,12 +125,20 @@ export default {
   },
   data () {
     return {
+      xOffset: 0,
+      yOffset: 0,
       localState: {
-        contact: {
-          // name: '',
-          // number: '',
-          // url: '',
-          // mailto: '',
+        contact: {}
+      },
+      viewerOptions: {
+        images: [jh_village],
+        options: {
+          rotatable: false,
+          movable: false,
+          navbar: false,
+          loop: true,
+          shown: this.initializeMapClickWidget,
+          hidden () { $('body').find('.map-pin').remove() }
         }
       }
     }
@@ -124,6 +154,52 @@ export default {
     this.initializeContact()
   },
   methods: {
+    getZoomLevel ($tooltip) {
+      const text = $tooltip.text()
+      if (text === '') return 1
+      return parseInt(text.substring(0, text.length - 1)) / 100
+    },
+    initializeMapClickWidget () {
+
+      const addMapClickHandler = () => {
+        $('body').off().on('click', 'img.viewer-transition', e => {
+          // const img = $(e.target)[0]
+          // const pixelHeight = img.naturalHeight
+          // const pixelWidth = img.naturalWidth
+          const zoomLevel = this.getZoomLevel($tooltip)
+          this.xOffset = Math.round(e.offsetX / zoomLevel)
+          this.yOffset = Math.round(e.offsetY / zoomLevel)
+        })
+
+        $viewerContainer.off().on('click', '.viewer-reset', () => {
+          $tooltip.text('100%')
+        })
+
+      }
+
+      const renderPin = () => {
+
+        const $image = $viewerContainer.find('img.viewer-transition')
+        const $body = $('body')
+        const styles = $image.attr('style').split(';')
+        const justTheNumber = str => str.substring(str.lastIndexOf(" ")+1, str.length - 2)
+        const xMargin = parseFloat(styles.filter(str => str.indexOf('margin-left') > -1).map(justTheNumber)[0])
+        const yMargin = parseFloat(styles.filter(str => str.indexOf('margin-top') > -1).map(justTheNumber)[0])
+
+        setTimeout(() => {
+          $body.append(`<span class="map-pin" style="top: ${yMargin}px; left: ${xMargin}px;"><i class="fas fa-map-pin" /></span>`)
+        }, 600);
+      }
+
+      $viewerContainer = $('body').find('.viewer-container')
+      $tooltip = $viewerContainer.find('.viewer-tooltip')
+      addMapClickHandler()
+      renderPin()
+
+    },
+    inited (viewer) {
+      this.$viewer = viewer;
+    },
     initializeContact () {
       this.localState.contact = Object.assign({}, this.contact)
     },
@@ -165,7 +241,22 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
+  div.control {
+    max-width: 480px;
+  }
+  .map-pin {
+    color: red;
+    position: fixed;
+    display: none;
+    z-index: 2016;
+  }
+  .viewer-open .map-pin {
+    display: inline-block;
+    .svg-inline--fa {
+      transform: translate(-50%, -100%);
+    }
+  }
   .edit-contact {
     padding-top: .6em;
   }
