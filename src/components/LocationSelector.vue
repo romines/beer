@@ -10,7 +10,19 @@
 
         <viewer :options="viewerOptions" :images="images"
                 class="viewer" ref="viewer">
-          <img v-for="src in images" :src="src" :key="src">
+          <div
+            v-for="image in images"
+            class="thumb-container"
+            :key="image.path">
+
+            <span class="inner-container" :class="selectedMap === image.fileName ? 'selected' : ''">
+              <span class="icon is-small remove">
+                <i class="fas fa-times-circle" />
+              </span>
+              <img :src="image.path">
+            </span>
+
+          </div>
         </viewer>
       </div>
     </div>
@@ -30,6 +42,9 @@ export default {
     coordinateString: {
       type: String
     },
+    selectedMap: {
+      type: String
+    }
   },
   data () {
     return {
@@ -42,11 +57,12 @@ export default {
       zoomLevel: 1,
       viewerOptions: {
         rotatable: false,
-        movable: false,
+        movable: true,
         navbar: false,
         loop: true,
         viewed: this.initializeMapClickability,
         zoomed: this.resetMap,
+        moved: this.resetMap
       }
     }
   },
@@ -89,13 +105,32 @@ export default {
 
     initializeMapClickability () {
 
+      const bodyEl = document.querySelector('body')
+
       const addMapEventHandlers = () => {
 
         // pin drop click
         this.imageEl.addEventListener('click', e => {
+          if (bodyEl.classList.contains('viewer-drag')) return
           e.stopPropagation()
+
           this.xCoordinate = Math.round(e.offsetX / this.zoomLevel)
           this.yCoordinate = Math.round(e.offsetY / this.zoomLevel)
+          this.$emit('coordinateClick', {
+            x: this.xCoordinate,
+            y: this.yCoordinate,
+            mapId: this.imageEl.getAttribute('alt')
+          })
+
+        })
+
+        // shift key is down
+        window.addEventListener('keydown', e => {
+          if (!e.shiftKey) return
+          bodyEl.classList.add('viewer-drag')
+        })
+        window.addEventListener('keyup', e => {
+          bodyEl.classList.remove('viewer-drag')
         })
 
         // close map click(s)
@@ -107,7 +142,10 @@ export default {
         document.querySelectorAll('.viewer-toolbar li').forEach( el => el.addEventListener('click', this.resetMap) )
 
         // window resize
-        window.addEventListener('resize', this.resetMap);
+        window.addEventListener('resize', () => {
+          console.log('Resize event handler!!!');
+          this.resetMap()
+        });
       }
 
       this.imageEl = document.querySelector('img.viewer-transition')
@@ -133,6 +171,57 @@ export default {
   div.control {
     max-width: 480px;
   }
+  .viewer {
+    // overflow-x: auto;
+    // white-space: nowrap;
+    display: flex;
+
+    .thumb-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30%;
+      &:not(:first-child) { margin-left: .6em; }
+
+      .inner-container {
+
+        position: relative;
+
+        &:not(.selected):not(:hover) {
+          filter: grayscale(50%);
+          &:after {
+            content: " ";
+            z-index: 10;
+            display: inline-block;
+            position: absolute;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+          }
+        }
+
+        .icon.remove {
+          position: absolute;
+          z-index: 10;
+          top: -6px;
+          left: -6px;
+          &:hover {
+            color: red;
+          }
+        }
+        &:not(.selected) { .icon.remove { display: none; }}
+
+      }
+
+      img {
+        filter: opacity(85%);
+        width: 100%;
+      }
+
+    }
+  }
   .map-pin {
     color: red;
     position: fixed;
@@ -141,12 +230,12 @@ export default {
   }
   .viewer-toolbar > ul > li {
     display: none;
-    &.viewer-zoom-in { display: inline; }
-    &.viewer-zoom-out { display: inline; }
-    &.viewer-zoom-one-to-one { display: inline; }
-    &.viewer-reset { display: inline; }
-    &.viewer-prev { display: inline; }
-    &.viewer-next { display: inline; }
+    &.viewer-zoom-in          { display: inline; }
+    &.viewer-zoom-out         { display: inline; }
+    &.viewer-zoom-one-to-one  { display: inline; }
+    &.viewer-reset            { display: inline; }
+    &.viewer-prev             { display: inline; }
+    &.viewer-next             { display: inline; }
 
   }
   .viewer-open .map-pin {
@@ -155,4 +244,8 @@ export default {
       transform: translate(-50%, -100%);
     }
   }
+  body:not(.viewer-drag) .viewer-move {
+    cursor: default;
+  }
+
 </style>

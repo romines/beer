@@ -61,7 +61,12 @@
       </div>
     </div>
 
-    <location-selector v-if="localState.contact.rect" :coordinate-string="localState.contact.rect" :images="images" />
+    <location-selector
+      v-if="localState.contact.rect"
+      :coordinate-string="localState.contact.rect"
+      :images="images"
+      :selected-map="localState.contact.mapId"
+      @coordinateClick="onCoordinateClick" />
 
     <div class="field is-grouped is-grouped-right">
       <p class="control no-expando">
@@ -89,7 +94,7 @@
 
 <script>
 import LocationSelector from './LocationSelector.vue'
-// import jh_village from '../assets/pixel_grid.png'
+import pixel_grid from '../assets/pixel_grid.png'
 import jh_village from '../assets/jh_village.png'
 
 export default {
@@ -112,7 +117,15 @@ export default {
       localState: {
         contact: {}
       },
-      images: [jh_village],
+      images: [
+        {
+          fileName: 'jh_village.png',
+          path: jh_village
+        },{
+          fileName: 'pixel_grid.png',
+          path: pixel_grid
+        }
+      ],
     }
   },
 
@@ -127,7 +140,7 @@ export default {
   },
   methods: {
     initializeContact () {
-      this.localState.contact = Object.assign({}, this.contact)
+      this.localState.contact = Object.assign({ mapId: '' }, this.contact)
     },
     saveContact () {
       this.$store.dispatch('saveContact', {
@@ -162,6 +175,11 @@ export default {
         onConfirm
       })
 
+    },
+
+    onCoordinateClick ({ x, y, mapId }) {
+      this.localState.contact.rect = `{{${x},${y}}}${this.contact.rect.split('}')[1]}}}`
+      this.localState.contact.mapId = mapId
     }
   }
 }
