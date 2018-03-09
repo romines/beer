@@ -22,6 +22,25 @@
     <!-- App frame -->
   </div>
 
+  <!-- Polyfills -->
+  <script>
+    // node.matches
+    if (!Element.prototype.matches) {
+        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+    }
+    // node.closest
+    if (!Element.prototype.closest)
+    Element.prototype.closest = function(s) {
+        var el = this;
+        if (!document.documentElement.contains(el)) return null;
+        do {
+            if (el.matches(s)) return el;
+            el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+        return null;
+    };
+  </script>
+
   <script src="/dist/js/vendor/modernizr-3.5.0.min.js"></script>
   <script src="/dist/build.js"></script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>

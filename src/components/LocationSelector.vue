@@ -6,17 +6,18 @@
       <div class="field-label is-normal">
         <label class="label">Map Coordinates</label>
       </div>
+
       <div class="control">
 
-        <viewer :options="viewerOptions" :images="images"
+        <viewer :options="viewerOptions" :images="images" @inited="initializeViewer"
                 class="viewer" ref="viewer">
           <div
-            v-for="image in images"
+            v-for="(image, index) in images"
             class="thumb-container"
             :key="image.path">
 
-            <span class="inner-container" :class="selectedMap === image.fileName ? 'selected' : ''">
-              <span class="icon is-small remove">
+            <span class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
+              <span class="icon is-small remove" @click="$emit('resetMapCoordinates')">
                 <i class="fas fa-times-circle" />
               </span>
               <img :src="image.path">
@@ -42,14 +43,14 @@ export default {
     coordinateString: {
       type: String
     },
-    selectedMap: {
-      type: String
+    mapId: {
+      type: Number
     }
   },
   data () {
     return {
-      showPin: false,
-      imageEl: document.createElement('img'),
+      hidePin: true,
+      viewingMapIndex: -1,
       xMargin: 0,
       yMargin: 0,
       xCoordinate: 0,
@@ -60,9 +61,15 @@ export default {
         movable: true,
         navbar: false,
         loop: true,
-        viewed: this.initializeMapClickability,
-        zoomed: this.resetMap,
-        moved: this.resetMap
+        ready: this.initializeMapUI,
+        viewed: this.onMapViewed,
+        zoomed: this.resetMapUI,
+        moved: this.resetMapUI
+      },
+      viewerDOM: {
+        bodyEl: document.querySelector('body'),
+        currentImage: document.createElement('img'),
+        saveCancelButtons: document.createDocumentFragment().childNodes
       }
     }
   },
@@ -72,46 +79,82 @@ export default {
     },
     yPinLocation () {
       return this.yMargin + this.yCoordinate * this.zoomLevel
+    },
+    showPin () {
+      return (this.xCoordinate || this.yCoordinate) && !this.hidePin
     }
   },
 
   watch: {
-    // re-initialize localState if coordinateString prop changes
-    coordinateString () {
-      this.initializeCoordinates()
+    // re-initialize localState when new values come down from above
+    coordinateString: {
+      immediate: true,
+      handler () {
+        this.initializeCoordinates()
+        this.toggleButtonState()
+      },
+    },
+    mapId: {
+      immediate: true,
+      handler () {
+        this.initializeMapId()
+      }
     }
   },
-  created () {
-    this.initializeCoordinates()
-  },
   methods: {
+    initializeViewer (viewer) {
+      this.$viewer = viewer
+    },
     initializeCoordinates () {
       const str = this.coordinateString.split('}')[0]
-      this.xCoordinate = str.substring(2, str.indexOf(','))
-      this.yCoordinate = str.substring(str.indexOf(',') + 1, str.length)
+      this.xCoordinate = parseInt(str.substring(2, str.indexOf(',')))
+      this.yCoordinate = parseInt(str.substring(str.indexOf(',') + 1, str.length))
+    },
+    initializeMapId () {
+      this.viewingMapIndex = this.mapId
     },
 
-    setZoomLevel () {
-      this.zoomLevel = this.imageEl.scrollWidth / this.imageEl.naturalWidth
+    getZoomLevel () {
+      this.zoomLevel = this.viewerDOM.currentImage.scrollWidth / this.viewerDOM.currentImage.naturalWidth
     },
 
-    setMarginOffset () {
+    getMarginOffset () {
       const justTheNumber = str => str.substring(str.lastIndexOf(" ")+1, str.length - 2)
-      const styles = this.imageEl.getAttribute('style').split(';')
+      const styles = this.viewerDOM.currentImage.getAttribute('style').split(';')
       this.xMargin = parseFloat(styles.filter(str => str.indexOf('margin-left') > -1).map(justTheNumber)[0])
       this.yMargin = parseFloat(styles.filter(str => str.indexOf('margin-top') > -1).map(justTheNumber)[0])
     },
 
+    onMapViewed ({detail}) {
+      this.viewingMapIndex = detail.index
+      this.viewerDOM.currentImage = document.querySelector(`[alt="${detail.image.alt}"]`)
+      this.resetMapUI()
+    },
 
-    initializeMapClickability () {
 
-      const bodyEl = document.querySelector('body')
+    initializeMapUI () {
+
+      const insertSaveCancelButtons = () => {
+        const markupString = `
+          <li class="accept persistence" title="Accept placement">
+            <span><i class="fas fa-check"></i></span>
+          </li>
+          <li class="clear persistence" title="Clear pin">
+            <span><i class="fas fa-times"></i></span>
+          </li>
+        `
+        const controls = document.querySelector('.viewer-toolbar ul')
+        controls.insertBefore(document.createRange().createContextualFragment(markupString), controls.firstElementChild)
+        this.viewerDOM.saveCancelButtons = document.querySelectorAll('.persistence')
+      }
 
       const addMapEventHandlers = () => {
 
         // pin drop click
-        this.imageEl.addEventListener('click', e => {
-          if (bodyEl.classList.contains('viewer-drag')) return
+        document.body.addEventListener('click', (e) => {
+
+          if (!e.target.matches('img.viewer-transition')) return
+          if (this.viewerDOM.bodyEl.classList.contains('viewer-drag')) return
           e.stopPropagation()
 
           this.xCoordinate = Math.round(e.offsetX / this.zoomLevel)
@@ -119,48 +162,77 @@ export default {
           this.$emit('coordinateClick', {
             x: this.xCoordinate,
             y: this.yCoordinate,
-            mapId: this.imageEl.getAttribute('alt')
+            mapIndex: this.viewingMapIndex
           })
+          this.toggleButtonState()
 
         })
+
+        // save/cancel click
+        const handleSaveCancel = (e) => {
+          if (e.target.closest('.persistence').classList.contains('inactive')) return
+          if (e.target.closest('.persistence').classList.contains('accept')) {
+            this.hidePin = true
+            this.$viewer.hide()
+          } else {
+            this.$emit('coordinateClick', { x: 0, y: 0, mapIndex: this.viewingMapIndex })
+          }
+        }
+        this.viewerDOM.saveCancelButtons.forEach(el => el.addEventListener('click', handleSaveCancel))
 
         // shift key is down
         window.addEventListener('keydown', e => {
           if (!e.shiftKey) return
-          bodyEl.classList.add('viewer-drag')
+          this.viewerDOM.bodyEl.classList.add('viewer-drag')
         })
         window.addEventListener('keyup', e => {
-          bodyEl.classList.remove('viewer-drag')
+          this.viewerDOM.bodyEl.classList.remove('viewer-drag')
         })
 
         // close map click(s)
-        const mask = this.imageEl.parentElement
-        mask.addEventListener('click', () => { this.showPin = false })
-        document.querySelector('.viewer-close').addEventListener('click', () => { this.showPin = false })
+        const hidePin = (e) => {
+          if (e.target.nodeName === 'IMG') return
+          this.hidePin = true
+        }
+        document.querySelector('.viewer-canvas').addEventListener('click', hidePin)
+        document.querySelector('.viewer-close').addEventListener('click', hidePin)
 
-        // toolbar click
-        document.querySelectorAll('.viewer-toolbar li').forEach( el => el.addEventListener('click', this.resetMap) )
+        // toolbar button click
+        document.querySelectorAll('.viewer-zoom-in, .viewer-zoom-out, .viewer-one-to-one, .viewer-reset')
+          .forEach( el => el.addEventListener('click', this.resetMapUI))
 
         // window resize
         window.addEventListener('resize', () => {
-          console.log('Resize event handler!!!');
-          this.resetMap()
+          this.resetMapUI()
         });
+
       }
 
-      this.imageEl = document.querySelector('img.viewer-transition')
-      this.resetMap()
+      insertSaveCancelButtons()
       addMapEventHandlers()
 
     },
 
-    resetMap () {
-      this.showPin = false
+    resetMapUI () {
+      this.hidePin = true
       setTimeout(() => {
-        this.setZoomLevel()
-        this.setMarginOffset()
-        this.showPin = true;
+        this.getZoomLevel()
+        this.getMarginOffset()
+        this.hidePin = false;
       }, 600)
+      this.toggleButtonState()
+    },
+
+    toggleButtonState () {
+      if ((this.xCoordinate || this.yCoordinate) && (this.mapId === this.viewingMapIndex)) {
+        this.viewerDOM.saveCancelButtons.forEach(el => el.classList.remove('inactive'))
+      } else {
+        this.viewerDOM.saveCancelButtons.forEach(el => el.classList.add('inactive'))
+      }
+    },
+
+    validMapCoordinatesExist (index) {
+      return (this.mapId === index) && (this.xCoordinate || this.yCoordinate)
     }
 
   }
@@ -168,6 +240,7 @@ export default {
 </script>
 
 <style lang="scss">
+
   div.control {
     max-width: 480px;
   }
@@ -187,9 +260,10 @@ export default {
 
         position: relative;
 
-        &:not(.selected):not(:hover) {
+        &:not(.selected) {
           filter: grayscale(50%);
           &:after {
+            pointer-events: none;
             content: " ";
             z-index: 10;
             display: inline-block;
@@ -198,7 +272,7 @@ export default {
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.32);
           }
         }
 
@@ -222,21 +296,38 @@ export default {
 
     }
   }
+
   .map-pin {
     color: red;
     position: fixed;
     display: none;
     z-index: 2016;
   }
-  .viewer-toolbar > ul > li {
-    display: none;
-    &.viewer-zoom-in          { display: inline; }
-    &.viewer-zoom-out         { display: inline; }
-    &.viewer-zoom-one-to-one  { display: inline; }
-    &.viewer-reset            { display: inline; }
-    &.viewer-prev             { display: inline; }
-    &.viewer-next             { display: inline; }
+  .viewer-toolbar > ul {
+    padding: 10px 0;
+    overflow: visible;
+    & > li {
+      &.viewer-play               { display: none; }
+      &[class^="viewer-flip-"]    { display: none; }
+      &.inactive {
+        opacity: .5;
+        filter: grayscale(100%);
+      }
+      &.accept, &.clear {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(-8px);
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        line-height: 16px;
+        color: green;
+      }
+      &.accept { color: green; }
+      &.clear { color: red; }
 
+    }
   }
   .viewer-open .map-pin {
     display: inline-block;

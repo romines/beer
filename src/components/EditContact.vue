@@ -65,8 +65,9 @@
       v-if="localState.contact.rect"
       :coordinate-string="localState.contact.rect"
       :images="images"
-      :selected-map="localState.contact.mapId"
-      @coordinateClick="onCoordinateClick" />
+      :map-id="localState.contact.mapId"
+      @coordinateClick="onCoordinateClick"
+      @resetMapCoordinates="resetMapCoordinates" />
 
     <div class="field is-grouped is-grouped-right">
       <p class="control no-expando">
@@ -96,6 +97,10 @@
 import LocationSelector from './LocationSelector.vue'
 import pixel_grid from '../assets/pixel_grid.png'
 import jh_village from '../assets/jh_village.png'
+const mapDefaults = {
+  rect :  '{{0,0}{80,80}}',
+  mapId : 0
+}
 
 export default {
   components: {
@@ -140,7 +145,7 @@ export default {
   },
   methods: {
     initializeContact () {
-      this.localState.contact = Object.assign({ mapId: '' }, this.contact)
+      this.localState.contact = Object.assign({...mapDefaults}, this.contact)
     },
     saveContact () {
       this.$store.dispatch('saveContact', {
@@ -177,9 +182,13 @@ export default {
 
     },
 
-    onCoordinateClick ({ x, y, mapId }) {
-      this.localState.contact.rect = `{{${x},${y}}}${this.contact.rect.split('}')[1]}}}`
-      this.localState.contact.mapId = mapId
+    onCoordinateClick ({ x, y, mapIndex }) {
+      this.localState.contact.rect = `{{${x},${y}}}${this.localState.contact.rect.split('}')[1]}}}`
+      this.localState.contact.mapId = mapIndex
+    },
+
+    resetMapCoordinates () {
+      this.localState.contact = {...this.localState.contact, ...mapDefaults}
     }
   }
 }

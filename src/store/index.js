@@ -4,6 +4,8 @@ import 'babel-polyfill'
 import firebase from 'firebase'
 import 'firebase/firestore'
 import jHContacts from '../assets/JH_contacts.json'
+import rLContacts from '../assets/RL_contacts.json'
+console.log(rLContacts);
 // import contactSpec from '../assets/ContactSpec_rev_2-28.json'
 // console.log({contactSpec, jHContacts});
 

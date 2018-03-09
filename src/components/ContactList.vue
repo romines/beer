@@ -90,7 +90,6 @@ export default {
       return index === this.editingContactAtIndex;
     },
     cancelEditsHandler () {
-      console.log('*cancelEdits* was emitted . . .');
       this.editingContactAtIndex = -1
     }
   }
