@@ -69,16 +69,4 @@ export default {
 </script>
 
 <style scoped>
-  /* .contact-group, .contact {
-    padding: .6em;
-  } */
-  .main {
-    max-width: 772px;
-    margin: 0 auto;
-    padding: 0 .85rem;
-  }
-  .title {
-    display: flex;
-    justify-content: space-around;
-  }
 </style>

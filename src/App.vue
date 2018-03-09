@@ -6,6 +6,10 @@
         <router-link to="/">home</router-link>
         <router-link to="json">JSON</router-link>
         <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
+        <span
+          @click="$store.dispatch('logOut')"
+          class="icon is-small"
+          v-if="Object.keys($store.state.user).length"><i class="fas fa-power-off" /></span>&nbsp;
       </span>
     </div>
 

@@ -1,31 +1,31 @@
-import Vue from 'vue'
-import Router from 'vue-router'
 import Contacts from '../components/Contacts'
+import Login from '../components/Login'
+import SignUp from '../components/SignUp'
 import ExportJson from '../components/ExportJson'
-import store from '../store'
 
-Vue.use(Router)
+const routes = [
+  {
+    path: '/',
+    name: 'contacts',
+    component: Contacts
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: Login
+  },
+  {
+    path: '/sign-up',
+    name: 'sign-up',
+    component: SignUp
+  },
+  // TODO: make '/' an alias of '/contacts'
+  // { path: '/contacts', component: Contacts },
+  {
+    path: '/json',
+    component: ExportJson
+  },
+]
 
-const router = new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'contacts',
-      component: Contacts
-    },
-    // TODO: make '/' an alias of '/contacts'
-    // { path: '/contacts', component: Contacts },
-    {
-      path: '/json',
-      component: ExportJson
-    },
-  ]
-})
 
-router.beforeEach((to, from, next) => {
-
-  store.dispatch('listen').then(() => next())
-
-})
-
-export default router
+export default routes
