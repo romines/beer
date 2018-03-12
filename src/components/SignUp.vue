@@ -13,7 +13,7 @@
       <div class="card">
         <header class="card-header">
           <p class="card-header-title">
-            Sign Up
+            Sign Up | ResortId: {{ resortId }}
           </p>
         </header>
         <div class="card-content">
@@ -73,6 +73,11 @@ import Firebase from 'firebase/app'
 export default {
   components: {
   },
+  props: {
+    encodedResortId: {
+      type: String
+    }
+  },
   data () {
     return {
       email: '',
@@ -80,20 +85,21 @@ export default {
     }
   },
   computed: {
-
+    resortId () {
+      console.log(this.encodedResortId);
+      return window.atob(this.encodedResortId)
+    }
 
   },
   created () {
   },
   methods: {
     signUp () {
-      Firebase.auth()
-        .createUserWithEmailAndPassword(this.email, this.password)
-        .then( user => {
-          this.$store.commit('SET_USER', user)
-          this.$router.replace('/')
-        },
-        error => { alert(error.message) })
+      this.$store.dispatch('createUser', {
+        email: this.email,
+        password: this.password,
+        resortId: this.resortId
+      }).then(() => { this.$router.replace('/')})
     }
   }
 }

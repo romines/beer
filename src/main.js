@@ -19,30 +19,26 @@ Vue.config.productionTip = false
 const router = new VueRouter({ routes })
 
 router.beforeEach((to, from, next) => {
-  store.dispatch('listen', db).then(() => next())
 
-  // if (to.name === 'login') return next()
+  store.commit('SET_FB_REFS', db)
 
-  // if (!Firebase.auth().currentUser) {
-  //   return next('/login')
-  // } else {
-  //   console.log({currentUser: Firebase.auth().currentUser})
-  //   store.dispatch('listen', db).then(() => next())
-  // }
+  if (to.name === 'login' || to.name === 'sign-up') return next()
+
+  if (!Firebase.auth().currentUser) {
+    return next('/login')
+  } else {
+    store.dispatch('listen', Firebase.auth().currentUser).then(() => next())
+  }
 
 })
 
-Firebase.auth().onAuthStateChanged(function (user) {
+Firebase.auth().onAuthStateChanged(() => {
 
   new Vue({
     el: '#app',
     router,
     store,
-    components: { App },
-    created () {
-      user && store.commit('SET_USER', user)
-    },
-    template: '<App/>',
-  });
+    render: h => h(App),
+  })
 
 })

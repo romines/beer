@@ -19,7 +19,7 @@
         <div class="card-content">
           <div class="field">
             <p class="control has-icons-left has-icons-right">
-              <input class="input" type="email" placeholder="Email">
+              <input class="input" v-model="email" type="email" placeholder="Email">
               <span class="icon is-small is-left">
                 <i class="fas fa-envelope" />
               </span>
@@ -30,7 +30,7 @@
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" type="password" placeholder="Password">
+              <input class="input" v-model="password" type="password" placeholder="Password">
               <span class="icon is-small is-left">
                 <i class="fas fa-lock" />
               </span>
@@ -38,7 +38,7 @@
           </div>
           <div class="field">
             <p class="control">
-              <button class="button is-success">
+              <button class="button is-success" @click="logIn">
                 Login
               </button>
             </p>
@@ -47,7 +47,7 @@
         <footer class="card-footer">
           <p class="card-footer-item">
             <span>
-              <router-link to="/sign-up">Sign up</router-link> instead (TEMP!!!!)
+              <router-link to="/sign-up/amFja3Nvbl9ob2xl">Sign up</router-link> instead (TEMP!!!!)
             </span>
           </p>
         </footer>
@@ -66,8 +66,8 @@ export default {
   },
   data () {
     return {
-      email: '',
-      password: '',
+      email: 'adam.romines@gmail.com',
+      password: 'password',
     }
   },
   computed: {
@@ -80,8 +80,9 @@ export default {
     logIn () {
       Firebase.auth()
         .signInWithEmailAndPassword(this.email, this.password)
-        .then( user => { this.$router.replace("dashboard"); },
-        error => { alert(error.message); });
+        .then( () => { this.$router.replace('/'); },
+          error => { alert(error.message); }
+        );
     }
   }
 }

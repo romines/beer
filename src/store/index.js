@@ -29,18 +29,12 @@ const state = {
   }
 }
 
-/*
-  TODO: don't hardcode
-*/
-const myId = 'jackson_hole'
-/*
-  . . .
-*/
 
 export default new Vuex.Store({
   state,
   mutations: {
     'SET_FB_REFS' (state, db) {
+      console.log('setting FB_REFS . . .');
       state.db = db
       state.resortsRef = db.collection('resorts')
     },
@@ -60,51 +54,69 @@ export default new Vuex.Store({
   },
   actions: {
 
-    listen ({ rootState, commit }, db) {
-      commit('SET_FB_REFS', db)
-      return rootState.resortsRef.doc(myId)
-        .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
+    listen ({ rootState, commit }, user) {
+      console.log('listen dispatched . . .');
+      rootState.db.collection('users').doc(user.uid).get().then(doc => {
+        const userData = doc.data()
+        user.authorizedResortIds = userData.authorizedResortIds
+        commit('SET_USER', user)
+        return rootState.resortsRef.doc(userData.authorizedResortIds[0]) // Note hardcoded to first resortId in list
+          .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
+      })
+
     },
     logOut ({ commit }) {
       Firebase.auth()
       .signOut()
       .then(() => {
         commit('SET_USER', {})
-        this.$router.replace('/sign-in');
       });
     },
-    seed ({ rootState }) {
+    createUser ({ rootState, commit }, { email, password, resortId }) {
+      let firebaseUser
+      return Firebase.auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then( user => {
+          firebaseUser = user
+          firebaseUser.authorizedResortIds = [resortId]
+          return rootState.db.collection('users').doc(user.uid).set({authorizedResortIds: [resortId]})
+      }, error => { alert(error.message) })
+        .then(() => {
+          commit('SET_USER', firebaseUser)
+        })
 
-      rootState.resortsRef.doc(myId).set({name: 'Jackson Hole', contactGroups: jHContacts.contactGroups, keys: jHContacts.keys, resortId: 'jackson_hole'})
     },
+    // seed ({ rootState }) {
+
+    //   rootState.resortsRef.doc('amFja3Nvbl9ob2xl').set({name: 'Jackson Hole', contactGroups: jHContacts.contactGroups, keys: jHContacts.keys, resortId: 'jackson_hole'})
+    // },
     saveNewEmptyGroup ({rootState}, groupName) {
       let groups = rootState.contactGroups.slice()
       groups.push({
         section: groupName,
         list: []
       })
-      return rootState.db.collection('resorts').doc(myId).update({
+      return rootState.db.collection('resorts').doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: groups
       })
     },
     saveContactGroupName ({ rootState }, { groupIndex, updatedName }) {
-
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
-      rootState.resortsRef.doc(myId).update({
+      rootState.resortsRef.doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: groups
       })
     },
-    deleteContactGroup ({rootState}, groupIndex) {
+    deleteContactGroup ({ rootState }, groupIndex) {
 
       let groups = rootState.contactGroups.slice()
       groups.splice(groupIndex, 1)
-      return rootState.resortsRef.doc(myId).update({
+      return rootState.resortsRef.doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: groups
       })
     },
     saveContactGroupList ({ rootState }, { updatedList }) {
-      rootState.resortsRef.doc(myId).update({
+      rootState.resortsRef.doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: updatedList
       })
     },
@@ -117,21 +129,21 @@ export default new Vuex.Store({
         // existing contact
         groups[payload.groupIndex].list[payload.contactIndex] = payload.updatedContact
       }
-      rootState.resortsRef.doc(myId).update({
+      rootState.resortsRef.doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: groups
       })
     },
     deleteContact ({ rootState }, { groupIndex, contactIndex}) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].list.splice(contactIndex, 1)
-      return rootState.resortsRef.doc(myId).update({
+      return rootState.resortsRef.doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: groups
       })
     },
     saveContactList ({ rootState }, payload) {
       let groups = rootState.contactGroups.slice()
       groups[payload.groupIndex].list = payload.updatedList
-      rootState.resortsRef.doc(myId).update({
+      rootState.resortsRef.doc(rootState.user.authorizedResortIds[0]).update({
         contactGroups: groups
       })
     },

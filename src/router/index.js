@@ -15,9 +15,10 @@ const routes = [
     component: Login
   },
   {
-    path: '/sign-up',
+    path: '/sign-up/:encodedResortId',
     name: 'sign-up',
-    component: SignUp
+    component: SignUp,
+    props: true
   },
   // TODO: make '/' an alias of '/contacts'
   // { path: '/contacts', component: Contacts },

@@ -7,7 +7,7 @@
         <router-link to="json">JSON</router-link>
         <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
         <span
-          @click="$store.dispatch('logOut')"
+          @click="logOut"
           class="icon is-small"
           v-if="Object.keys($store.state.user).length"><i class="fas fa-power-off" /></span>&nbsp;
       </span>
@@ -23,7 +23,13 @@
 import Modal from './components/Modal.vue'
 export default {
   name: 'App',
-  components: { Modal }
+  components: { Modal },
+  methods: {
+    logOut () {
+      this.$store.dispatch('logOut')
+      this.$router.replace('/login')
+    }
+  }
 }
 </script>
 
