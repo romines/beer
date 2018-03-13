@@ -18,15 +18,19 @@
         </header>
         <div class="card-content">
           <div class="field">
-            <p class="control has-icons-left has-icons-right">
-              <input class="input" v-model="email" type="email" placeholder="Email">
+            <p class="control has-icons-left">
+              <input class="input"
+                     v-model="email"
+                     type="email"
+                     placeholder="Email"
+                     @blur="emailHasBeenTouched = true"
+                     @focus="emailHasBeenTouched = false">
               <span class="icon is-small is-left">
                 <i class="fas fa-envelope" />
               </span>
-              <span class="icon is-small is-right">
-                <i class="fas fa-check" />
-              </span>
             </p>
+            <p class="help is-danger" v-show="email && emailHasBeenTouched && !validEmail">Email format is invalid</p>
+            <p class="help is-danger" v-show="emailHasBeenTouched && !email">Email is required</p>
           </div>
           <div class="field">
             <p class="control has-icons-left">
@@ -38,15 +42,16 @@
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" type="password" placeholder="Confirm Password">
+              <input class="input" v-model="confirmPassword" type="password" placeholder="Confirm Password">
               <span class="icon is-small is-left">
                 <i class="fas fa-lock" />
               </span>
             </p>
+            <p class="help is-danger" v-show="confirmPassword && !passwordMismatch">Passwords do not match</p>
           </div>
           <div class="field">
             <p class="control">
-              <button class="button is-success" @click="signUp">
+              <button class="button is-success" @click="signUp" :disabled="!isValid">
                 Submit
               </button>
             </p>
@@ -68,8 +73,6 @@
 
 <script>
 
-import Firebase from 'firebase/app'
-
 export default {
   components: {
   },
@@ -82,12 +85,25 @@ export default {
     return {
       email: '',
       password: '',
+      confirmPassword: '',
+      emailHasBeenTouched: false
     }
   },
   computed: {
     resortId () {
-      console.log(this.encodedResortId);
       return window.atob(this.encodedResortId)
+    },
+    isValid () {
+      return this.validEmail && !!this.password && (this.password === this.confirmPassword)
+    },
+    validEmail () {
+      var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return regex.test(this.email)
+    },
+    passwordMismatch () {
+      return this.confirmPassword.split('').every((char, index) => {
+        return char === this.password[index]}
+      )
     }
 
   },
@@ -95,11 +111,15 @@ export default {
   },
   methods: {
     signUp () {
+      this.$store.commit('SET_LOADING_STATE', true)
       this.$store.dispatch('createUser', {
         email: this.email,
         password: this.password,
-        resortId: this.resortId
-      }).then(() => { this.$router.replace('/')})
+        resortId: this.resortId,
+        onSuccess: () => {
+          this.$router.replace('/')
+        }
+      })
     }
   }
 }

@@ -44,13 +44,16 @@
             </p>
           </div>
         </div>
-        <footer class="card-footer">
+        <!-- <footer class="card-footer">
           <p class="card-footer-item">
             <span>
               <router-link to="/sign-up/amFja3Nvbl9ob2xl">Sign up</router-link> instead (TEMP!!!!)
             </span>
           </p>
         </footer>
+
+
+        -->
       </div>
 
     </div>
@@ -78,11 +81,12 @@ export default {
   },
   methods: {
     logIn () {
-      Firebase.auth()
-        .signInWithEmailAndPassword(this.email, this.password)
-        .then( () => { this.$router.replace('/'); },
-          error => { alert(error.message); }
-        );
+      this.$store.commit('SET_LOADING_STATE', true)
+      this.$store.dispatch('logIn', {
+        email: this.email,
+        password: this.password,
+        onSuccess: () => { this.$router.replace('/') }
+      })
     }
   }
 }

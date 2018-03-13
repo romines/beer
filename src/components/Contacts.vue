@@ -53,9 +53,6 @@ export default {
   created () {
   },
   methods: {
-    init () {
-      this.$store.dispatch('seed')
-    },
     createNewGroup () {
       this.$store.dispatch('saveNewEmptyGroup', this.groupNameDraft).then(() => {
         this.newGroupIdentifier = this.groupNameDraft

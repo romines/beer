@@ -8,22 +8,27 @@
         <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
         <span
           @click="logOut"
-          class="icon is-small"
-          v-if="Object.keys($store.state.user).length"><i class="fas fa-power-off" /></span>&nbsp;
+          class="icon is-small log-out"
+          v-if="$store.state.user && $store.state.user.uid"><i class="fas fa-power-off" /></span>&nbsp;
       </span>
     </div>
 
     <modal />
     <!-- end temp -->
-    <router-view/>
+    <loading-spinner v-if="$store.state.loading" />
+    <router-view v-if="!$store.state.loading"/>
   </div>
 </template>
 
 <script>
 import Modal from './components/Modal.vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
 export default {
   name: 'App',
-  components: { Modal },
+  components: {
+    Modal,
+    LoadingSpinner
+  },
   methods: {
     logOut () {
       this.$store.dispatch('logOut')
@@ -37,6 +42,7 @@ export default {
 @import '~bulma/bulma.sass';
 @import '~animate.css/animate.css';
 @import 'sharedStyles.scss';
+@import "~vue-wysiwyg/dist/vueWysiwyg.css";
 
 // global bulma overrides
 .box {
@@ -61,6 +67,9 @@ export default {
     color: blue;
     text-decoration: underline;
     cursor: pointer;
+  }
+  .log-out {
+    vertical-align: middle;
   }
 
 }

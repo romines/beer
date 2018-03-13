@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="modal" :class="{'is-active': localState.show}">
+  <div class="modal" :class="applicableClasses">
     <div class="modal-background" @click="close" />
 
     <div class="modal-content animated" :class="animationClass" @click.stop>
@@ -10,12 +10,12 @@
         <div class="body">
           <div class="contents">{{ contents.message }}</div>
           <div class="field is-grouped" v-show="!contents.buttonLess">
-            <p class="control">
+            <p class="control no-expando confirm">
               <a class="button is-primary" @click="onConfirm" :class="{ 'is-loading': contents.loading }">
                 {{ contents.confirmButtonLabel ? contents.confirmButtonLabel : 'Confirm' }}
               </a>
             </p>
-            <p class="control">
+            <p class="control no-expando cancel">
               <a class="button is-light" @click="onCancel">
                 {{ contents.cancelButtonLabel ? contents.cancelButtonLabel : 'Cancel' }}
               </a>
@@ -48,6 +48,15 @@ export default {
     contents () {
       return this.$store.state.modal.contents
     },
+    applicableClasses () {
+      let stylesObj = {
+        'is-active': this.localState.show
+      }
+      if (this.$store.state.modal.contents.classList.length) {
+        this.$store.state.modal.contents.classList.forEach(className => { stylesObj[className] = true })
+      }
+      return stylesObj
+    }
   },
   watch: {
     show (show) {
@@ -81,8 +90,26 @@ export default {
 </script>
 
 <style lang="scss">
+  @import '../sharedStyles.scss';
+
+  .title {
+    justify-content: flex-start;
+  }
   .contents {
     margin-bottom: 1em;
+  }
+  .error {
+    .confirm {
+      display: none;
+    }
+    .cancel .button {
+      background-color: #776565;
+      color: white;
+      border-radius: 3px;
+    }
+    .title {
+      color: $errorRed;
+    }
   }
 
 </style>
