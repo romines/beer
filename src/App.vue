@@ -47,9 +47,13 @@ export default {
 // global bulma overrides
 .box {
   padding: .85rem;
-  &:not(:last-child) {
+  margin-bottom: .88rem;
+  &.group-header {
     margin-bottom: .88rem;
   }
+}
+.contact-margin-setter:last-child .box {
+  margin-bottom: 0;
 }
 
 // temp

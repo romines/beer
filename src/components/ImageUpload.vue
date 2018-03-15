@@ -3,10 +3,10 @@
 
     <div class="file">
       <label class="file-label">
-        <input class="file-input" type="file" name="resume">
+        <input class="file-input" @change="onFileAdded" type="file" name="resume">
         <span class="file-cta">
           <span class="file-icon">
-            <i class="fas fa-upload"></i>
+            <i class="fas fa-upload"/>
           </span>
           <span class="file-label">
             Choose a file…
@@ -14,34 +14,37 @@
         </span>
       </label>
     </div>
+    <progress class="progress is-info" v-show="uploading" :value="uploadProgress" max="100" />
   </div>
 </template>
 
 <script>
-import Firebase from 'firebase/app'
 
 export default {
-  components: {
-  },
   data () {
     return {
-      email: 'adam.romines@gmail.com',
-      password: 'password',
+      uploading: false,
+      uploadProgress: 0,
     }
   },
-  computed: {
-
-
-  },
-  created () {
-  },
   methods: {
-    logIn () {
-      this.$store.commit('SET_LOADING_STATE', true)
-      this.$store.dispatch('logIn', {
-        email: this.email,
-        password: this.password,
-        onSuccess: () => { this.$router.replace('/') }
+    onFileAdded (e) {
+      this.uploading = true
+      const file = e.target.files[0]
+      const metadata = { contentType: 'image/jpeg' }
+      const fileName = (new Date().getTime()) + '.' + file.name.split('.')[file.name.split('.').length -1]
+      const newImageRef = this.$store.state.storageRef.child(`${this.$store.state.resortId}/images/${fileName}`)
+      const uploadTask = newImageRef.put(file, metadata)
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          this.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        }, (error) => {
+          this.$store.dispatch('showErrorModal', error.message)
+      }, () => {
+        this.uploading = false
+        this.$store.commit('SET_UPLOAD_BUFFER_URL', uploadTask.snapshot.downloadURL)
+        this.$emit('uploadComplete', uploadTask.snapshot.downloadURL)
       })
     }
   }
@@ -49,11 +52,7 @@ export default {
 </script>
 
 <style scoped>
-  /* .contact-group, .contact {
-    padding: .6em;
-  } */
-
-  .field {
-    max-width: 40em;
+  .file-label, .progress {
+    margin-top: .6em;
   }
 </style>

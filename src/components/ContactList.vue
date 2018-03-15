@@ -9,16 +9,16 @@
     <div
       class="contact contact-margin-setter"
       v-for="(contact, index) in myList" :key="contact.name"
-      :class="isOpen ? 'box' : ''">
+      :class="contactOpen(index) ? 'box' : ''">
       <!--
         To increase clickable surface area,
         contact header is .box if contact is closed
-         . . . otherwise whole contact
+         . . . otherwise whole contact is .box
                                                 -->
 
       <div class="contact-header"
-           :class="isOpen ? '' : 'box'"
-           @click.stop="contactOpen(index) ? editingContactAtIndex = -1 : editingContactAtIndex = index">
+           :class="contactOpen(index) ? '' : 'box'"
+           @click.stop="onContactHeaderClick(index)">
         <span class="name">
           <span class="grippy" />
           {{ contact.name }}
@@ -33,11 +33,11 @@
       </div>
 
       <edit-contact
-        v-show="contactOpen(index)"
+        v-if="contactOpen(index)"
         :group-index="groupIndex"
         :contact-index="index"
         :contact="contact"
-        @cancelEdits="cancelEditsHandler"/>
+        @closeContact="closeOpenContact"/>
 
     <!-- end .contact -->
     </div>
@@ -80,6 +80,7 @@ export default {
   },
   watch: {
     isOpen(open) {
+      // close open contact so it is closed next time
       if (!open) this.editingContactAtIndex = -1
     }
   },
@@ -89,9 +90,37 @@ export default {
     contactOpen (index) {
       return index === this.editingContactAtIndex;
     },
-    cancelEditsHandler () {
-      this.editingContactAtIndex = -1
-    }
+    closeOpenContact ({ resetDirtyState, onConfirmDirtyClose }) {
+      const onConfirm = () => {
+        if (this.$store.state.uploadBufferUrl) this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)
+        this.$store.commit('SET_CONTACT_DIRTY_STATE', false)
+        this.editingContactAtIndex = -1
+        onConfirmDirtyClose && onConfirmDirtyClose()
+        this.$store.commit('CLOSE_MODAL')
+      }
+
+      if (this.$store.state.openContactIsDirty && !resetDirtyState) {
+        this.$store.commit('SHOW_MODAL', {
+          heading: 'You have unsaved changes?',
+          confirmButtonLabel: 'Discard Changes',
+          onConfirm
+        })
+      } else {
+        return onConfirm()
+      }
+
+    },
+    onContactHeaderClick (index) {
+      if (this.editingContactAtIndex === -1) {
+        this.editingContactAtIndex = index
+      } else {
+        const closeOptions = {
+          resetDirtyState: false,
+          onConfirmDirtyClose: (this.editingContactAtIndex !== index) ? () => { this.editingContactAtIndex = index } : null
+        }
+        this.closeOpenContact(closeOptions)
+      }
+    },
   }
 }
 </script>

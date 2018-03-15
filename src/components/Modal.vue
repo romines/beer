@@ -52,7 +52,7 @@ export default {
       let stylesObj = {
         'is-active': this.localState.show
       }
-      if (this.$store.state.modal.contents.classList.length) {
+      if (this.$store.state.modal.contents.classList) {
         this.$store.state.modal.contents.classList.forEach(className => { stylesObj[className] = true })
       }
       return stylesObj

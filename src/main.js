@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import Firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import 'firebase/storage'
 
 import config from './firebaseConfig.js'
 import routes from './router'
@@ -12,7 +13,6 @@ import App from './App.vue'
 import wysiwyg from "vue-wysiwyg"
 
 Firebase.initializeApp(config)
-const db = Firebase.firestore()
 
 Vue.use(VueRouter)
 Vue.use(wysiwyg, { hideModules: { 'code': true, 'image': true, 'table': true  }})
@@ -22,7 +22,7 @@ const router = new VueRouter({ routes })
 
 router.beforeEach((to, from, next) => {
 
-  store.commit('SET_FB_REFS', db)
+  store.commit('SET_FB_REFS', Firebase)
 
   if (to.name === 'login' || to.name === 'sign-up') {
     store.commit('SET_LOADING_STATE', false)

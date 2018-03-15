@@ -1,6 +1,5 @@
 <template>
   <div class="edit-contact">
-
     <div class="field is-horizontal">
       <div class="field-label is-normal">
         <label class="label">Name</label>
@@ -147,14 +146,32 @@
       <wysiwyg v-model="localState.contact.z_detail" />
     </div>
 
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Image</label>
+      </div>
+      <div class="manage-image control">
+
+        <div class="image-container" v-show="!!localState.contact.imageUrl">
+          <span class="icon is-small remove" @click="removeImage">
+            <i class="fas fa-times-circle" />
+          </span>
+          <img :src="localState.contact.imageUrl">
+        </div>
+
+        <image-upload @uploadComplete="onImageUpload" v-show="!localState.contact.imageUrl" />
+
+      </div>
+    </div>
+
     <div class="field is-grouped is-grouped-right">
       <p class="control no-expando">
-        <a class="button is-primary" @click="saveContact">
+        <a class="button is-primary" @click="saveContact" :disabled="!contactIsDirty">
           Save
         </a>
       </p>
       <p class="control no-expando">
-        <a class="button is-light" @click="initializeContact(); $emit('cancelEdits')">
+        <a class="button is-light" @click="initializeContact(); $emit('closeContact', { resetDirtyState: false })">
           Cancel
         </a>
       </p>
@@ -173,13 +190,14 @@
 
 <script>
 import LocationSelector from './LocationSelector.vue'
+import ImageUpload from './ImageUpload.vue'
 import pixel_grid from '../assets/pixel_grid.png'
 import jh_village from '../assets/jh_village.png'
 
 // fields that might be missing should be initialized with default values to ensure reactivity
 const contactDefaults = {
   rect :  '{{0,0}{80,80}}',
-  mapId : 0,
+  mapId : -1,
   tags :  {
     summer: true,
     winter: true,
@@ -188,12 +206,14 @@ const contactDefaults = {
   menu: '',
   sms: '',
   z_reservations: '',
-  z_detail: ''
+  z_detail: '',
+  imageUrl: ''
 }
 
 export default {
   components: {
-    LocationSelector
+    LocationSelector,
+    ImageUpload
   },
   props: {
     contact: {
@@ -211,7 +231,8 @@ export default {
       localState: {
         contact: {}
       },
-      images: [
+      contactAtInitialization: {},
+      images: [ // TEMP. won't be hardcoded once I have images for all resorts
         {
           fileName: 'jh_village.png',
           path: jh_village
@@ -220,6 +241,13 @@ export default {
           path: pixel_grid
         }
       ],
+      pendingFileDeletion: ''
+    }
+  },
+
+  computed: {
+    contactIsDirty () {
+      return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
     }
   },
 
@@ -227,6 +255,9 @@ export default {
     // re-initialize localState when 'contact' prop changes
     contact () {
       this.initializeContact()
+    },
+    contactIsDirty (val) {
+      this.$store.commit('SET_CONTACT_DIRTY_STATE', val)
     }
   },
   created () {
@@ -234,20 +265,25 @@ export default {
   },
   methods: {
     initializeContact () {
-      this.localState.contact = Object.assign({...contactDefaults}, this.contact)
+      console.log('initializing contact . . .');
+      const defaults = JSON.parse(JSON.stringify(contactDefaults))
+      this.localState.contact = Object.assign(defaults, this.contact)
+      this.contactAtInitialization = JSON.parse(JSON.stringify(this.localState.contact))
     },
     saveContact () {
       this.$store.dispatch('saveContact', {
         groupIndex: this.groupIndex,
         contactIndex: this.contactIndex,
         updatedContact: this.localState.contact
+      }).then(() => {
+        if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
+        this.$emit('closeContact', { resetDirtyState: true })
       })
-      this.$emit('cancelEdits')
     },
     deleteContact () {
 
       const onConfirm = () => {
-        this.$emit('cancelEdits') // why won't this work in the .then cb below??
+        this.$emit('closeContact', { resetDirtyState: true }) // why won't this work in the .then cb below??
         this.$store.commit('SHOW_MODAL', { loading: true, heading: 'Are you sure you want to delete this contact?' })
         this.$store.dispatch('deleteContact', {
           groupIndex: this.groupIndex,
@@ -271,13 +307,24 @@ export default {
 
     },
 
+    onImageUpload (url) {
+      if (this.localState.contact.imageUrl) this.$store.dispatch('destroyImageFile', this.localState.contact.imageUrl)
+      this.localState.contact.imageUrl = url
+    },
+
+    removeImage () {
+      this.pendingFileDeletion = this.localState.contact.imageUrl
+      this.localState.contact.imageUrl = ''
+    },
+
     onCoordinateClick ({ x, y, mapIndex }) {
       this.localState.contact.rect = `{{${x},${y}}}${this.localState.contact.rect.split('}')[1]}}}`
       this.localState.contact.mapId = mapIndex
     },
 
     resetMapCoordinates () {
-      this.localState.contact = {...this.localState.contact, ...mapDefaults}
+      this.localState.contact.rect =  '{{0,0}{80,80}}'
+      this.localState.contact.mapId =  -1
     }
   }
 }
@@ -301,12 +348,24 @@ export default {
       margin-top: .3em;
       margin-right: .3em;
       &:not(.selected) {
-        opacity: .45;
+        opacity: .36;
       }
     }
   }
-  .time-active-tags, .toggle-container {
+  .time-active-tags, .toggle-container, .manage-image {
     width: 100%;
+  }
+  .manage-image .image-container {
+    position: relative;
+    .icon.remove {
+      position: absolute;
+      z-index: 10;
+      top: -6px;
+      left: -6px;
+      &:hover {
+        color: red;
+      }
+    }
   }
   .location-selector {
     margin-bottom: .75rem;

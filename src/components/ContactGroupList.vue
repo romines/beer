@@ -49,7 +49,7 @@
 
       <div
         class="group-detail"
-        v-show="detailGroup === group.section">
+        v-if="detailGroup === group.section">
 
         <contact-list :group-index="groupIndex" :is-open="detailGroup === group.section"/>
         <!-- end .group-detail -->
@@ -69,6 +69,15 @@
         </div>
 
       </div>
+      <!-- <list-component /> -->
+      <!-- <ul>
+        <item-component v-for="item in list" />
+      </ul> -->
+
+      <!-- <item-component /> -->
+      <!-- <li>
+        <header v-for="item in list" />
+      </li> -->
 
       <!-- end .contact-group -->
     </div>
