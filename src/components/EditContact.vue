@@ -116,7 +116,7 @@
       </div>
     </div>
 
-    <div class="field is-horizontal" v-show="localState.contact.dining">
+    <div class="field is-horizontal" v-show="localState.contact.tags.dining">
       <div class="field-label is-normal">
         <label class="label">Reservations URL</label>
       </div>
@@ -189,6 +189,8 @@
 </template>
 
 <script>
+// "https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fimages%2F1521218437156.jpg"
+// "https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fimages%2F1521218437156.jpg"
 import LocationSelector from './LocationSelector.vue'
 import ImageUpload from './ImageUpload.vue'
 import pixel_grid from '../assets/pixel_grid.png'
@@ -196,7 +198,11 @@ import jh_village from '../assets/jh_village.png'
 
 // fields that might be missing should be initialized with default values to ensure reactivity
 const contactDefaults = {
+  name: '',
+  mailto: '',
+  number: '',
   rect :  '{{0,0}{80,80}}',
+  url: '',
   mapId : -1,
   tags :  {
     summer: true,
@@ -307,8 +313,9 @@ export default {
 
     },
 
-    onImageUpload (url) {
+    onImageUpload ({ url, fileName }) {
       if (this.localState.contact.imageUrl) this.$store.dispatch('destroyImageFile', this.localState.contact.imageUrl)
+      this.$store.dispatch('listenForScaledImage', { url, fileName })
       this.localState.contact.imageUrl = url
     },
 

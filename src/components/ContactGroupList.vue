@@ -60,12 +60,12 @@
           </span>
         </div>
 
-        <div class="add-new-contact box" v-show="addingContactAtIndex === groupIndex">
+        <div class="add-new-contact box" v-if="addingContactAtIndex === groupIndex">
           <edit-contact
             :group-index="groupIndex"
             :contact-index="-1"
-            :contact="initializeNewContact()"
-            @cancelEdits="addingContactAtIndex = -1"/>
+            contact="{}"
+            @closeContact="addingContactAtIndex = -1"/>
         </div>
 
       </div>
@@ -165,7 +165,7 @@ export default {
     },
     initializeNewContact () {
       return {
-        mailto: '',
+        mailto: 'asdflkjsadf',
         name: '',
         number: '',
         rect: '',

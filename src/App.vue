@@ -52,9 +52,9 @@ export default {
     margin-bottom: .88rem;
   }
 }
-.contact-margin-setter:last-child .box {
-  margin-bottom: 0;
-}
+// .contact-margin-setter:last-child .box {
+//   margin-bottom: 0;
+// }
 
 // temp
 .top-nav-container {

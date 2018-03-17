@@ -76,6 +76,9 @@
       },
       'SET_UPLOAD_BUFFER_URL' (state, val) {
         state.uploadBufferUrl = val
+      },
+      'UPDATE_IMAGE_URL' (state, { groupIndex, contactIndex, scaledUrl }) {
+        state.contactGroups[groupIndex].list[contactIndex].imageUrl = scaledUrl
       }
 
     },
@@ -161,6 +164,7 @@
       },
       saveContact ({ rootState, commit }, payload) {
         let groups = rootState.contactGroups.slice()
+        payload.updatedContact.imageUrl = rootState.uploadBufferUrl ? rootState.uploadBufferUrl : payload.updatedContact.imageUrl
         if (payload.contactIndex === -1) {
           // new contact
           groups[payload.groupIndex].list.push(payload.updatedContact)
@@ -203,6 +207,25 @@
           commit('SET_UPLOAD_BUFFER_URL', '')
         }).catch(error => {
           console.log(error.message);
+        })
+      },
+      listenForScaledImage ({ rootState, commit }, { fileName, url }) {
+        rootState.resortsRef.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
+          if (!doc.data()) return
+          const scaledUrl = url.replace(fileName, `scaled_${fileName}`)
+          if (rootState.uploadBufferUrl) {
+            // image has been uploaded, but contact has not been saved
+            commit('SET_UPLOAD_BUFFER_URL', scaledUrl)
+          } else {
+            rootState.contactGroups.some((group, groupIndex) => {
+              return group.list.some((contact, contactIndex) => {
+                if (contact.imageUrl === url) {
+                  commit('UPDATE_IMAGE_URL', { groupIndex, contactIndex, scaledUrl })
+                  return true
+                }
+              })
+            })
+          }
         })
       },
       showErrorModal ({ commit }, message) {

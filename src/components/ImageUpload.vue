@@ -31,7 +31,12 @@ export default {
     onFileAdded (e) {
       this.uploading = true
       const file = e.target.files[0]
-      const metadata = { contentType: 'image/jpeg' }
+      const metadata = {
+        contentType: 'image/jpeg',
+        customMetadata: {
+          'resortId': this.$store.state.resortId,
+        }
+      }
       const fileName = (new Date().getTime()) + '.' + file.name.split('.')[file.name.split('.').length -1]
       const newImageRef = this.$store.state.storageRef.child(`${this.$store.state.resortId}/images/${fileName}`)
       const uploadTask = newImageRef.put(file, metadata)
@@ -44,7 +49,10 @@ export default {
       }, () => {
         this.uploading = false
         this.$store.commit('SET_UPLOAD_BUFFER_URL', uploadTask.snapshot.downloadURL)
-        this.$emit('uploadComplete', uploadTask.snapshot.downloadURL)
+        this.$emit('uploadComplete', {
+          url: uploadTask.snapshot.downloadURL,
+          fileName
+        })
       })
     }
   }
