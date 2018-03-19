@@ -86,13 +86,17 @@
 
       listen ({ rootState, commit }, user) {
         console.log('listen dispatched . . .');
+
         rootState.db.collection('users').doc(user.uid).get().then(doc => {
           const userData = doc.data()
           user.authorizedResortIds = userData.authorizedResortIds
           commit('SET_RESORT_ID', userData.authorizedResortIds[0])  // Note hardcoded to first resortId in list
           commit('SET_USER', user)
           return rootState.resortsRef.doc(rootState.resortId)
-            .onSnapshot(doc => commit('SET_CONTACT_GROUPS', doc.data()))
+            .onSnapshot(doc => {
+              let resortData = doc.data()
+              commit('SET_CONTACT_GROUPS', resortData)
+            })
         })
       },
       logIn ({ commit, dispatch }, { email, password, onSuccess }) {
@@ -129,7 +133,11 @@
 
       },
       seed ({ rootState }) {
-        rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups })
+        const addNoSort = group => {
+          if (group.noSort === undefined) group.noSort = false
+          return group
+        }
+        rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups.map(addNoSort) })
         // rootState.resortsRef.doc('russell_lands').set({ contactGroups: resortData.russell_lands.contactGroups, resortId: 'russell_lands', name: 'Russell Lands' })
       },
       saveNewEmptyGroup ({rootState}, groupName) {
@@ -150,7 +158,6 @@
         })
       },
       deleteContactGroup ({ rootState }, groupIndex) {
-
         let groups = rootState.contactGroups.slice()
         groups.splice(groupIndex, 1)
         return rootState.resortsRef.doc(rootState.resortId).update({
@@ -158,10 +165,18 @@
         })
       },
       saveContactGroupList ({ rootState }, { updatedList }) {
-        rootState.resortsRef.doc(rootState.resortId).update({
+        return rootState.resortsRef.doc(rootState.resortId).update({
           contactGroups: updatedList
         })
       },
+      toggleSortable ({ rootState }, groupIndex) {
+        let groups = rootState.contactGroups.slice()
+        groups[groupIndex].noSort = !rootState.contactGroups[groupIndex].noSort
+        rootState.resortsRef.doc(rootState.resortId).update({
+          contactGroups: groups
+        })
+      },
+
       saveContact ({ rootState, commit }, payload) {
         let groups = rootState.contactGroups.slice()
         payload.updatedContact.imageUrl = rootState.uploadBufferUrl ? rootState.uploadBufferUrl : payload.updatedContact.imageUrl

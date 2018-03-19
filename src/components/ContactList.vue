@@ -20,7 +20,7 @@
            :class="contactOpen(index) ? '' : 'box'"
            @click.stop="onContactHeaderClick(index)">
         <span class="name">
-          <span class="grippy" />
+          <span class="grippy" v-if="sortable"/>
           {{ contact.name }}
         </span>
         <span class="icon is-small" v-show="!contactOpen(index)">
@@ -60,7 +60,7 @@ export default {
     },
     isOpen: {
       type: Boolean
-    }
+    },
   },
   data () {
     return {
@@ -70,11 +70,18 @@ export default {
   computed: {
     myList: {
       get() {
-        return this.$store.state.contactGroups[this.groupIndex].list
+        if (this.$store.state.contactGroups[this.groupIndex].noSort) {
+          return this.$store.state.contactGroups[this.groupIndex].list
+        } else {
+          return this.sortByName(this.$store.state.contactGroups[this.groupIndex].list)
+        }
       },
       set(updatedList) {
         this.$store.dispatch('saveContactList', { updatedList, groupIndex: this.groupIndex })
       }
+    },
+    sortable () {
+        return this.$store.state.contactGroups[this.groupIndex].noSort
     }
 
   },
@@ -121,6 +128,18 @@ export default {
         this.closeOpenContact(closeOptions)
       }
     },
+    sortByName (list) {
+      return list.slice().sort((a, b) => {
+        if (a.name.toUpperCase() < b.name.toUpperCase()) {
+          return -1
+        }
+        if (a.name.toUpperCase() > b.name.toUpperCase()) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+    }
   }
 }
 </script>

@@ -20,10 +20,10 @@
         <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
           <span class="grippy" />
           <span class="name">{{ group.section }}</span>
-          <span class="icon is-small" @click.stop="editGroupTitle(groupIndex)">
+          <span class="icon edit-name is-small" @click.stop="editGroupTitle(groupIndex)">
             <i class="fas fa-edit"/>
           </span>
-          <span class="icon is-small" @click.stop="deleteGroup(groupIndex)">
+          <span class="icon delete-group is-small" @click.stop="deleteGroup(groupIndex)">
             <i class="fas fa-trash-alt"/>
           </span>
         </span>
@@ -38,12 +38,23 @@
           </p>
         </div>
 
+        <div class="group-sort" v-show="detailGroup === group.section">
+          <span>Custom Sort Order</span>
+          <div class="toggle-container ">
+            <label class="switch" @click.stop>
+              <input type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort" @click.stop.prevent.self="toggleSortable(groupIndex)">
+              <span class="slider round" />
+            </label>
+          </div>
+        </div>
+
         <span class="icon is-small" v-show="detailGroup !== group.section">
           <i class="fas fa-chevron-down"/>
         </span>
         <span class="icon is-small" v-show="detailGroup === group.section">
           <i class="fas fa-chevron-up"/>
         </span>
+
         <!-- end .group-header -->
       </div>
 
@@ -51,7 +62,7 @@
         class="group-detail"
         v-if="detailGroup === group.section">
 
-        <contact-list :group-index="groupIndex" :is-open="detailGroup === group.section"/>
+        <contact-list :group-index="groupIndex" :is-open="detailGroup === group.section" />
         <!-- end .group-detail -->
         <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
           <span class="text">Add New Contact</span>
@@ -69,15 +80,6 @@
         </div>
 
       </div>
-      <!-- <list-component /> -->
-      <!-- <ul>
-        <item-component v-for="item in list" />
-      </ul> -->
-
-      <!-- <item-component /> -->
-      <!-- <li>
-        <header v-for="item in list" />
-      </li> -->
 
       <!-- end .contact-group -->
     </div>
@@ -105,6 +107,7 @@ export default {
     return {
       detailGroup: '',
       editingNameOfGroupAtIndex: -1,
+      editingSettingsOfGroupAtIndex: -1,
       addingContactAtIndex: -1,
       groupNameDraft: '',
     }
@@ -133,6 +136,9 @@ export default {
     editGroupTitle (groupIndex) {
       this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section;
       this.editingNameOfGroupAtIndex = groupIndex;
+    },
+    toggleSortable (groupIndex) {
+      this.$store.dispatch('toggleSortable', groupIndex)
     },
     saveGroupName () {
       this.$store.dispatch('saveContactGroupName', { groupIndex: this.editingNameOfGroupAtIndex, updatedName: this.groupNameDraft })
@@ -189,16 +195,31 @@ export default {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+
     .name-and-edit {
+      flex: 1 0 34%;
       display: inline-flex;
       align-items: center;
       .icon {
-        opacity: .7;
+        opacity: .5;
+        color: black;
         font-size: .88em;
         margin-left: .5em;
+        &:hover {
+          opacity: 1;
+        }
       }
     }
     .name-editor { margin-bottom: 0; }
+    .group-sort {
+      display: inline-flex;
+      align-items: center;
+      transform: scale(.8);
+      .toggle-container {
+        margin-left: 1.2em;
+        display: inline-flex;
+      }
+    }
   }
 
 
