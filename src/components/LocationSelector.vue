@@ -1,6 +1,6 @@
 <template>
   <div class="location-selector">
-    <span class="map-pin" v-show="showPin" :style="{top: yPinLocation + 'px', left: xPinLocation + 'px'}"><i class="fas fa-map-pin" /></span>
+    <span class="map-pin" v-show="showPin" :style="{top: yPinLocation + 'px', left: xPinLocation + 'px'}"><i class="fas fa-map-marker-alt" /></span>
 
     <div class="field is-horizontal">
       <div class="field-label is-normal">
@@ -331,6 +331,7 @@ export default {
   }
   .viewer-open .map-pin {
     display: inline-block;
+    font-size: 22px;
     .svg-inline--fa {
       transform: translate(-50%, -100%);
     }

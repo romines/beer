@@ -27,6 +27,7 @@
     db: {},
     resortsRef: {},
     resortId: '',
+    resortCountry: '',
     contactGroups: [],
     loading: true,
     modal: {
@@ -56,7 +57,10 @@
       'SET_USER' (state, user) {
         state.user = user
       },
-      'SET_CONTACT_GROUPS' (state, { contactGroups }) {
+      'SET_RESORT_COUNTRY' (state, country) {
+        state.resortCountry = country
+      },
+      'SET_CONTACT_GROUPS' (state, contactGroups) {
         state.contactGroups = contactGroups
         state.loading = false
       },
@@ -95,7 +99,8 @@
           return rootState.resortsRef.doc(rootState.resortId)
             .onSnapshot(doc => {
               let resortData = doc.data()
-              commit('SET_CONTACT_GROUPS', resortData)
+              commit('SET_CONTACT_GROUPS', resortData.contactGroups)
+              commit('SET_RESORT_COUNTRY', resortData.country)
             })
         })
       },

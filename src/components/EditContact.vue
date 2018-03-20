@@ -14,16 +14,21 @@
         </span>
       </div>
     </div>
-
     <div class="field is-horizontal">
       <div class="field-label is-normal">
         <label class="label">Phone Number</label>
       </div>
       <div class="control has-icons-left">
-        <input
+        <cleave
           v-model="localState.contact.number"
           class="input"
-          placeholder="Phone (w/ country code)">
+          :class="{ 'is-danger': !phoneIsValid(localState.contact.number) }"
+          :options="{ phone: true, phoneRegionCode: $store.state.resortCountry }"
+          placeholder="Phone" />
+        <!-- <input
+          v-model="localState.contact.number"
+          class="input"
+          placeholder="Phone (w/ country code)"> -->
         <span class="icon is-small is-left">
           <i class="fas fa-phone" />
         </span>
@@ -35,10 +40,12 @@
         <label class="label">SMS</label>
       </div>
       <div class="control has-icons-left">
-        <input
+        <cleave
           v-model="localState.contact.sms"
           class="input"
-          placeholder="SMS">
+          :options="{ phone: true, phoneRegionCode: $store.state.resortCountry }"
+          :class="{ 'is-danger': !phoneIsValid(localState.contact.sms) }"
+          placeholder="SMS" />
         <span class="icon is-small is-left">
           <i class="fas fa-mobile-alt" />
         </span>
@@ -49,13 +56,19 @@
       <div class="field-label is-normal">
         <label class="label">Website</label>
       </div>
-      <div class="control has-icons-left">
+      <div class="control has-icons-left has-icons-right">
         <input
           v-model="localState.contact.url"
+          :class="{ 'is-danger': !urlIsValid(localState.contact.url) }"
           class="input"
           placeholder="Website">
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
+        </span>
+        <span class="icon is-small is-right test-link" v-show="localState.contact.url && urlIsValid(localState.contact.url)">
+          <a :href="localState.contact.url" target="_blank">
+            <i class="fas fa-external-link-alt" />
+          </a>
         </span>
       </div>
     </div>
@@ -68,6 +81,7 @@
         <input
           v-model="localState.contact.mailto"
           class="input"
+          :class="{ 'is-danger': !emailIsValid(localState.contact.mailto) }"
           placeholder="Email Address">
         <span class="icon is-small is-left">
           <i class="fas fa-envelope" />
@@ -105,13 +119,19 @@
       <div class="field-label is-normal">
         <label class="label">Menu URL</label>
       </div>
-      <div class="control has-icons-left">
+      <div class="control has-icons-left has-icons-right">
         <input
           v-model="localState.contact.menu"
+          :class="{ 'is-danger': !urlIsValid(localState.contact.menu) }"
           class="input"
           placeholder="Menu URL">
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
+        </span>
+        <span class="icon is-small is-right test-link" v-show="localState.contact.menu && urlIsValid(localState.contact.menu)">
+          <a :href="localState.contact.menu" target="_blank">
+            <i class="fas fa-external-link-alt" />
+          </a>
         </span>
       </div>
     </div>
@@ -120,13 +140,19 @@
       <div class="field-label is-normal">
         <label class="label">Reservations URL</label>
       </div>
-      <div class="control has-icons-left">
+      <div class="control has-icons-left has-icons-right">
         <input
           v-model="localState.contact.reservations"
+          :class="{ 'is-danger': !urlIsValid(localState.contact.reservations) }"
           class="input"
           placeholder="Reservations URL">
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
+        </span>
+        <span class="icon is-small is-right test-link" v-show="localState.contact.reservations && urlIsValid(localState.contact.reservations)">
+          <a :href="localState.contact.reservations" target="_blank">
+            <i class="fas fa-external-link-alt" />
+          </a>
         </span>
       </div>
     </div>
@@ -164,9 +190,11 @@
       </div>
     </div>
 
+    <div class="invalid-form-warning help is-danger" v-show="!formIsValid">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
+
     <div class="field is-grouped is-grouped-right">
       <p class="control no-expando">
-        <a class="button is-primary" @click="saveContact" :disabled="!contactIsDirty">
+        <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive">
           Save
         </a>
       </p>
@@ -189,12 +217,17 @@
 </template>
 
 <script>
-// "https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fimages%2F1521218437156.jpg"
-// "https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fimages%2F1521218437156.jpg"
+import Cleave from 'vue-cleave'
+import PhoneNumber from 'awesome-phonenumber'
+import 'cleave.js/dist/addons/cleave-phone.us.js'
 import LocationSelector from './LocationSelector.vue'
 import ImageUpload from './ImageUpload.vue'
 import pixel_grid from '../assets/pixel_grid.png'
 import jh_village from '../assets/jh_village.png'
+
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+const urlRegex = /^(?:(?:https?|ftp|file):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i
+
 
 // fields that might be missing should be initialized with default values to ensure reactivity
 const contactDefaults = {
@@ -218,6 +251,7 @@ const contactDefaults = {
 
 export default {
   components: {
+    Cleave,
     LocationSelector,
     ImageUpload
   },
@@ -235,7 +269,7 @@ export default {
   data () {
     return {
       localState: {
-        contact: {}
+        contact: {},
       },
       contactAtInitialization: {},
       images: [ // TEMP. won't be hardcoded once I have images for all resorts
@@ -254,6 +288,17 @@ export default {
   computed: {
     contactIsDirty () {
       return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
+    },
+    formIsValid () {
+      return ['url', 'menu', 'reservations'].every(fieldName => {
+        return this.urlIsValid(this.localState.contact[fieldName])
+      })
+        && this.phoneIsValid(this.localState.contact.number)
+        && this.phoneIsValid(this.localState.contact.sms)
+        && this.emailIsValid(this.localState.contact.mailto)
+    },
+    saveButtonActive () {
+      return this.contactIsDirty && this.formIsValid
     }
   },
 
@@ -270,6 +315,21 @@ export default {
     this.initializeContact()
   },
   methods: {
+    getPn (number) {
+      return new PhoneNumber(number, this.$store.state.resortCountry)
+    },
+    phoneIsValid (number) {
+      if (!number) return true
+      return this.getPn(number).a.valid
+    },
+    emailIsValid (email) {
+      if (!email) return true
+      return emailRegex.test(email);
+    },
+    urlIsValid (url) {
+      if (!url) return true
+      return urlRegex.test(url);
+    },
     initializeContact () {
       console.log('initializing contact . . .');
       const defaults = JSON.parse(JSON.stringify(contactDefaults))
@@ -277,10 +337,17 @@ export default {
       this.contactAtInitialization = JSON.parse(JSON.stringify(this.localState.contact))
     },
     saveContact () {
+      const number = this.localState.contact.number ? this.getPn(this.localState.contact.number).getNumber('international') : ''
+      const sms = this.localState.contact.sms ? this.getPn(this.localState.contact.sms).getNumber('international') : ''
+      const contact = {
+        ...this.localState.contact,
+        number,
+        sms
+      }
       this.$store.dispatch('saveContact', {
         groupIndex: this.groupIndex,
         contactIndex: this.contactIndex,
-        updatedContact: this.localState.contact
+        updatedContact: contact
       }).then(() => {
         if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
         this.$emit('closeContact', { resetDirtyState: true })
@@ -347,6 +414,20 @@ export default {
   .field .control:not(.no-expando) {
     flex-grow: 1;
   }
+  .test-link {
+    pointer-events: auto;
+    cursor: pointer !important;
+    a {
+      color: black;
+      opacity: .5;
+      &:hover { opacity: 1; }
+    }
+  }
+  // .phone-invalid {
+  //   text-align: right;
+  //   margin-right: .6em;
+  //   margin-top: -1.2em;
+  // }
   .time-active-tags {
     display: flex;
     align-items: center;
@@ -381,6 +462,10 @@ export default {
   .editr { max-width: 480px; }
   .editr--toolbar div:nth-child(14) {
     display: none;
+  }
+  .invalid-form-warning {
+    margin: .6em 0;
+    text-align: right;
   }
 
 </style>

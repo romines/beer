@@ -96,7 +96,7 @@ export default {
   components: {
     draggable,
     ContactList,
-    EditContact
+    EditContact,
   },
   props: {
     newGroupIdentifier: {
@@ -216,6 +216,7 @@ export default {
       align-items: center;
       transform: scale(.8);
       .toggle-container {
+        width: auto;
         margin-left: 1.2em;
         display: inline-flex;
       }

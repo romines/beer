@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "animate.css": "^3.6.1",
+    "awesome-phonenumber": "^2.2.5",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
@@ -18,6 +19,7 @@
     "firebase": "^4.10.1",
     "v-viewer": "file:../v-viewer",
     "vue": "^2.5.15",
+    "vue-cleave": "^1.2.2",
     "vue-router": "^3.0.1",
     "vue-wysiwyg": "^1.7.0",
     "vuedraggable": "^2.16.0",
