@@ -1,6 +1,7 @@
   import Vue from 'vue'
   import Vuex from 'vuex'
   import Firebase from 'firebase/app'
+  import uuid from 'uuid/v4'
   import 'babel-polyfill'
   import jHContacts from '../assets/JH_contacts.json'
   import rLContacts from '../assets/RL_contacts.json'
@@ -22,7 +23,7 @@
 
   Vue.use(Vuex)
 
-  const state = {
+  let state = {
     user: {},
     db: {},
     resortsRef: {},
@@ -55,7 +56,8 @@
         state.resortId = resortId
       },
       'SET_USER' (state, user) {
-        state.user = user
+        // Vue.set(state, 'user', user)
+        state.user = {...user}
       },
       'SET_RESORT_COUNTRY' (state, country) {
         state.resortCountry = country
@@ -90,6 +92,8 @@
 
       listen ({ rootState, commit }, user) {
         console.log('listen dispatched . . .');
+
+        if (!user) user = Firebase.auth().currentUser
 
         rootState.db.collection('users').doc(user.uid).get().then(doc => {
           const userData = doc.data()
@@ -138,11 +142,27 @@
 
       },
       seed ({ rootState }) {
+        const addUuidAndHttp = (contact) => {
+          if (contact.id === undefined) contact.id = uuid();
+          ['url', 'menu', 'reservations'].forEach(urlField => {
+            if (contact[urlField] && contact[urlField].startsWith('www')) {
+              contact[urlField] = 'http://' + contact[urlField]
+            }
+          })
+          return contact
+        }
+        const addContactIds = (group) => {
+          group.list = group.list.map(addUuidAndHttp)
+          return group
+        }
         const addNoSort = group => {
           if (group.noSort === undefined) group.noSort = false
           return group
         }
-        rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups.map(addNoSort) })
+        rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups
+          .map(addNoSort)
+          .map(addContactIds)
+        })
         // rootState.resortsRef.doc('russell_lands').set({ contactGroups: resortData.russell_lands.contactGroups, resortId: 'russell_lands', name: 'Russell Lands' })
       },
       saveNewEmptyGroup ({rootState}, groupName) {
@@ -182,22 +202,24 @@
         })
       },
 
-      saveContact ({ rootState, commit }, payload) {
+      saveContact ({ rootState, commit }, { groupIndex, updatedContact}) {
+        const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(contact => contact.id === updatedContact.id)
         let groups = rootState.contactGroups.slice()
-        payload.updatedContact.imageUrl = rootState.uploadBufferUrl ? rootState.uploadBufferUrl : payload.updatedContact.imageUrl
-        if (payload.contactIndex === -1) {
+        updatedContact.imageUrl = rootState.uploadBufferUrl ? rootState.uploadBufferUrl : updatedContact.imageUrl
+        if (contactIndex === -1) {
           // new contact
-          groups[payload.groupIndex].list.push(payload.updatedContact)
+          groups[groupIndex].list.push(updatedContact)
         } else {
           // existing contact
-          groups[payload.groupIndex].list[payload.contactIndex] = payload.updatedContact
+          groups[groupIndex].list[contactIndex] = updatedContact
         }
         return rootState.resortsRef.doc(rootState.resortId).update({
           contactGroups: groups
         }).then(() => { commit('SET_UPLOAD_BUFFER_URL', '')})
       },
-      deleteContact ({ rootState, dispatch }, { groupIndex, contactIndex}) {
+      deleteContact ({ rootState, dispatch }, { groupIndex, contactId }) {
 
+        const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(contact => contact.id === contactId)
         let groups = rootState.contactGroups.slice()
         const contact = groups[groupIndex].list.splice(contactIndex, 1)[0]
 

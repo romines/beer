@@ -6,7 +6,7 @@
       </div>
       <div class="control has-icons-left">
         <input
-          v-model="localState.contact.name"
+          v-model.trim="localState.contact.name"
           class="input"
           placeholder="Name">
         <span class="icon is-small is-left">
@@ -19,16 +19,14 @@
         <label class="label">Phone Number</label>
       </div>
       <div class="control has-icons-left">
+
         <cleave
           v-model="localState.contact.number"
           class="input"
-          :class="{ 'is-danger': !phoneIsValid(localState.contact.number) }"
+          :class="{ 'is-danger': !phoneIsValid(localState.contact.number)}"
           :options="{ phone: true, phoneRegionCode: $store.state.resortCountry }"
           placeholder="Phone" />
-        <!-- <input
-          v-model="localState.contact.number"
-          class="input"
-          placeholder="Phone (w/ country code)"> -->
+
         <span class="icon is-small is-left">
           <i class="fas fa-phone" />
         </span>
@@ -58,7 +56,7 @@
       </div>
       <div class="control has-icons-left has-icons-right">
         <input
-          v-model="localState.contact.url"
+          v-model.trim="localState.contact.url"
           :class="{ 'is-danger': !urlIsValid(localState.contact.url) }"
           class="input"
           placeholder="Website">
@@ -79,7 +77,7 @@
       </div>
       <div class="control has-icons-left">
         <input
-          v-model="localState.contact.mailto"
+          v-model.trim="localState.contact.mailto"
           class="input"
           :class="{ 'is-danger': !emailIsValid(localState.contact.mailto) }"
           placeholder="Email Address">
@@ -121,7 +119,7 @@
       </div>
       <div class="control has-icons-left has-icons-right">
         <input
-          v-model="localState.contact.menu"
+          v-model.trim="localState.contact.menu"
           :class="{ 'is-danger': !urlIsValid(localState.contact.menu) }"
           class="input"
           placeholder="Menu URL">
@@ -142,7 +140,7 @@
       </div>
       <div class="control has-icons-left has-icons-right">
         <input
-          v-model="localState.contact.reservations"
+          v-model.trim="localState.contact.reservations"
           :class="{ 'is-danger': !urlIsValid(localState.contact.reservations) }"
           class="input"
           placeholder="Reservations URL">
@@ -169,7 +167,7 @@
       <div class="field-label is-normal">
         <label class="label">Description</label>
       </div>
-      <wysiwyg v-model="localState.contact.z_detail" />
+      <wysiwyg v-model.trim="localState.contact.z_detail" />
     </div>
 
     <div class="field is-horizontal">
@@ -203,7 +201,7 @@
           Cancel
         </a>
       </p>
-      <p class="control no-expando" v-show="contactIndex !== -1">
+      <p class="control no-expando" v-show="contactId !== 'NEW'">
         <a class="button is-danger is-outlined" @click="deleteContact">
           <span>Delete</span>
           <span class="icon is-small">
@@ -219,6 +217,7 @@
 <script>
 import Cleave from 'vue-cleave'
 import PhoneNumber from 'awesome-phonenumber'
+import uuid from 'uuid/v4'
 import 'cleave.js/dist/addons/cleave-phone.us.js'
 import LocationSelector from './LocationSelector.vue'
 import ImageUpload from './ImageUpload.vue'
@@ -262,8 +261,8 @@ export default {
     groupIndex: {
       type: Number
     },
-    contactIndex: {
-      type: Number
+    contactId: {
+      type: String
     },
   },
   data () {
@@ -290,9 +289,7 @@ export default {
       return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
     },
     formIsValid () {
-      return ['url', 'menu', 'reservations'].every(fieldName => {
-        return this.urlIsValid(this.localState.contact[fieldName])
-      })
+      return ['url', 'menu', 'reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
         && this.phoneIsValid(this.localState.contact.number)
         && this.phoneIsValid(this.localState.contact.sms)
         && this.emailIsValid(this.localState.contact.mailto)
@@ -315,25 +312,13 @@ export default {
     this.initializeContact()
   },
   methods: {
-    getPn (number) {
-      return new PhoneNumber(number, this.$store.state.resortCountry)
-    },
-    phoneIsValid (number) {
-      if (!number) return true
-      return this.getPn(number).a.valid
-    },
-    emailIsValid (email) {
-      if (!email) return true
-      return emailRegex.test(email);
-    },
-    urlIsValid (url) {
-      if (!url) return true
-      return urlRegex.test(url);
-    },
+
     initializeContact () {
       console.log('initializing contact . . .');
       const defaults = JSON.parse(JSON.stringify(contactDefaults))
-      this.localState.contact = Object.assign(defaults, this.contact)
+      // this.localState.contact = Object.assign(defaults, this.contact)
+      this.localState.contact = {...defaults, ...this.contact}
+      if (this.contactId === 'NEW') this.localState.contact.id = uuid()
       this.contactAtInitialization = JSON.parse(JSON.stringify(this.localState.contact))
     },
     saveContact () {
@@ -346,7 +331,6 @@ export default {
       }
       this.$store.dispatch('saveContact', {
         groupIndex: this.groupIndex,
-        contactIndex: this.contactIndex,
         updatedContact: contact
       }).then(() => {
         if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
@@ -360,7 +344,7 @@ export default {
         this.$store.commit('SHOW_MODAL', { loading: true, heading: 'Are you sure you want to delete this contact?' })
         this.$store.dispatch('deleteContact', {
           groupIndex: this.groupIndex,
-          contactIndex: this.contactIndex
+          contactId: this.contactId
         }).then(() => {
           // this.$emit('cancelEdits')      // ...nerp..doesn't do shit here
           this.$store.commit('SHOW_MODAL', {
@@ -379,27 +363,38 @@ export default {
       })
 
     },
-
     onImageUpload ({ url, fileName }) {
       if (this.localState.contact.imageUrl) this.$store.dispatch('destroyImageFile', this.localState.contact.imageUrl)
       this.$store.dispatch('listenForScaledImage', { url, fileName })
       this.localState.contact.imageUrl = url
     },
-
     removeImage () {
       this.pendingFileDeletion = this.localState.contact.imageUrl
       this.localState.contact.imageUrl = ''
     },
-
     onCoordinateClick ({ x, y, mapIndex }) {
       this.localState.contact.rect = `{{${x},${y}}}${this.localState.contact.rect.split('}')[1]}}}`
       this.localState.contact.mapId = mapIndex
     },
-
     resetMapCoordinates () {
       this.localState.contact.rect =  '{{0,0}{80,80}}'
       this.localState.contact.mapId =  -1
-    }
+    },
+    getPn (number) {
+      return new PhoneNumber(number, this.$store.state.resortCountry)
+    },
+    phoneIsValid (number) {
+      if (!number) return true
+      return this.getPn(number).a.valid
+    },
+    emailIsValid (email) {
+      if (!email) return true
+      return emailRegex.test(email.trim());
+    },
+    urlIsValid (url) {
+      if (!url) return true
+      return urlRegex.test(url.trim());
+    },
   }
 }
 </script>

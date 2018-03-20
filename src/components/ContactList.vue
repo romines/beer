@@ -8,7 +8,7 @@
 
     <div
       class="contact contact-margin-setter"
-      v-for="(contact, index) in myList" :key="contact.name"
+      v-for="(contact, index) in myList" :key="contact.id"
       :class="contactOpen(index) ? 'box' : ''">
       <!--
         To increase clickable surface area,

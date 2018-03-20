@@ -3,6 +3,19 @@ $notQuiteWhite: #d4eaec;
 $boneGrey: #dfe0e2;
 $errorRed: #b11515;
 
+// global bulma overrides
+.box {
+  padding: .85rem;
+  margin-bottom: .88rem;
+  &.group-header {
+    margin-bottom: .88rem;
+  }
+}
+
+.button[disabled] {
+  pointer-events: none;
+}
+
 .icon { cursor: pointer; }
 
 .main {

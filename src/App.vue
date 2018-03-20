@@ -44,14 +44,6 @@ export default {
 @import 'sharedStyles.scss';
 @import "~vue-wysiwyg/dist/vueWysiwyg.css";
 
-// global bulma overrides
-.box {
-  padding: .85rem;
-  margin-bottom: .88rem;
-  &.group-header {
-    margin-bottom: .88rem;
-  }
-}
 // .contact-margin-setter:last-child .box {
 //   margin-bottom: 0;
 // }

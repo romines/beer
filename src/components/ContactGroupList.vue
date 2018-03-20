@@ -32,8 +32,8 @@
           <p class="control is-expanded">
             <input class="input is-small" v-model="groupNameDraft" placeholder="Group title">
           </p>
-          <p class="control">
-            <button class="button is-primary is-small" @click.stop="saveGroupName">Save</button>
+          <p class="control" @click.stop>
+            <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
             <button class="button is-small" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
           </p>
         </div>
@@ -74,8 +74,8 @@
         <div class="add-new-contact box" v-if="addingContactAtIndex === groupIndex">
           <edit-contact
             :group-index="groupIndex"
-            :contact-index="-1"
-            contact="{}"
+            :contact-id="'NEW'"
+            :contact="{}"
             @closeContact="addingContactAtIndex = -1"/>
         </div>
 
@@ -130,6 +130,7 @@ export default {
   },
   methods: {
     onGroupHeaderClick (section, event) {
+      console.log(event.target);
       if (event.target.nodeName === 'INPUT') return;
       this.detailGroup = (this.detailGroup === section) ? '' : section
     },
