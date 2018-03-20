@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    <div class="field is-horizontal">
+    <!-- <div class="field is-horizontal">
       <div class="field-label is-normal">
         <label class="label">Contact Active</label>
       </div>
@@ -99,9 +99,37 @@
           @click="localState.contact.tags.winter = !localState.contact.tags.winter"
           :class="{'selected': localState.contact.tags.winter}">Winter</span>
       </div>
+    </div> -->
+
+
+    <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'">
+      <div class="title is-6">Contact Active</div>
+      <div class="field is-horizontal toggle">
+        <div class="field-label is-normal">
+          <label class="label">Summer</label>
+        </div>
+        <div class="toggle-container control is-expanded">
+          <label class="switch">
+            <input type="checkbox" v-model="localState.contact.tags.summer">
+            <span class="slider round" />
+          </label>
+        </div>
+      </div>
+
+      <div class="field is-horizontal toggle">
+        <div class="field-label is-normal">
+          <label class="label">Winter</label>
+        </div>
+        <div class="toggle-container control is-expanded">
+          <label class="switch">
+            <input type="checkbox" v-model="localState.contact.tags.winter">
+            <span class="slider round" />
+          </label>
+        </div>
+      </div>
     </div>
 
-    <div class="field is-horizontal">
+    <div class="field is-horizontal toggle">
       <div class="field-label is-normal">
         <label class="label">Dining</label>
       </div>
@@ -409,6 +437,7 @@ export default {
   .field .control:not(.no-expando) {
     flex-grow: 1;
   }
+
   .test-link {
     pointer-events: auto;
     cursor: pointer !important;
@@ -418,24 +447,34 @@ export default {
       &:hover { opacity: 1; }
     }
   }
-  // .phone-invalid {
-  //   text-align: right;
-  //   margin-right: .6em;
-  //   margin-top: -1.2em;
-  // }
-  .time-active-tags {
-    display: flex;
-    align-items: center;
-    .tag {
-      cursor: pointer;
-      margin-top: .3em;
-      margin-right: .3em;
-      &:not(.selected) {
-        opacity: .36;
-      }
+  .field.toggle { margin-bottom: .26em; }
+  .active-toggles {
+    padding-bottom: 0;
+    margin-bottom: .65em !important;
+    .title {
+      margin-bottom: .3em;
+      padding-bottom: .3em;
+      border-bottom: 1px solid #c3c3c3;
     }
+    .field-label {
+     flex-basis: 172px;
+    }
+    .field.toggle { margin-bottom: .2em; }
   }
-  .time-active-tags, .toggle-container, .manage-image {
+
+  // .time-active-tags {
+  //   display: flex;
+  //   align-items: center;
+  //   .tag {
+  //     cursor: pointer;
+  //     margin-top: .3em;
+  //     margin-right: .3em;
+  //     &:not(.selected) {
+  //       opacity: .36;
+  //     }
+  //   }
+  // }
+  .toggle-container, .manage-image {
     width: 100%;
   }
   .manage-image .image-container {

@@ -3,7 +3,7 @@ $notQuiteWhite: #d4eaec;
 $boneGrey: #dfe0e2;
 $errorRed: #b11515;
 
-// global bulma overrides
+// bulma overrides
 .box {
   padding: .85rem;
   margin-bottom: .88rem;
@@ -11,7 +11,9 @@ $errorRed: #b11515;
     margin-bottom: .88rem;
   }
 }
-
+.title:not(:last-child), .subtitle:not(:last-child) {
+  margin-bottom: 1.1em;
+}
 .button[disabled] {
   pointer-events: none;
 }
