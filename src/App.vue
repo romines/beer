@@ -51,10 +51,13 @@ export default {
 // temp
 .top-nav-container {
   position: fixed;
+  z-index: 10;
   top: 0;
   width: 100%;
+  height: 28px;
   background-color: $boneGrey;
   text-align: right;
+  border-bottom: 1px solid black;
 }
 
 .top-nav {
@@ -76,7 +79,6 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
 }
 
 // drag and drop handles

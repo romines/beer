@@ -3,13 +3,15 @@
     class="contact-list"
     v-model="myList"
     :options="{handle:'.grippy'}"
-    @start="drag=true; editingContactAtIndex = -1;"
+    @start="drag=true; editingContactId = '';"
     @end="drag=false">
 
     <div
       class="contact contact-margin-setter"
-      v-for="(contact, index) in myList" :key="contact.id"
-      :class="contactOpen(index) ? 'box' : ''">
+      v-for="contact in myList"
+      :key="contact.id"
+      :ref="'contact_' + contact.id.substring(0, 8)"
+      :class="{'box': contactOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}">
       <!--
         To increase clickable surface area,
         contact header is .box if contact is closed
@@ -17,27 +19,27 @@
                                                 -->
 
       <div class="contact-header"
-           :class="contactOpen(index) ? '' : 'box'"
-           @click.stop="onContactHeaderClick(index)">
+           :class="{'box': !contactOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
+           @click.stop="onContactHeaderClick(contact.id)">
         <span class="name">
           <span class="grippy" v-if="sortable"/>
           {{ contact.name }}
         </span>
-        <span class="icon is-small" v-show="!contactOpen(index)">
+        <span class="icon is-small" v-show="!contactOpen(contact.id)">
           <i class="fas fa-chevron-down"/>
         </span>
-        <span class="icon is-small" v-show="contactOpen(index)">
+        <span class="icon is-small" v-show="contactOpen(contact.id)">
           <i class="fas fa-chevron-up"/>
         </span>
       <!-- end .contact-header -->
       </div>
 
       <edit-contact
-        v-if="contactOpen(index)"
+        v-if="contactOpen(contact.id)"
         :group-index="groupIndex"
-        :contact-index="index"
+        :contact-id="contact.id"
         :contact="contact"
-        @closeContact="closeOpenContact"/>
+        @closeContact="closeContact"/>
 
     <!-- end .contact -->
     </div>
@@ -58,13 +60,15 @@ export default {
     groupIndex: {
       type: Number
     },
-    isOpen: {
+    groupIsOpen: {
       type: Boolean
     },
   },
   data () {
     return {
-      editingContactAtIndex: -1
+      editingContactId: '',
+      highlightedContactId: '',
+      contactOffsetAtOpen: 0
     }
   },
   computed: {
@@ -86,46 +90,70 @@ export default {
 
   },
   watch: {
-    isOpen(open) {
-      // close open contact so it is closed next time
-      if (!open) this.editingContactAtIndex = -1
+    groupIsOpen(open) {
+      // when group closes, close open contact
+      if (!open) this.editingContactId = ''
     }
   },
   created () {
   },
   methods: {
-    contactOpen (index) {
-      return index === this.editingContactAtIndex;
+    contactOpen (id) {
+      return id === this.editingContactId;
     },
-    closeOpenContact ({ resetDirtyState, onConfirmDirtyClose }) {
+    contactHighlighted (id) {
+      return id === this.highlightedContactId
+    },
+    closeContact ({ resetDirtyState, onConfirmDirtyClose, contactId }) {
+
       const onConfirm = () => {
+
+        const rollUpContact = (contactId) => {
+          document.documentElement.scrollTop = document.body.scrollTop = this.contactOffsetAtOpen
+          this.highlightedContactId = contactId
+          setTimeout(() => {
+            this.highlightedContactId = ''
+          }, 2600);
+        }
+
         if (this.$store.state.uploadBufferUrl) this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)
         this.$store.commit('SET_CONTACT_DIRTY_STATE', false)
-        this.editingContactAtIndex = -1
+        this.editingContactId = ''
         onConfirmDirtyClose && onConfirmDirtyClose()
         this.$store.commit('CLOSE_MODAL')
+        this.$nextTick(() => rollUpContact(contactId))
+
       }
 
       if (this.$store.state.openContactIsDirty && !resetDirtyState) {
+
         this.$store.commit('SHOW_MODAL', {
           heading: 'You have unsaved changes?',
           confirmButtonLabel: 'Discard Changes',
           onConfirm
         })
+
       } else {
         return onConfirm()
       }
 
     },
-    onContactHeaderClick (index) {
-      if (this.editingContactAtIndex === -1) {
-        this.editingContactAtIndex = index
+    onContactHeaderClick (id) {
+
+      const openContact = id => {
+        this.editingContactId = id
+        this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
+      }
+
+      if (this.editingContactId === '') { // none are open
+        openContact(id)
       } else {
         const closeOptions = {
+          contactId: id,
           resetDirtyState: false,
-          onConfirmDirtyClose: (this.editingContactAtIndex !== index) ? () => { this.editingContactAtIndex = index } : null
+          onConfirmDirtyClose: !this.contactOpen(id) ? () => { this.editingContactId = id } : null
         }
-        this.closeOpenContact(closeOptions)
+        this.closeContact(closeOptions)
       }
     },
     sortByName (list) {
@@ -139,12 +167,15 @@ export default {
           return 0
         }
       })
+    },
+    getContactElById (id) {
+      return this.$refs[`contact_${id.substring(0, 8)}`][0]
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .contact-list {
     margin-top: .6em;
   }
@@ -153,5 +184,11 @@ export default {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    transition: border-width 0.6s linear;
+    border: solid 0 rgba(66, 79, 173, 0.43);
+    .contact.highlighted &.box {
+      border-width: 5px;
+      transition: none;
+    }
   }
 </style>

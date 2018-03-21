@@ -17,13 +17,19 @@ $errorRed: #b11515;
 .button[disabled] {
   pointer-events: none;
 }
+// end bulma overrides
 
 .icon { cursor: pointer; }
 
+body {
+  margin: 0;
+  padding-top: 28px;
+}
+
 .main {
   max-width: 772px;
-  margin: 0 auto;
-  padding: 0 .85rem;
+  margin: -28px auto;
+  padding: 28px .85rem;
 }
 .title {
   display: flex;

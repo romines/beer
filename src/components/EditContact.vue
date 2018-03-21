@@ -225,7 +225,7 @@
         </a>
       </p>
       <p class="control no-expando">
-        <a class="button is-light" @click="initializeContact(); $emit('closeContact', { resetDirtyState: false })">
+        <a class="button is-light" @click="initializeContact(); $emit('closeContact', { resetDirtyState: false, contactId: contactId })">
           Cancel
         </a>
       </p>
@@ -362,7 +362,7 @@ export default {
         updatedContact: contact
       }).then(() => {
         if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
-        this.$emit('closeContact', { resetDirtyState: true })
+        this.$emit('closeContact', { resetDirtyState: true, contactId: this.contactId })
       })
     },
     deleteContact () {
@@ -439,7 +439,7 @@ export default {
   }
 
   .test-link {
-    pointer-events: auto;
+    pointer-events: auto !important;
     cursor: pointer !important;
     a {
       color: black;

@@ -62,7 +62,7 @@
         class="group-detail"
         v-if="detailGroup === group.section">
 
-        <contact-list :group-index="groupIndex" :is-open="detailGroup === group.section" />
+        <contact-list :group-index="groupIndex" :group-is-open="detailGroup === group.section" />
         <!-- end .group-detail -->
         <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
           <span class="text">Add New Contact</span>
@@ -129,10 +129,38 @@ export default {
     }
   },
   methods: {
-    onGroupHeaderClick (section, event) {
-      console.log(event.target);
+    onGroupHeaderClick (section, event, scrollIntoView) {
+
+      // TODO: handle dirty contact state
+
       if (event.target.nodeName === 'INPUT') return;
-      this.detailGroup = (this.detailGroup === section) ? '' : section
+      const offSetAtClick = event.target.offsetTop
+      scrollIntoView && console.log(offSetAtClick);
+
+      const groupEl = event.target.closest('.contact-group')
+      const openGroup = (section, groupEl, scrollIntoView) => {
+        this.detailGroup = section
+
+        scrollIntoView && this.$nextTick(() => {
+          window.scrollTo({
+            'behavior': 'smooth',
+            'left': 0,
+            'top': groupEl.offsetTop -45
+          });
+        })
+      }
+
+      if (this.detailGroup === section) {
+        // this section is open
+        this.detailGroup = ''
+      } else if (this.detailGroup === '') {
+        console.log('no section is open');
+        // no section is open
+        openGroup(section, groupEl)
+      } else {
+        openGroup(section, groupEl, true)
+      }
+
     },
     editGroupTitle (groupIndex) {
       this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section;
