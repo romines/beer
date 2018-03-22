@@ -87,21 +87,6 @@
       </div>
     </div>
 
-    <!-- <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Contact Active</label>
-      </div>
-      <div class="time-active-tags control is-expanded">
-        <span class="tag is-info"
-          @click="localState.contact.tags.summer = !localState.contact.tags.summer"
-          :class="{'selected': localState.contact.tags.summer}">Summer</span>
-        <span class="tag is-info"
-          @click="localState.contact.tags.winter = !localState.contact.tags.winter"
-          :class="{'selected': localState.contact.tags.winter}">Winter</span>
-      </div>
-    </div> -->
-
-
     <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'">
       <div class="title is-6">Contact Active</div>
       <div class="field is-horizontal toggle">
@@ -190,6 +175,30 @@
       :map-id="localState.contact.mapId"
       @coordinateClick="onCoordinateClick"
       @resetMapCoordinates="resetMapCoordinates" />
+
+    <div class="field is-horizontal" v-if="nearByLocations">
+      <div class="field-label is-normal">
+        <label class="label">&nbsp;</label>
+      </div>
+      <div class="proximate-pins">
+        <div class="proximity-warning">
+          <div class="heading">
+            <span class="warning-title">NOTICE: Similar locations exist.</span>
+            <span class="coordinates" v-if="localState.contact.rect">Selected coordinates: ({{ getCoordinates(localState.contact.rect).x }}, {{ getCoordinates(localState.contact.rect).y }})</span>
+          </div>
+          <div class="sub-heading">
+            Click location(s) below to apply existing coordinates. This ensures contacts which share a location are grouped together in app
+          </div>
+
+        </div>
+        <ul class="proximate-location-group" v-for="group in nearByLocations">
+          <li class="proximate-location" v-for="location in group">
+            <span class="name">{{ location.name }}</span>
+            <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
+          </li>
+        </ul>
+      </div>
+    </div>
 
     <div class="field is-horizontal">
       <div class="field-label is-normal">
@@ -324,6 +333,50 @@ export default {
     },
     saveButtonActive () {
       return this.contactIsDirty && this.formIsValid
+    },
+    nearByLocations () {
+
+      const addIfNearby = (contact) => {
+
+        let results = []
+        if (!contact.rect) return results
+
+        const myCoords = this.getCoordinates(this.localState.contact.rect)
+        const testCoords = this.getCoordinates(contact.rect)
+        const isMatch = contact => {
+          return (Math.abs(testCoords.x - myCoords.x) < 81)
+            && (Math.abs(testCoords.y - myCoords.y) < 81)
+            && (contact.mapId === this.localState.contact.mapId)
+            && (contact.id !== this.localState.contact.id)
+        }
+        if (isMatch(contact)) {
+          results.push({
+            name: contact.name,
+            x: testCoords.x,
+            y: testCoords.y,
+          })
+        }
+        return results
+      }
+
+      const flatMatches = this.$store.state.contactGroups.reduce((nearBy, group) => {
+        const matchesFromGroup = group.list.reduce((results, contact) => {
+          const matchesFromContact = addIfNearby(contact)
+          return [...results, ...matchesFromContact]
+        }, [])
+        return [...nearBy, ...matchesFromGroup]
+      }, [])
+
+      let result = {}
+
+      flatMatches.forEach(coordinateObject => {
+        const coordString = coordinateObject.x.toString() + coordinateObject.y.toString()
+        if (!result[coordString]) result[coordString] = []
+        result[coordString].push(coordinateObject)
+      })
+
+      return result
+
     }
   },
 
@@ -408,6 +461,14 @@ export default {
       this.localState.contact.rect =  '{{0,0}{80,80}}'
       this.localState.contact.mapId =  -1
     },
+    getCoordinates (coordinateString) {
+      if (!coordinateString) return
+      const str = coordinateString.split('}')[0]
+      return {
+        x: parseInt(str.substring(2, str.indexOf(','))),
+        y: parseInt(str.substring(str.indexOf(',') + 1, str.length))
+      }
+    },
     getPn (number) {
       return new PhoneNumber(number, this.$store.state.resortCountry)
     },
@@ -428,16 +489,16 @@ export default {
 </script>
 
 <style lang="scss">
-  div.control {
-    max-width: 480px;
-  }
   .edit-contact {
     padding-top: .6em;
   }
   .field .control:not(.no-expando) {
     flex-grow: 1;
   }
-
+  .toggle-container, .manage-image, .proximate-pins, div.control, .editr {
+    width: 100%;
+    max-width: 480px;
+  }
   .test-link {
     pointer-events: auto !important;
     cursor: pointer !important;
@@ -462,21 +523,6 @@ export default {
     .field.toggle { margin-bottom: .2em; }
   }
 
-  // .time-active-tags {
-  //   display: flex;
-  //   align-items: center;
-  //   .tag {
-  //     cursor: pointer;
-  //     margin-top: .3em;
-  //     margin-right: .3em;
-  //     &:not(.selected) {
-  //       opacity: .36;
-  //     }
-  //   }
-  // }
-  .toggle-container, .manage-image {
-    width: 100%;
-  }
   .manage-image .image-container {
     position: relative;
     .icon.remove {
@@ -492,8 +538,17 @@ export default {
   .location-selector {
     margin-bottom: .75rem;
   }
+  .proximate-location-group {
+    border: 1px solid grey;
+    margin-bottom: .1em;
+    padding: .2em .4em;
+    border-radius: 6px;
+  }
+  .proximate-location {
+    display: flex;
+    justify-content: space-between;
+  }
 
-  .editr { max-width: 480px; }
   .editr--toolbar div:nth-child(14) {
     display: none;
   }

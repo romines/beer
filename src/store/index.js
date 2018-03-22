@@ -142,8 +142,9 @@
 
       },
       seed ({ rootState }) {
-        const addUuidAndHttp = (contact) => {
+        const addMapIndexUuidAndHttp = (contact) => {
           if (contact.id === undefined) contact.id = uuid();
+          if (contact.mapId === undefined) contact.mapId = 0;
           ['url', 'menu', 'reservations'].forEach(urlField => {
             if (contact[urlField] && contact[urlField].startsWith('www')) {
               contact[urlField] = 'http://' + contact[urlField]
@@ -152,7 +153,7 @@
           return contact
         }
         const addContactIds = (group) => {
-          group.list = group.list.map(addUuidAndHttp)
+          group.list = group.list.map(addMapIndexUuidAndHttp)
           return group
         }
         const addNoSort = group => {

@@ -298,7 +298,7 @@ export default {
   }
 
   .map-pin {
-    color: red;
+    color: #002bff;
     position: fixed;
     display: none;
     z-index: 2016;
