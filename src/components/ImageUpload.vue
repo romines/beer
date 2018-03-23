@@ -3,7 +3,7 @@
 
     <div class="file">
       <label class="file-label">
-        <input class="file-input" @change="onFileAdded" type="file" name="resume">
+        <input class="file-input" @change="onFileAdded" type="file" accept="image/*" name="resume">
         <span class="file-cta">
           <span class="file-icon">
             <i class="fas fa-upload"/>

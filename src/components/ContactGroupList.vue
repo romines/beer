@@ -134,8 +134,6 @@ export default {
       // TODO: handle dirty contact state
 
       if (event.target.nodeName === 'INPUT') return;
-      const offSetAtClick = event.target.offsetTop
-      scrollIntoView && console.log(offSetAtClick);
 
       const groupEl = event.target.closest('.contact-group')
       const openGroup = (section, groupEl, scrollIntoView) => {
@@ -150,15 +148,28 @@ export default {
         })
       }
 
-      if (this.detailGroup === section) {
-        // this section is open
-        this.detailGroup = ''
-      } else if (this.detailGroup === '') {
-        console.log('no section is open');
+      if (this.detailGroup === '') {
         // no section is open
         openGroup(section, groupEl)
       } else {
-        openGroup(section, groupEl, true)
+        // a section is open, might be dirty
+        const applyGroupOpenClosedState = this.detailGroup === section
+          ? this.detailGroup = ''
+          : () => openGroup(section, groupEl, true)
+
+        if (this.$store.state.openContactIsDirty) {
+          this.$store.commit('SHOW_MODAL', {
+            heading: 'You have unsaved changes',
+            confirmButtonLabel: 'Discard Changes',
+            onConfirm: () => {
+              this.$store.commit('SET_CONTACT_DIRTY_STATE', false)
+              this.$store.commit('CLOSE_MODAL')
+              applyGroupOpenClosedState()
+            }
+          })
+        } else {
+          return applyGroupOpenClosedState()
+        }
       }
 
     },

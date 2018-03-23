@@ -19,7 +19,7 @@ module.exports = functions.storage.object().onChange((event) => {
   }
 
   // Get the file name.
-  const fileName = path.basename(filePath);
+  const fileName = path.basename(filePath).split('.')[0] + '.png';
   // Exit if the image is already a thumbnail.
   if (fileName.startsWith('scaled_')) {
     console.log('Already scaled.');
@@ -54,7 +54,8 @@ module.exports = functions.storage.object().onChange((event) => {
   }).then(() => {
     console.log('Image downloaded locally to', tempFilePath);
     // Generate a thumbnail using ImageMagick.
-    return spawn('convert', [tempFilePath, '-thumbnail', '800x800>', tempFilePath]);
+    const magickOptions = [tempFilePath, '-filter', 'Triangle', '-define', 'filter:support=2', '-thumbnail', '800x800>', '-unsharp', '0.25x0.25+8+0.065', '-dither', 'None', '-posterize', '136', '-quality', '82', '-define', 'jpeg:fancy-upsampling=off', '-define', 'png:compression-filter=5', '-define', 'png:compression-level=9', '-define', 'png:compression-strategy=1', '-define', 'png:exclude-chunk=all', '-interlace', 'none', '-colorspace', 'sRGB', '-strip', tempFilePath]
+    return spawn('convert', magickOptions);
   }).then(() => {
     console.log('Thumbnail created at', tempFilePath);
     // We add a 'scaled_' prefix to thumbnails file name. That's where we'll upload the thumbnail.

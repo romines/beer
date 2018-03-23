@@ -128,7 +128,7 @@ export default {
       if (this.$store.state.openContactIsDirty && !resetDirtyState) {
 
         this.$store.commit('SHOW_MODAL', {
-          heading: 'You have unsaved changes?',
+          heading: 'You have unsaved changes',
           confirmButtonLabel: 'Discard Changes',
           onConfirm
         })

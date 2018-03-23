@@ -137,15 +137,21 @@ export default {
       const insertSaveCancelButtons = () => {
         const markupString = `
           <li class="accept persistence" title="Accept placement">
-            <span><i class="fas fa-check"></i></span>
+            <span><i class="fas fa-save"></i></span>
           </li>
           <li class="clear persistence" title="Clear pin">
-            <span><i class="fas fa-times"></i></span>
+            <span><i class="fas fa-minus-circle"></i></span>
           </li>
         `
         const controls = document.querySelector('.viewer-toolbar ul')
         controls.insertBefore(document.createRange().createContextualFragment(markupString), controls.firstElementChild)
         this.viewerDOM.saveCancelButtons = document.querySelectorAll('.persistence')
+      }
+
+      const insertPanNotice = () => {
+        const markupString = `<p class="pan-notice"><span class="inner">Hold 'Shift' and click to drag map.</span></p>`
+        const footer = document.querySelector('.viewer-footer')
+        footer.insertBefore(document.createRange().createContextualFragment(markupString), footer.firstElementChild)
       }
 
       const addMapEventHandlers = () => {
@@ -209,6 +215,7 @@ export default {
       }
 
       insertSaveCancelButtons()
+      insertPanNotice()
       addMapEventHandlers()
 
     },
@@ -303,30 +310,43 @@ export default {
     display: none;
     z-index: 2016;
   }
-  .viewer-toolbar > ul {
-    padding: 10px 0;
-    overflow: visible;
-    & > li {
-      &.viewer-play               { display: none; }
-      &[class^="viewer-flip-"]    { display: none; }
-      &.inactive {
-        opacity: .5;
-        filter: grayscale(100%);
-      }
-      &.accept, &.clear {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        transform: translateY(-8px);
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-        line-height: 16px;
-        color: green;
-      }
-      &.accept { color: green; }
-      &.clear { color: red; }
 
+  .viewer-footer {
+    color: white;
+    p.pan-notice {
+      span.inner {
+        display: inline-block;
+        padding: .3em;
+        margin-bottom: .6em;
+        background: rgba(0, 0, 0, 0.32)
+      }
+      font-size: 16px;
+      line-height: 16px;
+    }
+    .viewer-toolbar > ul {
+      padding: 10px 0;
+      overflow: visible;
+      & > li {
+        &.viewer-play               { display: none; }
+        &[class^="viewer-flip-"]    { display: none; }
+        &.inactive {
+          opacity: .5;
+          filter: grayscale(100%);
+        }
+        &.accept, &.clear {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          transform: translateY(-8px);
+          width: 40px;
+          height: 40px;
+          font-size: 16px;
+          line-height: 16px;
+        }
+        // &.accept { color: green; }
+        // &.clear { color: red; }
+
+      }
     }
   }
   .viewer-open .map-pin {

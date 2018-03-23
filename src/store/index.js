@@ -255,7 +255,7 @@
       listenForScaledImage ({ rootState, commit }, { fileName, url }) {
         rootState.resortsRef.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
           if (!doc.data()) return
-          const scaledUrl = url.replace(fileName, `scaled_${fileName}`)
+          const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
           if (rootState.uploadBufferUrl) {
             // image has been uploaded, but contact has not been saved
             commit('SET_UPLOAD_BUFFER_URL', scaledUrl)

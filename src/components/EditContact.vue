@@ -176,27 +176,46 @@
       @coordinateClick="onCoordinateClick"
       @resetMapCoordinates="resetMapCoordinates" />
 
-    <div class="field is-horizontal" v-if="nearByLocations">
+    <div class="field is-horizontal" v-if="matchingLocations && matchingLocations.length">
+      <div class="field-label is-normal">
+        <label class="label">&nbsp;</label>
+      </div>
+      <div class="matching-pins">
+        <div class="proximity-warning">
+          <div class="heading">This contact shares coordinates with the following contact(s)</div>
+        </div>
+        <ul class="location-group">
+          <li class="location" v-for="location in matchingLocations">
+            <span class="name">{{ location.name }}</span>
+            <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="field is-horizontal" v-if="groupedNearbyLocations && Object.keys(groupedNearbyLocations).length">
       <div class="field-label is-normal">
         <label class="label">&nbsp;</label>
       </div>
       <div class="proximate-pins">
         <div class="proximity-warning">
           <div class="heading">
-            <span class="warning-title">NOTICE: Similar locations exist.</span>
+            <span class="warning-title">
+              <strong>NOTICE: Nearby locations exist.</strong>
+            </span>
             <span class="coordinates" v-if="localState.contact.rect">Selected coordinates: ({{ getCoordinates(localState.contact.rect).x }}, {{ getCoordinates(localState.contact.rect).y }})</span>
-          </div>
-          <div class="sub-heading">
-            Click location(s) below to apply existing coordinates. This ensures contacts which share a location are grouped together in app
           </div>
 
         </div>
-        <ul class="proximate-location-group" v-for="group in nearByLocations">
-          <li class="proximate-location" v-for="location in group">
+        <ul class="location-group" v-for="group in groupedNearbyLocations" @click="locationGroupClick(group)">
+          <li class="location" v-for="location in group">
             <span class="name">{{ location.name }}</span>
             <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
           </li>
         </ul>
+        <small>
+          Click location(s) above to apply existing coordinates. This ensures contacts which share a location are grouped together in app
+        </small>
       </div>
     </div>
 
@@ -211,13 +230,14 @@
       <div class="field-label is-normal">
         <label class="label">Image</label>
       </div>
-      <div class="manage-image control">
 
+      <div class="manage-image control">
         <div class="image-container" v-show="!!localState.contact.imageUrl">
           <span class="icon is-small remove" @click="removeImage">
             <i class="fas fa-times-circle" />
           </span>
           <img :src="localState.contact.imageUrl">
+          <small class="remove-image" @click="removeImage">remove image</small>
         </div>
 
         <image-upload @uploadComplete="onImageUpload" v-show="!localState.contact.imageUrl" />
@@ -334,48 +354,43 @@ export default {
     saveButtonActive () {
       return this.contactIsDirty && this.formIsValid
     },
-    nearByLocations () {
-
-      const addIfNearby = (contact) => {
-
-        let results = []
-        if (!contact.rect) return results
-
-        const myCoords = this.getCoordinates(this.localState.contact.rect)
-        const testCoords = this.getCoordinates(contact.rect)
-        const isMatch = contact => {
-          return (Math.abs(testCoords.x - myCoords.x) < 81)
-            && (Math.abs(testCoords.y - myCoords.y) < 81)
-            && (contact.mapId === this.localState.contact.mapId)
-            && (contact.id !== this.localState.contact.id)
-        }
-        if (isMatch(contact)) {
-          results.push({
-            name: contact.name,
-            x: testCoords.x,
-            y: testCoords.y,
-          })
-        }
-        return results
-      }
-
-      const flatMatches = this.$store.state.contactGroups.reduce((nearBy, group) => {
-        const matchesFromGroup = group.list.reduce((results, contact) => {
-          const matchesFromContact = addIfNearby(contact)
-          return [...results, ...matchesFromContact]
-        }, [])
-        return [...nearBy, ...matchesFromGroup]
+    flattenedContacts () {
+      return this.$store.state.contactGroups.reduce((accumulated, group) => {
+        return [...accumulated, ...group.list]
       }, [])
+    },
+    myCoordinates () {
+      return this.getCoordinates(this.localState.contact.rect)
+    },
+    matchingLocations () {
+      return this.flattenedContacts.filter(contact => {
+        if (!contact.rect || !this.myCoordinates) return false
+        if (contact.id === this.localState.contact.id) return false
+        const testCoords = this.getCoordinates(contact.rect)
+        return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
+      }).map(this.contactToLocation)
+    },
+    nearbyLocations () {
+      const isMatch = (contact) => {
+        if (!contact.rect || !this.myCoordinates) return false
+        const testCoords = this.getCoordinates(contact.rect)
+        return (contact.id !== this.localState.contact.id)                                        // not same contact
+          && (contact.mapId === this.localState.contact.mapId)                                    // using same map
+          && ((testCoords.x !== this.myCoordinates.x) || (testCoords.y !== this.myCoordinates.y)) // not exact match
+          && (Math.abs(testCoords.x - this.myCoordinates.x) < 81)                                 // within tolerance
+          && (Math.abs(testCoords.y - this.myCoordinates.y) < 81)
+      }
+      return this.flattenedContacts.filter(isMatch).map(this.contactToLocation)
+    },
 
-      let result = {}
+    groupedNearbyLocations () {
 
-      flatMatches.forEach(coordinateObject => {
+      return this.nearbyLocations.reduce((acc, coordinateObject) => {
         const coordString = coordinateObject.x.toString() + coordinateObject.y.toString()
-        if (!result[coordString]) result[coordString] = []
-        result[coordString].push(coordinateObject)
-      })
-
-      return result
+        if (!acc[coordString]) acc[coordString] = []
+        acc[coordString].push(coordinateObject)
+        return acc
+      }, {})
 
     }
   },
@@ -469,6 +484,20 @@ export default {
         y: parseInt(str.substring(str.indexOf(',') + 1, str.length))
       }
     },
+    locationGroupClick (group) {
+      this.onCoordinateClick({
+        x: group[0].x,
+        y: group[0].y,
+        mapIndex: this.localState.contact.mapId
+      })
+    },
+    contactToLocation ({ name, rect }) {
+      return {
+        name,
+        x: this.getCoordinates(rect).x,
+        y: this.getCoordinates(rect).y
+      }
+    },
     getPn (number) {
       return new PhoneNumber(number, this.$store.state.resortCountry)
     },
@@ -495,7 +524,7 @@ export default {
   .field .control:not(.no-expando) {
     flex-grow: 1;
   }
-  .toggle-container, .manage-image, .proximate-pins, div.control, .editr {
+  .toggle-container, .manage-image, .proximate-pins, .matching-pins, div.control, .editr {
     width: 100%;
     max-width: 480px;
   }
@@ -523,30 +552,48 @@ export default {
     .field.toggle { margin-bottom: .2em; }
   }
 
-  .manage-image .image-container {
-    position: relative;
-    .icon.remove {
-      position: absolute;
-      z-index: 10;
-      top: -6px;
-      left: -6px;
+  .manage-image {
+    .image-container {
+      position: relative;
+      .icon.remove {
+        position: absolute;
+        z-index: 10;
+        top: -6px;
+        left: -6px;
+        &:hover {
+          color: red;
+        }
+      }
+    }
+    .remove-image {
+      cursor: pointer;
+      text-decoration: underline;
       &:hover {
         color: red;
       }
     }
   }
+
   .location-selector {
     margin-bottom: .75rem;
   }
-  .proximate-location-group {
+  // Nearby and matching locations
+  .location-group {
     border: 1px solid grey;
     margin-bottom: .1em;
     padding: .2em .4em;
     border-radius: 6px;
+    .location {
+      display: flex;
+      justify-content: space-between;
+    }
   }
-  .proximate-location {
-    display: flex;
-    justify-content: space-between;
+
+  .proximate-pins {
+    .location-group {
+      cursor: pointer;
+      &:hover { background-color: #d0d0d0; }
+    }
   }
 
   .editr--toolbar div:nth-child(14) {
