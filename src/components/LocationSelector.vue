@@ -14,13 +14,13 @@
           <div
             v-for="(image, index) in images"
             class="thumb-container"
-            :key="image.path">
+            :key="image">
 
             <span class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
               <span class="icon is-small remove" @click="$emit('resetMapCoordinates')">
                 <i class="fas fa-times-circle" />
               </span>
-              <img :src="image.path">
+              <img :src="image">
             </span>
 
           </div>
@@ -33,13 +33,18 @@
 
 <script>
 import Viewer from "v-viewer/src/component.vue"
+// import pixel_grid from '../assets/pixel_grid.png'
+import jh_village from '../assets/jh_village.png'
+import russell_lands from '../assets/russell_lands.png'
+
+const imageDefinitions = {
+  jh_village,
+  russell_lands
+}
 
 export default {
   components: { Viewer },
   props: {
-    images: {
-      type: Array
-    },
     coordinateString: {
       type: String
     },
@@ -82,6 +87,9 @@ export default {
     },
     showPin () {
       return (this.xCoordinate || this.yCoordinate) && !this.hidePin
+    },
+    images () {
+      return this.$store.state.mapFiles.map(fileName => imageDefinitions[fileName])
     }
   },
 

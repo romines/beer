@@ -3,13 +3,17 @@
     <!-- temp -->
     <div class="top-nav-container">
       <span class="top-nav">
-        <router-link to="/">home</router-link>
+        <!-- <router-link to="/">home</router-link>
         <router-link to="json">JSON</router-link>
-        <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
+        <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp; -->
         <span
           @click="logOut"
-          class="icon is-small log-out"
-          v-if="$store.state.user && $store.state.user.uid"><i class="fas fa-power-off" /></span>&nbsp;
+          class="text-and-icon"
+          v-if="$store.state.user && $store.state.user.uid">
+          <span class="log-out">logout</span>
+          <span class="icon is-small">
+            <i class="fas fa-power-off" /></span>&nbsp;
+          </span>
       </span>
     </div>
 
@@ -62,13 +66,18 @@ export default {
 
 .top-nav {
   margin-right: 2.2em;
-  & > * {
+  .text-and-icon {
     color: blue;
-    text-decoration: underline;
     cursor: pointer;
+    position: relative;
+    .icon {
+      position: relative;
+      top: .2em;
+      left: .2em;
+    }
   }
   .log-out {
-    vertical-align: middle;
+    text-decoration: underline;
   }
 
 }

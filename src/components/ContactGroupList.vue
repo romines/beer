@@ -154,7 +154,7 @@ export default {
       } else {
         // a section is open, might be dirty
         const applyGroupOpenClosedState = this.detailGroup === section
-          ? this.detailGroup = ''
+          ? () => {this.detailGroup = ''}
           : () => openGroup(section, groupEl, true)
 
         if (this.$store.state.openContactIsDirty) {

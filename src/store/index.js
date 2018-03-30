@@ -29,6 +29,7 @@
     resortsRef: {},
     resortId: '',
     resortCountry: '',
+    mapFiles: [],
     contactGroups: [],
     loading: true,
     modal: {
@@ -59,8 +60,9 @@
         // Vue.set(state, 'user', user)
         state.user = {...user}
       },
-      'SET_RESORT_COUNTRY' (state, country) {
+      'SET_RESORT_META' (state, { country, mapFiles }) {
         state.resortCountry = country
+        state.mapFiles = mapFiles
       },
       'SET_CONTACT_GROUPS' (state, contactGroups) {
         state.contactGroups = contactGroups
@@ -104,7 +106,8 @@
             .onSnapshot(doc => {
               let resortData = doc.data()
               commit('SET_CONTACT_GROUPS', resortData.contactGroups)
-              commit('SET_RESORT_COUNTRY', resortData.country)
+              // commit('SET_RESORT_COUNTRY', resortData.country)
+              commit('SET_RESORT_META', { country: resortData.country, mapFiles: resortData.mapFiles })
             })
         })
       },
@@ -143,8 +146,9 @@
       },
       seed ({ rootState }) {
         const addMapIndexUuidAndHttp = (contact) => {
-          if (contact.id === undefined) contact.id = uuid();
-          if (contact.mapId === undefined) contact.mapId = 0;
+          if (contact.id === undefined) contact.id = uuid()
+          if (contact.mapId === undefined) contact.mapId = 0
+          if (contact.name === 'Emergency' || contact.name === ' Ski Patrol (Emergency)') contact.emergency = true;
           ['url', 'menu', 'reservations'].forEach(urlField => {
             if (contact[urlField] && contact[urlField].startsWith('www')) {
               contact[urlField] = 'http://' + contact[urlField]
