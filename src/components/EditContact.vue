@@ -169,7 +169,6 @@
     </div>
 
     <location-selector
-      v-if="localState.contact.rect"
       :coordinate-string="localState.contact.rect"
       :map-id="localState.contact.mapId"
       @coordinateClick="onCoordinateClick"
