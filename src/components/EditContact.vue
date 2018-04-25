@@ -404,7 +404,7 @@ export default {
       this.contactAtInitialization = JSON.parse(JSON.stringify(this.localState.contact))
     },
     saveContact () {
-      const number = this.localState.contact.number ? this.getPn(this.localState.contact.number).getNumber('international') : ''
+      const number = this.localState.contact.number ? this.getPn(this.localState.contact.number).getNumber('international').replace(/ /g,'-') : ''
       const sms = this.localState.contact.sms ? this.getPn(this.localState.contact.sms).getNumber('international') : ''
       const contact = {
         ...this.localState.contact,

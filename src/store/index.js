@@ -5,10 +5,14 @@
   import 'babel-polyfill'
   import jHContacts from '../assets/JH_contacts.json'
   import rLContacts from '../assets/RL_contacts.json'
-  const resortData = {
+  import aprilExport from '../../utils/firestore-export.json'
+  const resortDataOld = {
+    jackson_hole: jHContacts,
     russell_lands: rLContacts,
-    jackson_hole: jHContacts
   }
+  const resortData = aprilExport.resorts
+  console.log(resortDataOld)
+  console.log(resortData)
   // import contactSpec from '../assets/ContactSpec_rev_2-28.json'
   // console.log({contactSpec, jHContacts});
   const defaultModalContents = {
@@ -156,8 +160,12 @@
           })
           return contact
         }
-        const addContactIds = (group) => {
-          group.list = group.list.map(addMapIndexUuidAndHttp)
+        const replaceNumberSpaces = (contact) => {
+          contact.number = contact.number.replace(/ /g,'-')
+          return contact
+        }
+        const addContactIdsAndFormatPhoneNumbers = (group) => {
+          group.list = group.list.map(addMapIndexUuidAndHttp).map(replaceNumberSpaces)
           return group
         }
         const addNoSort = group => {
@@ -166,7 +174,7 @@
         }
         rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups
           .map(addNoSort)
-          .map(addContactIds)
+          .map(addContactIdsAndFormatPhoneNumbers)
         })
         // rootState.resortsRef.doc('russell_lands').set({ contactGroups: resortData.russell_lands.contactGroups, resortId: 'russell_lands', name: 'Russell Lands' })
       },
