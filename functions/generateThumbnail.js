@@ -7,6 +7,8 @@ const spawn = require('child-process-promise').spawn;
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const ONE_WEEK = '604800';
+
 
 module.exports = functions.storage.object().onChange((event) => {
   const object = event.data;
@@ -47,6 +49,7 @@ module.exports = functions.storage.object().onChange((event) => {
   const resortId = object.metadata.resortId
   const metadata = {
     contentType: object.contentType,
+    cacheControl: `public, max-age=${ONE_WEEK}`
   };
   // let fileName;
   return bucket.file(filePath).download({

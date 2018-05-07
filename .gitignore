@@ -1,6 +1,6 @@
 .DS_Store
 node_modules/
-functions/node_modules/
+**/node_modules/
 dist/
 npm-debug.log
 yarn-error.log
@@ -12,4 +12,5 @@ yarn-error.log
 src/firebaseConfig.js
 
 src/assets/*.json
+utils/*.json
 **/*-key.json

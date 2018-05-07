@@ -3,18 +3,11 @@
   import Firebase from 'firebase/app'
   import uuid from 'uuid/v4'
   import 'babel-polyfill'
-  import jHContacts from '../assets/JH_contacts.json'
-  import rLContacts from '../assets/RL_contacts.json'
-  import aprilExport from '../../utils/firestore-export.json'
-  const resortDataOld = {
-    jackson_hole: jHContacts,
-    russell_lands: rLContacts,
-  }
-  const resortData = aprilExport.resorts
-  console.log(resortDataOld)
+  import mayExport from '../../utils/firestore-export.json'
+
+  const resortData = mayExport.resorts
   console.log(resortData)
-  // import contactSpec from '../assets/ContactSpec_rev_2-28.json'
-  // console.log({contactSpec, jHContacts});
+
   const defaultModalContents = {
     heading: '',
     message: '',
@@ -172,11 +165,13 @@
           if (group.noSort === undefined) group.noSort = false
           return group
         }
+        // resortData is imported from json file
+
         rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups
           .map(addNoSort)
           .map(addContactIdsAndFormatPhoneNumbers)
         })
-        // rootState.resortsRef.doc('russell_lands').set({ contactGroups: resortData.russell_lands.contactGroups, resortId: 'russell_lands', name: 'Russell Lands' })
+
       },
       saveNewEmptyGroup ({rootState}, groupName) {
         let groups = rootState.contactGroups.slice()
