@@ -17,20 +17,20 @@ exports.httpEndpoint = functions.https.onRequest((request, response) => {
   }
   const stripContactIdsAndEmptyFields = (group) => {
     group.list = group.list
-      .map(rmUuid)
-      .map(stripEmptyFields)
+    .map(rmUuid)
+    .map(stripEmptyFields)
+    console.log(`${_deleteCount} fields deleted . . .`);
     return group
   }
   const stripEmptyFields = (contact) => {
     if (STRIP_EMPTY) {
       Object.keys(contact).forEach(key => {
         if ((contact[key]) !== 0 && !contact[key]) {
-          delete contact[key]
-          _deleteCount += 1
+          delete contact[key];
+          _deleteCount += 1;
         }
       });
     }
-    console.log(`${_deleteCount} fields deleted . . .`);
     return contact
   }
 

@@ -263,13 +263,16 @@
         rootState.resortsRef.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
           if (!doc.data()) return
           const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
-          if (rootState.uploadBufferUrl) {
+          if (rootState.uploadBufferUrl && (rootState.uploadBufferUrl === url)) {
             // image has been uploaded, but contact has not been saved
+            console.log('setting upload buffer url to newly scaled image');
             commit('SET_UPLOAD_BUFFER_URL', scaledUrl)
           } else {
+            // use .some to break loop as soon as we find the Contact Group and Contact whose url needs updating
             rootState.contactGroups.some((group, groupIndex) => {
               return group.list.some((contact, contactIndex) => {
                 if (contact.imageUrl === url) {
+                  console.log(`setting ${rootState.contactGroups[groupIndex].section} > ${rootState.contactGroups[groupIndex].list[contactIndex].name} imageUrl to that of newly scaled image . . .`);
                   commit('UPDATE_IMAGE_URL', { groupIndex, contactIndex, scaledUrl })
                   return true
                 }

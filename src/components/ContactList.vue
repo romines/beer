@@ -117,6 +117,7 @@ export default {
         }
 
         if (this.$store.state.uploadBufferUrl) this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)
+
         this.$store.commit('SET_CONTACT_DIRTY_STATE', false)
         this.editingContactId = ''
         onConfirmDirtyClose && onConfirmDirtyClose()
