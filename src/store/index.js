@@ -4,9 +4,12 @@
   import uuid from 'uuid/v4'
   import 'babel-polyfill'
   import mayExport from '../../utils/firestore-export.json'
+  import thredbo from '../../utils/thredbo.json'
 
   const resortData = mayExport.resorts
+  resortData.thredbo = thredbo
   console.log(resortData)
+  console.log(thredbo)
 
   const defaultModalContents = {
     heading: '',
@@ -94,6 +97,9 @@
 
         if (!user) user = Firebase.auth().currentUser
 
+        // if user is admin, listen to a ref that shows available resorts
+        // else, listen to resort root
+
         rootState.db.collection('users').doc(user.uid).get().then(doc => {
           const userData = doc.data()
           user.authorizedResortIds = userData.authorizedResortIds
@@ -167,7 +173,10 @@
         }
         // resortData is imported from json file
 
-        rootState.resortsRef.doc(rootState.resortId).update({ contactGroups: resortData[rootState.resortId].contactGroups
+        // const resortId = rootState.resortId
+        const resortId = 'thredbo'
+        console.log(`updating contact for ${resortId} . . .`);
+        rootState.resortsRef.doc(resortId).update({ contactGroups: resortData[resortId].contactGroups
           .map(addNoSort)
           .map(addContactIdsAndFormatPhoneNumbers)
         })
@@ -260,9 +269,11 @@
         })
       },
       listenForScaledImage ({ rootState, commit }, { fileName, url }) {
+        console.log('Listening for scaled image . . .');
         rootState.resortsRef.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
           if (!doc.data()) return
           const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
+
           if (rootState.uploadBufferUrl && (rootState.uploadBufferUrl === url)) {
             // image has been uploaded, but contact has not been saved
             console.log('setting upload buffer url to newly scaled image');

@@ -396,7 +396,6 @@ export default {
   methods: {
 
     initializeContact () {
-      console.log('initializing contact . . .');
       const defaults = JSON.parse(JSON.stringify(contactDefaults))
       // this.localState.contact = Object.assign(defaults, this.contact)
       this.localState.contact = {...defaults, ...this.contact}

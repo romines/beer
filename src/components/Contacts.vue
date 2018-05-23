@@ -1,13 +1,5 @@
 <template>
-  <div class="main">
-
-    <!-- TODO: move this somewhere common -->
-    <h1 class="title">
-      <router-link to="/"><img src="../assets/logo.png"></router-link>
-      <span class="page-title">
-        Contact Management
-      </span>
-    </h1>
+  <div class="contacts">
 
     <contact-group-list :new-group-identifier="newGroupIdentifier"/>
 
