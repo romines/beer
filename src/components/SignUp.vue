@@ -13,7 +13,7 @@
       <div class="card">
         <header class="card-header">
           <p class="card-header-title">
-            Sign Up | ResortId: {{ resortId }}
+            Sign Up
           </p>
         </header>
         <div class="card-content">

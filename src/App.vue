@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <!-- temp -->
+
+    <!-- TODO: nav to separate component -->
     <div class="top-nav-container">
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
@@ -18,9 +19,12 @@
     </div>
 
     <modal />
-    <!-- end temp -->
+
+    <!-- main content area -->
     <loading-spinner v-if="$store.state.loading" />
     <router-view v-if="!$store.state.loading"/>
+    <!--  -->
+
   </div>
 </template>
 
@@ -66,18 +70,23 @@ export default {
 
 .top-nav {
   margin-right: 2.2em;
+  color: blue !important;
+  & > *:not(.text-and-icon) {
+    text-decoration: underline;
+  }
+
   .text-and-icon {
-    color: blue;
     cursor: pointer;
     position: relative;
+    .log-out {
+      text-decoration: underline;
+    }
+
     .icon {
       position: relative;
       top: .2em;
       left: .2em;
     }
-  }
-  .log-out {
-    text-decoration: underline;
   }
 
 }

@@ -10,6 +10,7 @@
     </h1>
 
     <div class="main">
+
       <div class="card">
         <div class="card-header">
           <p class="card-header-title">
@@ -44,16 +45,7 @@
             </p>
           </div>
         </div>
-        <!-- <footer class="card-footer">
-          <p class="card-footer-item">
-            <span>
-              <router-link to="/sign-up/amFja3Nvbl9ob2xl">Sign up</router-link> instead (TEMP!!!!)
-            </span>
-          </p>
-        </footer>
 
-
-        -->
       </div>
 
     </div>
@@ -62,7 +54,6 @@
 </template>
 
 <script>
-import Firebase from 'firebase/app'
 
 export default {
   components: {
