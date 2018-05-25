@@ -68,8 +68,9 @@ export default new Vuex.Store({
       state.mapFiles = mapFiles
     },
     'SET_CONTACT_GROUPS' (state, contactGroups) {
+      console.log('SET_CONTACT_GROUPS . . .');
       state.contactGroups = contactGroups
-      state.loading = false
+      // state.loading = false
     },
     'SHOW_MODAL' (state, contents) {
       state.modal.show = true
@@ -80,6 +81,9 @@ export default new Vuex.Store({
       state.modal.content = defaultModalContents
     },
     'SET_LOADING_STATE' (state, loading) {
+
+      console.log('SET_LOADING_STATE . . .');
+
       state.loading = loading
     },
     'SET_CONTACT_DIRTY_STATE' (state, isDirty) {
@@ -102,9 +106,6 @@ export default new Vuex.Store({
         const userData = doc.data()
         user.authorizedResortIds = userData.authorizedResortIds
 
-        // if user is admin, listen to a ref that shows available resorts
-        // else, listen to resort root
-
         commit('SET_RESORT_ID', userData.authorizedResortIds[0])  // Note hardcoded to first resortId in list
         commit('SET_USER', {
           email: user.email,
@@ -113,27 +114,12 @@ export default new Vuex.Store({
           authorizedResortIds: userData.authorizedResortIds
         })
 
-        // if (userData.superAdmin) {
-        //   return dispatch('getResorts')
-        // } else {
-
-        //   return rootState.resortsRef.doc(rootState.resortId)
-        //     .onSnapshot(doc => {
-        //       let resortData = doc.data()
-        //       commit('SET_CONTACT_GROUPS', resortData.contactGroups)
-        //       // commit('SET_RESORT_COUNTRY', resortData.country)
-        //       commit('SET_RESORT_META', { country: resortData.country, mapFiles: resortData.mapFiles })
-        //     })
-
-        // }
-
       })
     },
     getResorts ({ rootState, commit }) {
       return rootState.resortsRef.get().then(snapshot => {
         let resorts = []
         snapshot.forEach(doc => {
-          console.log(doc.data())
           resorts.push(doc.data())
         })
         commit('SET_RESORTS', resorts)
@@ -142,13 +128,19 @@ export default new Vuex.Store({
     listenToContacts ({ rootState, commit }) {
 
       console.log('listen[ing]ToContacts . . .');
-      return rootState.resortsRef.doc(rootState.resortId)
-        .onSnapshot(doc => {
-          let resortData = doc.data()
-          commit('SET_CONTACT_GROUPS', resortData.contactGroups)
-          // commit('SET_RESORT_COUNTRY', resortData.country)
-          commit('SET_RESORT_META', { country: resortData.country, mapFiles: resortData.mapFiles })
-        })
+
+      return new Promise((resolve, reject) => {
+        rootState.resortsRef.doc(rootState.resortId)
+          .onSnapshot(doc => {
+            let resortData = doc.data()
+            commit('SET_CONTACT_GROUPS', resortData.contactGroups)
+            // commit('SET_RESORT_COUNTRY', resortData.country)
+            commit('SET_RESORT_META', { country: resortData.country, mapFiles: resortData.mapFiles })
+            resolve()
+          }, (err) => reject(`Error listening to contacts: ${err}`))
+
+      })
+
 
     },
     logIn ({ commit, dispatch }, { email, password, onSuccess }) {
@@ -156,6 +148,7 @@ export default new Vuex.Store({
         .signInWithEmailAndPassword(email, password)
         .then(onSuccess, error => {
           commit('SET_LOADING_STATE', false)
+
           dispatch('showErrorModal', error.message)
         })
     },
@@ -183,6 +176,7 @@ export default new Vuex.Store({
           onSuccess()
         }, error => {
           commit('SET_LOADING_STATE', false)
+
           dispatch('showErrorModal', error.message)
         })
 

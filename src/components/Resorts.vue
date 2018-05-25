@@ -15,7 +15,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -24,15 +23,23 @@ export default {
     return {}
   },
   computed: {
-    ...mapState([
-      'resorts'
-    ])
-
+    resorts () {
+      return this.$store.state.resorts.slice().sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      })
+    }
   },
   created () {
   },
   methods: {
     goToResort (resortId) {
+      this.$store.commit('SET_LOADING_STATE', true)
       this.$router.push(`resorts/${resortId}`)
     }
   }

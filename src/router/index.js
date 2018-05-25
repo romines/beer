@@ -13,17 +13,52 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (store.state.user.superAdmin) return next('/resorts')
+      store.dispatch('listenToContacts').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
+    }
   },
   {
     path: '/resorts',
     name: 'resorts',
-    component: Resorts
+    component: Resorts,
+    meta: {
+      requiresAuth: true,
+      requiresSuperAdmin: true
+    },
+    beforeEnter: (to, from, next) => {
+      store.dispatch('getResorts').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
+    }
   },
   {
     path: '/resorts/:resortId',
     name: 'resort',
-    component: Resort
+    component: Resort,
+    meta: {
+      requiresAuth: true,
+      requiresSuperAdmin: true
+    },
+    beforeEnter: (to, from, next) => {
+      store.dispatch('getResorts')
+        .then(() => {
+          store.commit('SET_RESORT_ID', to.params.resortId)
+          return store.dispatch('listenToContacts')
+        })
+        .then(() => {
+          store.commit('SET_LOADING_STATE', false)
+          next()
+        })
+    }
   },
   {
     path: '/login',
@@ -48,26 +83,35 @@ router.beforeEach((to, from, next) => {
 
   store.commit('SET_FB_REFS', Firebase)
 
-  if (to.name === 'login' || to.name === 'sign-up' || to.params.adminRedirect) {
-    store.commit('SET_LOADING_STATE', false)
-    return next()
-  }
-
-  if (!Firebase.auth().currentUser) {
-    return next('/login')
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!Firebase.auth().currentUser) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      store.dispatch('getUserData', Firebase.auth().currentUser).then(() => {
+        if (to.matched.some(record => record.meta.requiresSuperAdmin)) {
+          // route requires superAdmin. check vuex state
+          // user, redirect if not superAdmin
+          if (store.state.user.superAdmin) {
+            next()
+          } else {
+            next('/')
+          }
+        } else {
+          // must be authenticated, can be regular user
+          next()
+        }
+      })
+    }
   } else {
-
-    store.dispatch('getUserData', Firebase.auth().currentUser).then(() => {
-
-      if (store.state.user.superAdmin && to.name === 'resorts') {
-        store.dispatch('getResorts').then(() => next({ name: 'resorts', params: { adminRedirect: true }}))
-      } else {
-        if (to.params.resortId) store.commit('SET_RESORT_ID', to.params.resortId)
-        store.dispatch('listenToContacts').then(() => next())
-      }
-
-    })
+    // routes open to unauthenticated users
+    next()
   }
+
 
 })
 
