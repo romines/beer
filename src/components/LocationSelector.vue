@@ -33,13 +33,14 @@
 
 <script>
 import Viewer from "v-viewer/src/component.vue"
-// import pixel_grid from '../assets/pixel_grid.png'
+import thredbo from '../assets/thredbo.png'
 import jh_village from '../assets/jh_village.png'
 import russell_lands from '../assets/russell_lands.png'
 
 const imageDefinitions = {
   jh_village,
-  russell_lands
+  russell_lands,
+  thredbo
 }
 
 export default {

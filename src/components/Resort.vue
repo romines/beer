@@ -1,6 +1,11 @@
 <template>
   <div class="resorts">
-    <h3>Manage Resort</h3>
+    <h1 class="title">
+      <router-link to="/"><img src="../assets/logo.png"></router-link>
+      <span class="page-title">
+        Contact Management
+      </span>
+    </h1>
     <contacts />
   </div>
 </template>

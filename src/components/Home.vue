@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="home">
 
     <h1 class="title">
       <router-link to="/"><img src="../assets/logo.png"></router-link>

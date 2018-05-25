@@ -5,8 +5,8 @@
     <div class="top-nav-container">
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
-        <router-link to="json">JSON</router-link>
-        <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp;
+        <!-- <router-link to="json">JSON</router-link> -->
+        <!-- <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp; -->
         <span
           @click="logOut"
           class="text-and-icon"
@@ -22,7 +22,7 @@
 
     <!-- main content area -->
     <loading-spinner v-if="$store.state.loading" />
-    <router-view v-if="!$store.state.loading"/>
+    <router-view class="main" v-if="!$store.state.loading" />
     <!--  -->
 
   </div>

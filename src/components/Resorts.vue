@@ -1,8 +1,15 @@
 <template>
   <div class="resorts">
-    <h3>Resorts</h3>
+    <h1 class="title">
+      <router-link to="/"><img src="../assets/logo.png"></router-link>
+      <span class="page-title">
+        Resort Management
+      </span>
+    </h1>
     <ul>
-      <li class="resort" v-for="resort in resorts" @click="goToResort(resort.resortId)">{{ resort.name }}</li>
+      <li class="resort box" v-for="resort in resorts" @click="goToResort(resort.resortId)">
+        <span class="name">{{ resort.name }}</span>
+      </li>
     </ul>
   </div>
 </template>
@@ -32,5 +39,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.resorts {
+  .resort.box:not(:last-child) {
+    margin-bottom: .88rem;
+  }
+}
 </style>
