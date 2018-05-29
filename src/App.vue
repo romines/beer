@@ -6,7 +6,7 @@
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
         <!-- <router-link to="json">JSON</router-link> -->
-        <!-- <span @click="$store.dispatch('seed')">reset contacts</span>&nbsp; -->
+        <span @click="$store.dispatch('archive')">archive</span>&nbsp;
         <span
           @click="logOut"
           class="text-and-icon"

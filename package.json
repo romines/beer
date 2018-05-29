@@ -17,6 +17,7 @@
     "babel-polyfill": "^6.26.0",
     "bulma": "^0.6.2",
     "firebase": "^4.10.1",
+    "moment": "^2.22.1",
     "uuid": "^3.2.1",
     "v-viewer": "file:../v-viewer",
     "vue": "^2.5.15",

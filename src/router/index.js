@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Firebase from '../firebaseInit.js'
 
 import Home from '../components/Home'
+import Archive from '../components/Archive'
 import Login from '../components/Login'
 import SignUp from '../components/SignUp'
 import Resorts from '../components/Resorts'
@@ -15,11 +16,28 @@ const routes = [
     name: 'home',
     component: Home,
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresResortId: true
     },
     beforeEnter: (to, from, next) => {
       if (store.state.user.superAdmin) return next('/resorts')
       store.dispatch('listenToContacts').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
+    }
+  },
+  {
+    path: '/history',
+    name: 'history',
+    component: Archive,
+    meta: {
+      requiresAuth: true,
+      requiresResortId: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      store.dispatch('listenToArchiveList').then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })

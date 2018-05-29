@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 // import Firebase from 'firebase/app'
 import Firebase from '../firebaseInit.js'
+import moment from 'moment'
 
 import uuid from 'uuid/v4'
 import 'babel-polyfill'
@@ -32,6 +33,7 @@ let state = {
   resortCountry: '',
   mapFiles: [],
   contactGroups: [],
+  archives: {},
   loading: true,
   modal: {
     show: false,
@@ -49,8 +51,10 @@ export default new Vuex.Store({
     'SET_FB_REFS' (state, firebase) {
       console.log('setting FB_REFS . . .');
       const db = firebase.firestore()
+      const rtDb = firebase.database()
       const storage = firebase.storage()
       state.db = db
+      state.rtDb = rtDb
       state.resortsRef = db.collection('resorts')
       state.storageRef = storage.ref()
     },
@@ -70,7 +74,9 @@ export default new Vuex.Store({
     'SET_CONTACT_GROUPS' (state, contactGroups) {
       console.log('SET_CONTACT_GROUPS . . .');
       state.contactGroups = contactGroups
-      // state.loading = false
+    },
+    'SET_ARCHIVE_LIST' (state, archives) {
+      state.archives = archives
     },
     'SHOW_MODAL' (state, contents) {
       state.modal.show = true
@@ -219,7 +225,31 @@ export default new Vuex.Store({
       }
 
     },
-    saveNewEmptyGroup ({rootState}, groupName) {
+    archive ({ rootState }, { name, description }) {
+      const resortRoot = rootState.rtDb.ref(rootState.resortId)
+      const archiveListRef = resortRoot.child('archives').push()
+      const archiveKey = archiveListRef.key
+      const now = moment()
+      const archiveName = name ? name : now.format('llll')
+
+      let updates = {};
+      updates[`/archives/${archiveKey}`] = {
+        date: now.valueOf(),
+        name: archiveName,
+        description
+      }
+      updates[`/archiveData/${archiveKey}`] = rootState.contactGroups
+      resortRoot.update(updates)
+    },
+    listenToArchiveList ({ rootState, commit }) {
+      const resortId = 'jackson_hole' // TEMP
+      rootState.rtDb.ref(`${resortId}/archives`).on('value', snap => {
+        // do we care that that this is an object instead of array?
+        // const archives = snap.val()
+        commit('SET_ARCHIVE_LIST', snap.val())
+      })
+    },
+    saveNewEmptyGroup ({ rootState }, groupName) {
       let groups = rootState.contactGroups.slice()
       groups.push({
         section: groupName,

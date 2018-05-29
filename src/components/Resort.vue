@@ -35,7 +35,7 @@ export default {
   methods: {
     goBack () {
       this.$store.commit('SET_LOADING_STATE', true)
-      this.$router.go(-1)
+      this.$router.push('/resorts')
     }
   }
 }
