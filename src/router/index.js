@@ -88,8 +88,7 @@ router.beforeEach((to, from, next) => {
     // if not, redirect to login page.
     if (!Firebase.auth().currentUser) {
       next({
-        path: '/login',
-        query: { redirect: to.fullPath }
+        path: '/login'
       })
     } else {
       store.dispatch('getUserData', Firebase.auth().currentUser).then(() => {
@@ -109,6 +108,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     // routes open to unauthenticated users
+    store.commit('SET_LOADING_STATE', false)
     next()
   }
 
