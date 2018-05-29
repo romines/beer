@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import firebase from '../firebaseInit.js'
 
 export default {
   data () {
@@ -38,7 +39,7 @@ export default {
         }
       }
       const fileName = (new Date().getTime()) + '.' + file.name.split('.')[file.name.split('.').length -1]
-      const newImageRef = this.$store.state.storageRef.child(`${this.$store.state.resortId}/images/${fileName}`)
+      const newImageRef = firebase.storage().child(`${this.$store.state.resortId}/images/${fileName}`)
       const uploadTask = newImageRef.put(file, metadata)
 
       uploadTask.on('state_changed',

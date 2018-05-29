@@ -31,13 +31,11 @@ body {
   margin: -28px auto;
   padding: 43px .85rem;
 }
-.title {
-  display: flex;
-  justify-content: space-around;
-}
-.page-title {
-  margin-left: 1.2em;
-}
+// .title {
+//   display: flex;
+//   justify-content: space-around;
+// }
+
 .card-footer-item {
   justify-content: flex-start;
 }
@@ -98,7 +96,6 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-/* Rounded sliders */
 .slider.round {
   border-radius: 34px;
 }

@@ -6,7 +6,7 @@
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
         <!-- <router-link to="json">JSON</router-link> -->
-        <span @click="$store.dispatch('archive')">archive</span>&nbsp;
+        <router-link to="/history" v-if="$store.state.user && $store.state.user.uid">Save/Publish</router-link>&nbsp;
         <span
           @click="logOut"
           class="text-and-icon"

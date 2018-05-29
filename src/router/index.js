@@ -1,6 +1,6 @@
 import store from '../store'
 import VueRouter from 'vue-router'
-import Firebase from '../firebaseInit.js'
+import firebase from '../firebaseInit.js'
 
 import Home from '../components/Home'
 import Archive from '../components/Archive'
@@ -99,18 +99,15 @@ const router = new VueRouter({ routes })
 
 router.beforeEach((to, from, next) => {
 
-  store.commit('SET_FB_REFS', Firebase)
-
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!Firebase.auth().currentUser) {
+    if (!firebase.auth().currentUser) {           // why not check for user in store?
       next({
-        path: '/login',
-        query: { redirect: to.fullPath }
+        path: '/login'
       })
     } else {
-      store.dispatch('getUserData', Firebase.auth().currentUser).then(() => {
+      store.dispatch('getUserData', firebase.auth().currentUser).then(() => {
         if (to.matched.some(record => record.meta.requiresSuperAdmin)) {
           // route requires superAdmin. check vuex state
           // user, redirect if not superAdmin
@@ -127,6 +124,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     // routes open to unauthenticated users
+    store.commit('SET_LOADING_STATE', false)
     next()
   }
 

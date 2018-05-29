@@ -1,12 +1,9 @@
 <template>
   <div class="home">
 
-    <h1 class="title">
-      <router-link to="/"><img src="../assets/logo.png"></router-link>
-      <span class="page-title">
-        Contact Management
-      </span>
-    </h1>
+    <site-header>
+      <span slot="title">Contact Management</span>
+    </site-header>
 
     <contacts />
 
@@ -15,10 +12,12 @@
 
 <script>
 import Contacts from './Contacts'
+import SiteHeader from './SiteHeader'
 
 export default {
   components: {
-    Contacts
+    Contacts,
+    SiteHeader
   },
   data () {
     return {

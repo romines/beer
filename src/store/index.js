@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 // import Firebase from 'firebase/app'
-import Firebase from '../firebaseInit.js'
+import firebase from '../firebaseInit.js'
 import moment from 'moment'
 
 import uuid from 'uuid/v4'
 import 'babel-polyfill'
 import mayExport from '../../utils/firestore-export.json'
 import thredbo from '../../utils/thredbo.json'
+
+const RESORTS_REF = firebase.firestore().collection('resorts') // is there a better way to call attention to module scoped var
 
 const SEED_DATA = mayExport.resorts
 SEED_DATA.thredbo = thredbo
@@ -48,16 +50,6 @@ let state = {
 export default new Vuex.Store({
   state,
   mutations: {
-    'SET_FB_REFS' (state, firebase) {
-      console.log('setting FB_REFS . . .');
-      const db = firebase.firestore()
-      const rtDb = firebase.database()
-      const storage = firebase.storage()
-      state.db = db
-      state.rtDb = rtDb
-      state.resortsRef = db.collection('resorts')
-      state.storageRef = storage.ref()
-    },
     'SET_RESORT_ID' (state, resortId) {
       state.resortId = resortId
     },
@@ -108,7 +100,7 @@ export default new Vuex.Store({
     getUserData ({ rootState, commit, dispatch }, user) {
       console.log('getUserData dispatched . . .');
 
-      return rootState.db.collection('users').doc(user.uid).get().then(doc => {
+      return firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
         const userData = doc.data()
         user.authorizedResortIds = userData.authorizedResortIds
 
@@ -122,8 +114,8 @@ export default new Vuex.Store({
 
       })
     },
-    getResorts ({ rootState, commit }) {
-      return rootState.resortsRef.get().then(snapshot => {
+    getResorts ({ commit }) {
+      return RESORTS_REF.get().then(snapshot => {
         let resorts = []
         snapshot.forEach(doc => {
           resorts.push(doc.data())
@@ -136,7 +128,7 @@ export default new Vuex.Store({
       console.log('listen[ing]ToContacts . . .');
 
       return new Promise((resolve, reject) => {
-        rootState.resortsRef.doc(rootState.resortId)
+        RESORTS_REF.doc(rootState.resortId)
           .onSnapshot(doc => {
             let resortData = doc.data()
             commit('SET_CONTACT_GROUPS', resortData.contactGroups)
@@ -150,7 +142,7 @@ export default new Vuex.Store({
 
     },
     logIn ({ commit, dispatch }, { email, password, onSuccess }) {
-      return Firebase.auth()
+      return firebase.auth()
         .signInWithEmailAndPassword(email, password)
         .then(onSuccess, error => {
           commit('SET_LOADING_STATE', false)
@@ -159,7 +151,7 @@ export default new Vuex.Store({
         })
     },
     logOut ({ commit }) {
-      Firebase.auth()
+      firebase.auth()
       .signOut()
       .then(() => {
         commit('SET_USER', {})
@@ -168,12 +160,12 @@ export default new Vuex.Store({
     },
     createUser ({ rootState, commit, dispatch }, { email, password, resortId, onSuccess }) {
       let firebaseUser
-      return Firebase.auth()
+      return firebase.auth()
         .createUserWithEmailAndPassword(email, password)
         .then( user => {
           firebaseUser = user
           firebaseUser.authorizedResortIds = [resortId]
-          return rootState.db.collection('users').doc(firebaseUser.uid).set({
+          return firebase.firestore().collection('users').doc(firebaseUser.uid).set({
             authorizedResortIds: [resortId],
             email
           })
@@ -218,7 +210,7 @@ export default new Vuex.Store({
         return console.log(`No resort data found for ${resortId}!`)
       } else {
         console.log(`updating contact for ${resortId} . . .`);
-        rootState.resortsRef.doc(resortId).update({ contactGroups: SEED_DATA[resortId].contactGroups
+        RESORTS_REF.doc(resortId).update({ contactGroups: SEED_DATA[resortId].contactGroups
           .map(addNoSort)
           .map(addContactIdsAndFormatPhoneNumbers)
         })
@@ -226,7 +218,7 @@ export default new Vuex.Store({
 
     },
     archive ({ rootState }, { name, description }) {
-      const resortRoot = rootState.rtDb.ref(rootState.resortId)
+      const resortRoot = firebase.database().ref(rootState.resortId)
       const archiveListRef = resortRoot.child('archives').push()
       const archiveKey = archiveListRef.key
       const now = moment()
@@ -243,7 +235,7 @@ export default new Vuex.Store({
     },
     listenToArchiveList ({ rootState, commit }) {
       const resortId = 'jackson_hole' // TEMP
-      rootState.rtDb.ref(`${resortId}/archives`).on('value', snap => {
+      firebase.database().ref(`${resortId}/archives`).on('value', snap => {
         // do we care that that this is an object instead of array?
         // const archives = snap.val()
         commit('SET_ARCHIVE_LIST', snap.val())
@@ -255,33 +247,33 @@ export default new Vuex.Store({
         section: groupName,
         list: []
       })
-      return rootState.db.collection('resorts').doc(rootState.resortId).update({
+      return firebase.firestore().collection('resorts').doc(rootState.resortId).update({
         contactGroups: groups
       })
     },
     saveContactGroupName ({ rootState }, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
-      rootState.resortsRef.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       })
     },
     deleteContactGroup ({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups.splice(groupIndex, 1)
-      return rootState.resortsRef.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       })
     },
     saveContactGroupList ({ rootState }, { updatedList }) {
-      return rootState.resortsRef.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: updatedList
       })
     },
     toggleSortable ({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].noSort = !rootState.contactGroups[groupIndex].noSort
-      rootState.resortsRef.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       })
     },
@@ -297,7 +289,7 @@ export default new Vuex.Store({
         // existing contact
         groups[groupIndex].list[contactIndex] = updatedContact
       }
-      return rootState.resortsRef.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       }).then(() => { commit('SET_UPLOAD_BUFFER_URL', '')})
     },
@@ -308,11 +300,11 @@ export default new Vuex.Store({
       const contact = groups[groupIndex].list.splice(contactIndex, 1)[0]
 
       if (!contact.imageUrl) {
-        return rootState.resortsRef.doc(rootState.resortId).update({
+        return RESORTS_REF.doc(rootState.resortId).update({
           contactGroups: groups
         })
       } else {
-        return rootState.resortsRef.doc(rootState.resortId).update({
+        return RESORTS_REF.doc(rootState.resortId).update({
           contactGroups: groups
         }).then(() => { return dispatch('destroyImageFile', contact.imageUrl) })
       }
@@ -321,12 +313,12 @@ export default new Vuex.Store({
     saveContactList ({ rootState }, payload) {
       let groups = rootState.contactGroups.slice()
       groups[payload.groupIndex].list = payload.updatedList
-      rootState.resortsRef.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       })
     },
     destroyImageFile ({ rootState, commit }, url) {
-      const refToDestroy = Firebase.storage().refFromURL(url)
+      const refToDestroy = firebase.storage().refFromURL(url)
       if (!refToDestroy) { console.log('hey! empty ref cannot be destroyed!'); return; }
       return refToDestroy.delete().then(() => {
         console.log('File deleted successfully')
@@ -337,7 +329,7 @@ export default new Vuex.Store({
     },
     listenForScaledImage ({ rootState, commit }, { fileName, url }) {
       console.log('Listening for scaled image . . .');
-      rootState.resortsRef.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
+      RESORTS_REF.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
         if (!doc.data()) return
         const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
 
