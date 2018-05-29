@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot --progress",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "stage": "cross-env NODE_ENV=staging webpack --progress --hide-modules && firebase deploy -P staging"
   },
   "dependencies": {
     "animate.css": "^3.6.1",

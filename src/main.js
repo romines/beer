@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import Firebase from './firebaseInit.js'
+import firebase from './firebaseInit.js'
 import router from './router'
 import store from './store'
 import App from './App.vue'
@@ -11,7 +11,7 @@ Vue.use(VueRouter)
 Vue.use(wysiwyg, { hideModules: { 'code': true, 'image': true, 'table': true  }})
 Vue.config.productionTip = false
 
-Firebase.auth().onAuthStateChanged(() => {
+firebase.auth().onAuthStateChanged(() => {
 
   new Vue({
     el: '#app',

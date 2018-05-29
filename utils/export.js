@@ -2,13 +2,15 @@
 var admin = require("./firebaseAdmin.js");
 var fs = require('fs');
 
-// var collectionName = process.argv[2];
-var collectionName = 'resorts';
+var collectionName = process.argv[2] ? process.argv[2] : 'resorts';
+var fileName = process.argv[3] ? process.argv[3] : 'firestore-export.json';
 
 var db = admin.firestore();
 
 var data = {};
 data[collectionName] = {};
+
+console.log('NOTE: exporting from production . . .');
 
 var results = db.collection(collectionName)
   .get()
@@ -24,7 +26,7 @@ var results = db.collection(collectionName)
 
 results.then(data => {
   // Write collection to JSON file
-  fs.writeFile("firestore-export.json", JSON.stringify(data), function(err) {
+  fs.writeFile(fileName, JSON.stringify(data), function(err) {
       if(err) {
           return console.log(err);
       }

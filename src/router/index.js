@@ -21,10 +21,12 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (store.state.user.superAdmin) return next('/resorts')
+
       store.dispatch('listenToContacts').then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })
+
     }
   },
   {
@@ -107,6 +109,7 @@ router.beforeEach((to, from, next) => {
         path: '/login'
       })
     } else {
+
       store.dispatch('getUserData', firebase.auth().currentUser).then(() => {
         if (to.matched.some(record => record.meta.requiresSuperAdmin)) {
           // route requires superAdmin. check vuex state
@@ -121,6 +124,7 @@ router.beforeEach((to, from, next) => {
           next()
         }
       })
+
     }
   } else {
     // routes open to unauthenticated users

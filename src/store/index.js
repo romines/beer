@@ -7,12 +7,12 @@ import moment from 'moment'
 import uuid from 'uuid/v4'
 import 'babel-polyfill'
 import mayExport from '../../utils/firestore-export.json'
-import thredbo from '../../utils/thredbo.json'
+import userData from '../../utils/userData.json'
 
 const RESORTS_REF = firebase.firestore().collection('resorts') // is there a better way to call attention to module scoped var
 
 const SEED_DATA = mayExport.resorts
-SEED_DATA.thredbo = thredbo
+const USER_DATA = userData.users
 
 const defaultModalContents = {
   heading: '',
@@ -28,8 +28,6 @@ Vue.use(Vuex)
 
 let state = {
   user: {},
-  db: {},
-  resortsRef: {},
   resorts: [],
   resortId: '',
   resortCountry: '',
@@ -192,6 +190,7 @@ export default new Vuex.Store({
         return contact
       }
       const replaceNumberSpaces = (contact) => {
+        if (!contact.number) return contact
         contact.number = contact.number.replace(/ /g,'-')
         return contact
       }
@@ -206,14 +205,21 @@ export default new Vuex.Store({
       // SEED_DATA is imported from json file
 
       const resortId = rootState.resortId
+
       if (!SEED_DATA[resortId].contactGroups || !Object.keys(SEED_DATA[resortId].contactGroups).length) {
         return console.log(`No resort data found for ${resortId}!`)
       } else {
         console.log(`updating contact for ${resortId} . . .`);
-        RESORTS_REF.doc(resortId).update({ contactGroups: SEED_DATA[resortId].contactGroups
+        const tempSeedData = SEED_DATA[resortId]
+        tempSeedData.contactGroups = tempSeedData.contactGroups
           .map(addNoSort)
           .map(addContactIdsAndFormatPhoneNumbers)
-        })
+
+        return RESORTS_REF.doc(resortId).set(tempSeedData)
+        // return RESORTS_REF.doc(resortId).update({ contactGroups: SEED_DATA[resortId].contactGroups
+        //   .map(addNoSort)
+        //   .map(addContactIdsAndFormatPhoneNumbers)
+        // })
       }
 
     },
