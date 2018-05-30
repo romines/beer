@@ -10,7 +10,7 @@
     </div>
     <textarea class="textarea" placeholder="Describe what's changed . . ." rows="3" v-model="newArchive.description"/>
     <div class="buttons">
-      <span class="button is-info">Save &amp; Publish</span>
+      <span class="button is-info" @click="saveAndPublish">Save &amp; Publish</span>
       <span class="button is-success" @click="saveNewArchive">Save</span>
       <span class="button is-danger" @click="cancelSaveNew">Cancel</span>
     </div>
@@ -37,12 +37,20 @@ export default {
   },
   methods: {
     saveNewArchive () {
+      this.resetForm()
       this.$store.dispatch('archive', this.newArchive)
     },
+    saveAndPublish () {
+      this.resetForm()
+      this.$store.dispatch('archive', {...this.newArchive, publish: true})
+    },
     cancelSaveNew () {
+      this.resetForm()
+      this.$emit('cancelSaveNew')
+    },
+    resetForm () {
       this.newArchive.name = ''
       this.newArchive.description = ''
-      this.$emit('cancelSaveNew')
     }
   }
 }

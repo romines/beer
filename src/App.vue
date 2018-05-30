@@ -5,7 +5,7 @@
     <div class="top-nav-container">
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
-        <!-- <router-link to="json">JSON</router-link> -->
+        <!-- <span @click="$store.dispatch('seedMeta')">seedMeta</span> -->
         <router-link to="/history" v-if="$store.state.user && $store.state.user.uid">Save/Publish</router-link>&nbsp;
         <span
           @click="logOut"

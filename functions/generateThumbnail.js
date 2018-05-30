@@ -10,8 +10,7 @@ const fs = require('fs');
 const ONE_WEEK = '604800';
 
 
-module.exports = functions.storage.object().onChange((event) => {
-  const object = event.data;
+module.exports = functions.storage.object().onFinalize((object, context) => {
   const filePath = object.name;
 
   // Exit if this is triggered on a file that is not an image.

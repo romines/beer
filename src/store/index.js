@@ -191,7 +191,7 @@ export default new Vuex.Store({
       }
       const replaceNumberSpaces = (contact) => {
         if (!contact.number) return contact
-        contact.number = contact.number.replace(/ /g,'-')
+        contact.number = contact.number.trim().replace(/ /g,'-')
         return contact
       }
       const addContactIdsAndFormatPhoneNumbers = (group) => {
@@ -223,30 +223,49 @@ export default new Vuex.Store({
       }
 
     },
-    archive ({ rootState }, { name, description }) {
-      const resortRoot = firebase.database().ref(rootState.resortId)
-      const archiveListRef = resortRoot.child('archives').push()
-      const archiveKey = archiveListRef.key
-      const now = moment()
-      const archiveName = name ? name : now.format('llll')
-
-      let updates = {};
-      updates[`/archives/${archiveKey}`] = {
-        date: now.valueOf(),
-        name: archiveName,
-        description
-      }
-      updates[`/archiveData/${archiveKey}`] = rootState.contactGroups
-      resortRoot.update(updates)
+    seedMeta ({ rootState }) {
+      firebase.database().ref(rootState.resortId).set(SEED_DATA[rootState.resortId])
     },
+
     listenToArchiveList ({ rootState, commit }) {
       const resortId = 'jackson_hole' // TEMP
       firebase.database().ref(`${resortId}/archives`).on('value', snap => {
         // do we care that that this is an object instead of array?
         // const archives = snap.val()
         commit('SET_ARCHIVE_LIST', snap.val())
+        return Promise.resolve()
       })
     },
+    archive ({ rootState }, { name, description, publish }) {
+      const resortRoot = firebase.database().ref(rootState.resortId)
+      const archiveListRef = resortRoot.child('archives').push()
+      const archiveKey = archiveListRef.key
+      const now = moment()
+      const archiveName = name ? name : now.format('llll')
+
+      let updates = {}
+      updates[`/archives/${archiveKey}`] = {
+        date: now.valueOf(),
+        name: archiveName,
+        description
+      }
+      updates[`/archiveData/${archiveKey}`] = rootState.contactGroups
+      if (publish) updates['published'] = archiveKey
+
+      resortRoot.update(updates)
+
+    },
+    deleteArchive ({ rootState }, archiveKey) {
+      const resortRoot = firebase.database().ref(rootState.resortId)
+      let updates = {}
+      updates[`/archives/${archiveKey}`] = null
+      updates[`/archiveData/${archiveKey}`] = null
+      resortRoot.update(updates)
+    },
+    toggleArchiveStar ({ rootState }, archive) {
+      firebase.database().ref(`${rootState.resortId}/archives/${archive.key}/starred/`).set(!archive.starred)
+    },
+
     saveNewEmptyGroup ({ rootState }, groupName) {
       let groups = rootState.contactGroups.slice()
       groups.push({

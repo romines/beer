@@ -39,7 +39,10 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
-      store.dispatch('listenToArchiveList').then(() => {
+      Promise.all([
+        store.dispatch('listenToArchiveList'),
+        store.dispatch('listenToContacts')
+      ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })
