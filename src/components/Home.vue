@@ -4,7 +4,7 @@
     <site-header>
       <span slot="title">Contact Management</span>
     </site-header>
-
+    <save-publish />
     <contacts />
 
   </div>
@@ -13,11 +13,13 @@
 <script>
 import Contacts from './Contacts'
 import SiteHeader from './SiteHeader'
+import SavePublish from './SavePublish'
 
 export default {
   components: {
     Contacts,
-    SiteHeader
+    SiteHeader,
+    SavePublish
   },
   data () {
     return {

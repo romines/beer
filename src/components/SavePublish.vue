@@ -1,19 +1,23 @@
 <template>
-  <div class="save-publish">
-    <div class="field">
-      <div class="control">
-        <input
-          v-model.trim="newArchive.name"
-          class="input"
-          placeholder="Name">
-      </div>
-    </div>
-    <textarea class="textarea" placeholder="Describe what's changed . . ." rows="3" v-model="newArchive.description"/>
-    <div class="buttons">
+  <div class="save-publish" v-show="dirty">
+    <div class="notice-and-buttons">
+      <span class="notice">You have unpublished changes</span>
       <span class="button is-info" @click="saveAndPublish">Save &amp; Publish</span>
       <span class="button is-success" @click="saveNewArchive">Save</span>
-      <span class="button is-danger" @click="cancelSaveNew">Cancel</span>
     </div>
+
+    <div class="name-and-notes" v-show="editingNotes">
+      <div class="field">
+        <div class="control">
+          <input
+            v-model.trim="newArchive.name"
+            class="input"
+            placeholder="Name">
+        </div>
+      </div>
+      <textarea class="textarea" placeholder="Describe what's changed . . ." rows="3" v-model="newArchive.description"/>
+    </div>
+
   </div>
 </template>
 
@@ -24,6 +28,7 @@ export default {
   },
   data () {
     return {
+      editingNotes: false,
       newArchive: {
         name: '',
         description: ''
@@ -31,9 +36,13 @@ export default {
     }
   },
   computed: {
-
+    dirty () {
+      if (!this.$store.state.publishedContacts.length) return false
+      return JSON.stringify(this.$store.state.publishedContacts) !== JSON.stringify(this.$store.state.contactGroups)
+    }
   },
-  created () {
+  mounted () {
+    this.$store.dispatch('listenToPublishedContacts')
   },
   methods: {
     saveNewArchive () {

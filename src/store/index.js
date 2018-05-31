@@ -33,6 +33,7 @@ let state = {
   resortCountry: '',
   mapFiles: [],
   contactGroups: [],
+  publishedContacts: [],
   archives: {},
   loading: true,
   modal: {
@@ -64,6 +65,10 @@ export default new Vuex.Store({
     'SET_CONTACT_GROUPS' (state, contactGroups) {
       console.log('SET_CONTACT_GROUPS . . .');
       state.contactGroups = contactGroups
+    },
+    'SET_PUBLISHED_CONTACTS' (state, publishedContacts) {
+      console.log('SET_PUBLISHED_CONTACTS . . .');
+      state.publishedContacts = publishedContacts
     },
     'SET_ARCHIVE_LIST' (state, archives) {
       state.archives = archives
@@ -136,6 +141,28 @@ export default new Vuex.Store({
           }, (err) => reject(`Error listening to contacts: ${err}`))
 
       })
+
+
+    },
+    listenToPublishedContacts ({ rootState, commit }) {
+
+      console.log('listen[ing]ToPublished . . .');
+      const resortRef = firebase.database().ref(rootState.resortId)
+
+      return new Promise((resolve, reject) => {
+
+        resortRef.child('published').on('value', snap => {
+          const key = snap.val()
+
+          resortRef.child(`archiveData/${key}`).on('value', snap => {
+            commit('SET_PUBLISHED_CONTACTS', snap.val())
+            resolve()
+          })
+
+        })
+
+      })
+
 
 
     },
