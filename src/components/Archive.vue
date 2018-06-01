@@ -3,27 +3,37 @@
     <site-header>
       <span slot="title">Manage Versions</span>
     </site-header>
-    <div class="box">
-      <h3 class="title is-4" @click="savingNew = !savingNew">Save New</h3>
-      <div class="save-form">
-        <save-publish v-show="savingNew" @cancelSaveNew="savingNew = false"/>
-      </div>
-    </div>
+    <save-publish />
     <ul class="archive-list">
-      <li class="archive box" v-for="archive in archives" :key="archive.date">
+      <li class="archive published-archive box" v-for="archive in publishedArchive" :key="archive.date">
         <div class="left">
           <span class="icon star" @click="$store.dispatch('toggleArchiveStar', archive)" :class="{'starred': archive.starred}">
             <i class="far fa-star off" />
             <i class="fas fa-star on" />
           </span>
-          <span class="name">{{ archive.name }} - {{ archive.description }} - {{ getDateString(archive.date) }}</span>
+          <span class="name">{{ archive.name }} - {{ getDateString(archive.date) }}</span>
           <span class="icon is-small edit">
             <i class="fas fa-edit" />
           </span>
         </div>
         <div class="right actions">
-          <span class="button is-small restore">Restore</span>
-          <span class="icon delete-archive is-small" @click="deleteArchive(archive)">
+          <span class="tag is-light">Published</span>
+        </div>
+      </li>
+      <li class="archive box" v-for="archive in remainder" :key="archive.date">
+        <div class="left">
+          <span class="icon star" @click="$store.dispatch('toggleArchiveStar', archive)" :class="{'starred': archive.starred}">
+            <i class="far fa-star off" />
+            <i class="fas fa-star on" />
+          </span>
+          <span class="name">{{ archive.name }} - {{ getDateString(archive.date) }}</span>
+          <span class="icon is-small edit">
+            <i class="fas fa-edit" />
+          </span>
+        </div>
+        <div class="right actions">
+          <span class="button is-small is-info restore">Restore</span>
+          <span class="button delete-archive is-small" @click="deleteArchive(archive)">
             <i class="fas fa-trash-alt"/>
           </span>
         </div>
@@ -53,20 +63,26 @@ export default {
   },
   computed: {
     archives () {
-      if (!this.$store.state.archives) return []
-      return Object.keys(this.$store.state.archives).map(key => {
+      if (!this.$store.state.archives.archives) return []
+      return Object.keys(this.$store.state.archives.archives).map(key => {
         return {
-          ...this.$store.state.archives[key],
+          ...this.$store.state.archives.archives[key],
           key
         }
       })
-    }
+    },
+    publishedArchive () {
+      return this.archives.filter(({key}) =>  key === this.$store.state.archives.publishedContactsKey )
+    },
+    remainder () {
+      return this.archives.filter(({key}) =>  key !== this.$store.state.archives.publishedContactsKey )
+    },
   },
   created () {
   },
   methods: {
     getDateString (time) {
-      return moment(time).format('ll')
+      return moment(time).format('llll')
     },
     deleteArchive (archive) {
 
@@ -80,17 +96,26 @@ export default {
         message: 'This cannot be undone.',
         onConfirm
       })
+    },
+
+    restoreArchive (archive) {
+
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+  @import '../sharedStyles.scss';
   .archive-list {
     .archive {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      &.published-archive {
+        border: 2px solid $dark;
+        background-color: $boneGrey;
+      }
       .icon {
         margin-top: -.22em;
       }

@@ -20,6 +20,7 @@
     "firebase": "^4.10.1",
     "moment": "^2.22.1",
     "uuid": "^3.2.1",
+    "v-click-outside": "^1.0.4",
     "v-viewer": "file:../v-viewer",
     "vue": "^2.5.15",
     "vue-cleave": "^1.2.2",

@@ -6,7 +6,7 @@
     <div class="right">
       <!-- <h3 class="sub-heading title is-3"> TODO: show resort name if superAdmin and not on /resorts
       </h3> -->
-      <h1 class="title page-title">
+      <h1 class="title page-title is-primary">
         <slot name="title" />
       </h1>
     </div>

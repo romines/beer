@@ -47,9 +47,11 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bulma/bulma.sass';
+@import "~bulma/sass/utilities/initial-variables";
+@import "~bulma/sass/utilities/functions";
+@import 'sharedStyles';
+@import '~bulma/bulma';
 @import '~animate.css/animate.css';
-@import 'sharedStyles.scss';
 @import "~vue-wysiwyg/dist/vueWysiwyg.css";
 
 // .contact-margin-setter:last-child .box {
@@ -96,7 +98,7 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  color: #272c30;
 }
 
 // drag and drop handles
