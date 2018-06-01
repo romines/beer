@@ -15,7 +15,7 @@
                 {{ contents.confirmButtonLabel ? contents.confirmButtonLabel : 'Confirm' }}
               </a>
             </p>
-            <p class="control no-expando cancel">
+            <p class="control no-expando cancel" v-if="!contents.hideCancel">
               <a class="button is-light" @click="onCancel">
                 {{ contents.cancelButtonLabel ? contents.cancelButtonLabel : 'Cancel' }}
               </a>

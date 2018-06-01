@@ -15,40 +15,38 @@ import userData from '../../utils/userData.json'
 const RESORTS_REF = firebase.firestore().collection('resorts') // is there a better way to call attention to module scoped var
 
 const SEED_DATA = mayExport.resorts
-const USER_DATA = userData.users
+// const USER_DATA = userData.users
 
 const defaultModalContents = {
   heading: '',
   message: '',
-  onConfirm: () => {return},
-  onCancel: () => {return},
+  onConfirm() { },
+  onCancel() { },
   buttonLess: false,
+  hideCancel: false,
   loading: false,
   classList: []
 }
 
 Vue.use(Vuex)
 
-let state = {
-  user: {},
-  resorts: [],
-  resortId: '',
-  resortCountry: '',
-  mapFiles: [],
-  contactGroups: [],
-  loading: true,
-  modal: {
-    show: false,
-    contents: defaultModalContents
+const store = {
+  state: {
+    user: {},
+    resorts: [],
+    resortId: '',
+    resortCountry: '',
+    mapFiles: [],
+    contactGroups: [],
+    loading: true,
+    modal: {
+      show: false,
+      contents: defaultModalContents
+    },
+    openContactIsDirty: false,
+    openGroupIsDirty: false,
+    uploadBufferUrl: ''
   },
-  openContactIsDirty: false,
-  openGroupIsDirty: false,
-  uploadBufferUrl: ''
-}
-
-
-export default new Vuex.Store({
-  state,
   mutations: {
     'SET_RESORT_ID' (state, resortId) {
       state.resortId = resortId
@@ -69,7 +67,7 @@ export default new Vuex.Store({
     },
     'SHOW_MODAL' (state, contents) {
       state.modal.show = true
-      state.modal.contents = {...contents}
+      state.modal.contents = contents
     },
     'CLOSE_MODAL' (state) {
       state.modal.show = false
@@ -338,6 +336,16 @@ export default new Vuex.Store({
         }
       })
     },
+    showModal ({ commit, rootState }, contents) {
+      // feel free to commit 'SHOW_MODAL' directly, however this action provides a default onConfirm
+      const mergedContents = {
+        ...rootState.modal.contents,
+        onConfirm() { console.log('default onConfirm . . .'); commit('CLOSE_MODAL') },
+        onCancel() { commit('CLOSE_MODAL') },
+        ...contents
+      }
+      commit('SHOW_MODAL', mergedContents)
+    },
     showErrorModal ({ commit }, message) {
       commit('SHOW_MODAL', {
         heading: 'An error has occurred!',
@@ -352,4 +360,6 @@ export default new Vuex.Store({
   modules: {
     archives
   }
-})
+}
+
+export default new Vuex.Store(store)

@@ -44,6 +44,7 @@ const routes = [
         store.dispatch('listenToContacts'),
         store.dispatch('listenToPublishedContacts')
       ]).then(() => {
+        console.log('archive keys length: ' + Object.keys(store.state.archives.archives).length);
         store.commit('SET_LOADING_STATE', false)
         next()
       })

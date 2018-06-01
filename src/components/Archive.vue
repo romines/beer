@@ -6,7 +6,7 @@
     <save-publish />
     <ul class="archive-list">
 
-      <li class="archive published-archive box">
+      <li class="archive published-archive box" v-if="publishedArchive">
 
         <div class="col col-one icon star" @click="$store.dispatch('toggleArchiveStar', publishedArchive)" :class="{'starred': publishedArchive.starred}">
           <i class="far fa-star off" />
@@ -17,7 +17,7 @@
           <!--  -->
           <div class="row-one" v-show="editingNameOfArchiveAtIndex !== -2">
               <span class="name">{{ publishedArchive.name }}</span>
-              <span class="icon edit is-small" @click.stop="editingNameOfArchiveAtIndex = -2">
+              <span class="icon edit is-small" @click.stop="editArchiveName(publishedArchive, -2)">
                 <i class="fas fa-edit"/>
               </span>
           </div>
@@ -25,8 +25,8 @@
           <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === -2">
             <input class="input is-small" v-model="archiveNameDraft" placeholder="Archive Name">
             <span class="actions" @click.stop>
-              <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
-              <button class="button is-small" @click.stop="editingNameOfArchiveAtIndex = -1; archiveNameDraft = '';">Cancel</button>
+              <button class="button is-primary is-small" @click.stop.prevent="saveArchiveName(archive)">Save</button>
+              <button class="button is-small" @click.stop="cancelArchiveNameEdit">Cancel</button>
             </span>
           </div>
           <!--  -->
@@ -58,16 +58,16 @@
           <!--  -->
           <div class="row-one" v-show="editingNameOfArchiveAtIndex !== index">
             <span class="name">{{ archive.name }}</span>
-            <span class="icon is-small edit" @click="editingNameOfArchiveAtIndex = index">
+            <span class="icon is-small edit" @click="editArchiveName(archive, index)">
               <i class="fas fa-edit" />
             </span>
           </div>
           <!-- Or -->
           <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === index">
-            <input class="input is-small archive-name" v-model="archiveNameDraft" placeholder="Archive Name">
+            <input class="input is-small archive-name" v-model="archiveNameDraft" :ref="'archiveNameInputs'" placeholder="Archive Name">
             <span class="actions" @click.stop>
-              <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
-              <button class="button is-small" @click.stop="editingNameOfArchiveAtIndex = -1; archiveNameDraft = '';">Cancel</button>
+              <button class="button is-primary is-small" @click.stop.prevent="saveArchiveName(archive)">Save</button>
+              <button class="button is-small" @click.stop="cancelArchiveNameEdit">Cancel</button>
             </span>
           </div>
           <!--  -->
@@ -75,7 +75,7 @@
 
         </div>
         <div class="col col-three actions">
-          <span class="button is-small is-info restore">Restore</span>
+          <span class="button is-small is-info restore" @click="restoreArchive(archive)">Restore</span>
           <span class="button delete-archive is-small" @click="deleteArchive(archive)">
             <i class="fas fa-trash-alt"/>
           </span>
@@ -101,7 +101,6 @@ export default {
         name: '',
         description: ''
       },
-      savingNew: false,
       archiveNameDraft: '',
       editingNameOfArchiveAtIndex: -1
     }
@@ -124,6 +123,7 @@ export default {
     },
   },
   created () {
+    // if (!this.$store.state.archives.archives.length) debugger
   },
   methods: {
     getDateString (time) {
@@ -143,10 +143,51 @@ export default {
       })
     },
 
-    restoreArchive (archive) {
+    editArchiveName (archive, index) {
+      this.archiveNameDraft = archive.name
+      this.editingNameOfArchiveAtIndex = index
+      this.$nextTick(() => this.$refs.archiveNameInputs[index].focus())
+    },
 
+    cancelArchiveNameEdit () {
+      this.editingNameOfArchiveAtIndex = -1
+      this.archiveNameDraft = ''
+    },
+
+    saveArchiveName ({ key }) {
+      this.$store.dispatch('saveArchiveName', { key, name: this.archiveNameDraft }).then(() => this.cancelArchiveNameEdit())
+    },
+
+    restoreArchive (archive) {
+      const goHome = () => this.$router.push('/')
+      const doRestore = () => {
+        this.$store.commit('SET_LOADING_STATE', true)
+        this.$store.dispatch('restoreArchive', archive).then(() => {
+          goHome()
+          this.$store.dispatch('showModal', {
+            heading: 'Contacts restored successfully',
+            message: 'You may edit restored contacts or publish them.',
+            confirmButtonLabel: 'OK',
+            hideCancel: true,
+          })
+          setTimeout(() => {
+            this.$store.commit('CLOSE_MODAL')
+          }, 7000);
+        })
+      }
+
+      if (this.$store.getters.dirty) {
+        this.$store.commit('SHOW_MODAL', {
+          heading: 'Discard unpublished changes?',
+          message: 'Restoring this version will overwrite your changes.',
+          onConfirm: doRestore
+        })
+      } else {
+        doRestore()
+      }
     }
   }
+
 }
 </script>
 
@@ -169,8 +210,11 @@ export default {
       .col-three {
         flex: 0 0 9em;
         border-left: 1px solid grey;
-        justify-content: space-evenly;
+        justify-content: center;
         display: inline-flex;
+        .button {
+          margin: 0 .4em;
+        }
       }
 
 
@@ -220,7 +264,7 @@ export default {
           flex-wrap: nowrap;
           padding: 0 .6em;
           .button {
-            margin: .3em;
+            margin: .4em;
           }
         }
       }
