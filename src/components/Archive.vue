@@ -5,33 +5,76 @@
     </site-header>
     <save-publish />
     <ul class="archive-list">
-      <li class="archive published-archive box" v-for="archive in publishedArchive" :key="archive.date">
-        <div class="left">
-          <span class="icon star" @click="$store.dispatch('toggleArchiveStar', archive)" :class="{'starred': archive.starred}">
-            <i class="far fa-star off" />
-            <i class="fas fa-star on" />
-          </span>
-          <span class="name">{{ archive.name }} - {{ getDateString(archive.date) }}</span>
-          <span class="icon is-small edit">
-            <i class="fas fa-edit" />
-          </span>
+
+      <li class="archive published-archive box">
+
+        <div class="col col-one icon star" @click="$store.dispatch('toggleArchiveStar', publishedArchive)" :class="{'starred': publishedArchive.starred}">
+          <i class="far fa-star off" />
+          <i class="fas fa-star on" />
         </div>
-        <div class="right actions">
+
+        <div class="col col-two">
+          <!--  -->
+          <div class="row-one" v-show="editingNameOfArchiveAtIndex !== -2">
+              <span class="name">{{ publishedArchive.name }}</span>
+              <span class="icon edit is-small" @click.stop="editingNameOfArchiveAtIndex = -2">
+                <i class="fas fa-edit"/>
+              </span>
+          </div>
+          <!-- Or -->
+          <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === -2">
+            <input class="input is-small" v-model="archiveNameDraft" placeholder="Archive Name">
+            <span class="actions" @click.stop>
+              <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
+              <button class="button is-small" @click.stop="editingNameOfArchiveAtIndex = -1; archiveNameDraft = '';">Cancel</button>
+            </span>
+          </div>
+          <!--  -->
+
+          <div class="row-two date" v-show="editingNameOfArchiveAtIndex !== -2">
+            {{ getDateString(publishedArchive.date) }}
+          </div>
+
+        </div>
+
+        <div class="col col-three actions">
           <span class="tag is-light">Published</span>
         </div>
       </li>
-      <li class="archive box" v-for="archive in remainder" :key="archive.date">
-        <div class="left">
+
+
+
+          <!-- <span class="icon is-small edit">
+            <i class="fas fa-edit" />
+          </span> -->
+      <li class="archive box" v-for="(archive, index) in remainder" :key="archive.date">
+        <div class="col-one">
           <span class="icon star" @click="$store.dispatch('toggleArchiveStar', archive)" :class="{'starred': archive.starred}">
             <i class="far fa-star off" />
             <i class="fas fa-star on" />
           </span>
-          <span class="name">{{ archive.name }} - {{ getDateString(archive.date) }}</span>
-          <span class="icon is-small edit">
-            <i class="fas fa-edit" />
-          </span>
         </div>
-        <div class="right actions">
+        <div class="col-two">
+          <!--  -->
+          <div class="row-one" v-show="editingNameOfArchiveAtIndex !== index">
+            <span class="name">{{ archive.name }}</span>
+            <span class="icon is-small edit" @click="editingNameOfArchiveAtIndex = index">
+              <i class="fas fa-edit" />
+            </span>
+          </div>
+          <!-- Or -->
+          <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === index">
+            <input class="input is-small archive-name" v-model="archiveNameDraft" placeholder="Archive Name">
+            <span class="actions" @click.stop>
+              <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
+              <button class="button is-small" @click.stop="editingNameOfArchiveAtIndex = -1; archiveNameDraft = '';">Cancel</button>
+            </span>
+          </div>
+          <!--  -->
+          <div class="row-two date" v-show="editingNameOfArchiveAtIndex !== index">{{ getDateString(archive.date) }}</div>
+
+        </div>
+        <div class="col col-three actions">
           <span class="button is-small is-info restore">Restore</span>
           <span class="button delete-archive is-small" @click="deleteArchive(archive)">
             <i class="fas fa-trash-alt"/>
@@ -58,7 +101,9 @@ export default {
         name: '',
         description: ''
       },
-      savingNew: false
+      savingNew: false,
+      archiveNameDraft: '',
+      editingNameOfArchiveAtIndex: -1
     }
   },
   computed: {
@@ -72,7 +117,7 @@ export default {
       })
     },
     publishedArchive () {
-      return this.archives.filter(({key}) =>  key === this.$store.state.archives.publishedContactsKey )
+      return this.archives.filter(({key}) =>  key === this.$store.state.archives.publishedContactsKey )[0]
     },
     remainder () {
       return this.archives.filter(({key}) =>  key !== this.$store.state.archives.publishedContactsKey )
@@ -82,7 +127,7 @@ export default {
   },
   methods: {
     getDateString (time) {
-      return moment(time).format('llll')
+      return moment(time).format('lll')
     },
     deleteArchive (archive) {
 
@@ -111,17 +156,29 @@ export default {
     .archive {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      &.published-archive {
-        border: 2px solid $dark;
-        background-color: $boneGrey;
+      padding-right: 0;
+
+      .col-one {
+        flex-grow: 0;
       }
-      .icon {
-        margin-top: -.22em;
+
+      .col-two {
+        flex-grow: 1;
       }
-      .left {
+
+      .col-three {
+        flex: 0 0 9em;
+        border-left: 1px solid grey;
+        justify-content: space-evenly;
         display: inline-flex;
-        align-items: center;
+      }
+
+
+
+      // .icon {
+      //   margin-top: -.22em;
+      // }
+      // .col-two
         .star {
           margin-right: .6em;
           font-size: 1.3em;
@@ -138,15 +195,47 @@ export default {
         .edit {
           opacity: .7;
           margin-left: 1em;
+          font-size: .7em;
         }
-      }
-      .actions {
-        display: inline-flex;
+
+      .col-two .row-one {
+        margin-top: -.6em;
+        margin-bottom: -.3em;
+        display: flex;
         align-items: center;
-        .restore {
-          margin-right: .9em;
+      }
+
+      .name {
+        font-size: 1.25em;
+      }
+      .name-editor {
+        display: flex;
+        padding-top: .3em;
+        // input {
+        //   width: 74%;
+        // }
+        .actions {
+          flex: 0 0 0;
+          display: flex;
+          flex-wrap: nowrap;
+          padding: 0 .6em;
+          .button {
+            margin: .3em;
+          }
         }
       }
+
+      .date {
+        font-size: .7em;
+        margin-top: .3em;
+        margin-bottom: -.9em
+      }
+
+      &.published-archive {
+        border: 2px solid $dark;
+        background-color: $boneGrey;
+      }
+
     }
   }
 </style>

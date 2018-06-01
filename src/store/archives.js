@@ -38,7 +38,7 @@ export default {
       })
 
     },
-    listenToArchiveList ({ rootState, commit }) {
+    listenToArchiveList ({ commit }) {
       const resortId = 'jackson_hole' // TEMP
       firebase.database().ref(`${resortId}/archives`).on('value', snap => {
         // do we care that that this is an object instead of array?

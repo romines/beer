@@ -41,7 +41,8 @@ const routes = [
       if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
       Promise.all([
         store.dispatch('listenToArchiveList'),
-        store.dispatch('listenToContacts')
+        store.dispatch('listenToContacts'),
+        store.dispatch('listenToPublishedContacts')
       ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
