@@ -39,9 +39,22 @@
           <span class="tag is-light">Published</span>
         </div>
       </li>
+    </ul>
 
-
-
+    <div class="archive-filters">
+      <span class="filter-label">Filter</span>
+      <span class="button starred" :class="{'active': starredOnly}" @click="starredOnly = !starredOnly">Starred</span>
+      <span class="button reverse" @click="newFirst = !newFirst">
+        <span class="text">Sort</span>
+        <span class="icon">
+          <i class="fas fa-long-arrow-alt-down" />
+        </span>
+        <span class="icon up">
+          <i class="fas fa-long-arrow-alt-up" />
+        </span>
+      </span>
+    </div>
+    <ul class="archive-list">
           <!-- <span class="icon is-small edit">
             <i class="fas fa-edit" />
           </span> -->
@@ -95,6 +108,8 @@ export default {
   },
   data () {
     return {
+      newFirst: true,
+      starredOnly: false,
       newArchive: {
         name: '',
         description: ''
@@ -106,18 +121,20 @@ export default {
   computed: {
     archives () {
       if (!this.$store.state.archives.archives) return []
-      return Object.keys(this.$store.state.archives.archives).map(key => {
+      const sorted = Object.keys(this.$store.state.archives.archives).map(key => {
         return {
           ...this.$store.state.archives.archives[key],
           key
         }
-      }).sort((a, b) => a.date - b.date).reverse()
+      }).sort((a, b) => a.date - b.date)
+      return this.newFirst ? sorted.reverse() : sorted
     },
     publishedArchive () {
       return this.archives.filter(({key}) =>  key === this.$store.state.archives.publishedContactsKey )[0]
     },
     remainder () {
-      return this.archives.filter(({key}) =>  key !== this.$store.state.archives.publishedContactsKey )
+      const remaining = this.archives.filter(({ key }) =>  key !== this.$store.state.archives.publishedContactsKey )
+      return this.starredOnly ? remaining.filter(archive => archive.starred) : remaining
     },
   },
   created () {
@@ -192,6 +209,7 @@ export default {
 
 <style lang="scss" scoped>
   @import '../sharedStyles.scss';
+  $starYellow: #ffd400;
   .archive-list {
     .archive {
       display: flex;
@@ -231,7 +249,7 @@ export default {
             .on { display: none; }
           }
           &.starred {
-            color: #ffd400;
+            color: $starYellow;
             .off { display: none; }
           }
         }
@@ -279,6 +297,41 @@ export default {
         background-color: $boneGrey;
       }
 
+    }
+  }
+  .archive-filters {
+    border-top: 1px solid $boneGrey;
+    border-bottom: 1px solid $boneGrey;
+    padding: .2em 0;
+    margin-bottom: .6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // & > span {
+    //   margin: 0 .6em;
+    // }
+    .filter-label {
+      font-size: .8em;
+      opacity: .8;
+      margin-right: .8em;
+    }
+    .button {
+      margin-right: .3em;
+      &.starred {
+        border: 4px solid $starYellow;
+        &:not(.active) {
+          opacity: .5;
+        }
+      }
+    }
+    .reverse {
+      .icon {
+        opacity: .8;
+        font-size: .8em;
+        &.up {
+          margin-left: -.75em;
+        }
+      }
     }
   }
 </style>
