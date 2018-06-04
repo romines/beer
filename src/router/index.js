@@ -17,7 +17,6 @@ const routes = [
     component: Home,
     meta: {
       requiresAuth: true,
-      requiresResortId: true
     },
     beforeEnter: (to, from, next) => {
       if (store.state.user.superAdmin) return next('/resorts')
@@ -35,7 +34,6 @@ const routes = [
     component: Archive,
     meta: {
       requiresAuth: true,
-      requiresResortId: true
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
@@ -59,6 +57,7 @@ const routes = [
       requiresSuperAdmin: true
     },
     beforeEnter: (to, from, next) => {
+      store.commit('SET_RESORT_ID', '')
       store.dispatch('getResorts').then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()

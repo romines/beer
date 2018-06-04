@@ -1,9 +1,7 @@
 <template>
   <div class="resorts">
 
-    <site-header>
-      <span slot="page-title">Resorts</span>
-    </site-header>
+    <site-header title="Resorts" />
 
     <ul>
       <li class="resort box" v-for="resort in resorts" @click="goToResort(resort.resortId)">
@@ -48,8 +46,11 @@ export default {
 
 <style lang="scss" scoped>
 .resorts {
-  .resort.box:not(:last-child) {
-    margin-bottom: .88rem;
+  .resort {
+    cursor: pointer;
+    &.box:not(:last-child) {
+      margin-bottom: .88rem;
+    }
   }
 }
 </style>

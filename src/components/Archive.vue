@@ -1,8 +1,6 @@
 <template>
   <div class="archive">
-    <site-header>
-      <span slot="title">Manage Versions</span>
-    </site-header>
+    <site-header title="'Manage Versions'" />
     <save-publish />
     <ul class="archive-list">
 
@@ -23,9 +21,9 @@
           </div>
           <!-- Or -->
           <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === -2">
-            <input class="input is-small" v-model="archiveNameDraft" placeholder="Archive Name">
+            <input class="input is-small" v-model="archiveNameDraft" :ref="'publishedArchiveNameInput'" placeholder="Archive Name">
             <span class="actions" @click.stop>
-              <button class="button is-primary is-small" @click.stop.prevent="saveArchiveName(archive)">Save</button>
+              <button class="button is-primary is-small" @click.stop.prevent="saveArchiveName(publishedArchive)">Save</button>
               <button class="button is-small" @click.stop="cancelArchiveNameEdit">Cancel</button>
             </span>
           </div>
@@ -113,7 +111,7 @@ export default {
           ...this.$store.state.archives.archives[key],
           key
         }
-      })
+      }).sort((a, b) => a.date - b.date).reverse()
     },
     publishedArchive () {
       return this.archives.filter(({key}) =>  key === this.$store.state.archives.publishedContactsKey )[0]
@@ -146,7 +144,8 @@ export default {
     editArchiveName (archive, index) {
       this.archiveNameDraft = archive.name
       this.editingNameOfArchiveAtIndex = index
-      this.$nextTick(() => this.$refs.archiveNameInputs[index].focus())
+      const inputRef = index > -2 ? this.$refs.archiveNameInputs[index] : this.$refs.publishedArchiveNameInput
+      this.$nextTick(() => inputRef.focus())
     },
 
     cancelArchiveNameEdit () {

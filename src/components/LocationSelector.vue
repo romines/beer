@@ -90,7 +90,7 @@ export default {
       return (this.xCoordinate || this.yCoordinate) && !this.hidePin
     },
     images () {
-      return this.$store.state.mapFiles.map(fileName => imageDefinitions[fileName])
+      return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
     }
   },
 

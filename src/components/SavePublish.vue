@@ -84,8 +84,10 @@ export default {
       this.resetForm()
     },
     saveAndPublish () {
-      this.$store.dispatch('archive', {...this.newArchive, publish: true})
-      this.resetForm()
+      this.$store.dispatch('archive', {...this.newArchive, publish: true}).then(() => {
+        this.resetForm()
+        this.$store.dispatch('showSuccessModal', 'Contacts published successfully')
+      })
     },
     cancelSaveNew () {
       this.resetForm()

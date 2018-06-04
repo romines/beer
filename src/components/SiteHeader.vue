@@ -4,11 +4,15 @@
       <router-link to="/"><img src="../assets/logo.png"></router-link>
     </div>
     <div class="right">
-      <!-- <h3 class="sub-heading title is-3"> TODO: show resort name if superAdmin and not on /resorts
-      </h3> -->
-      <h1 class="title page-title is-primary">
-        <slot name="title" />
-      </h1>
+
+      <div class="super-admin-nav" v-if="$route.name === 'resort'">
+        <span class="icon back is-small" @click="$router.push('/')" title="Back to All Resorts">
+          <i class="fas fa-arrow-left"/>
+        </span>
+        <span class="resort-name">{{ $store.state.resortMeta.name }}</span>
+      </div>
+
+      <h1 class="title page-title is-primary">{{ title }}</h1>
     </div>
 
   </div>
@@ -19,11 +23,18 @@
 export default {
   components: {
   },
+  props: {
+    title: {
+      type: String
+    },
+    subHeading: {
+      type: String
+    },
+  },
   data () {
     return {}
   },
   computed: {
-
   },
   created () {
   },
@@ -38,8 +49,13 @@ export default {
     padding-bottom: .6em;
     display: flex;
     align-items: flex-start;
-    .page-title {
-      margin-left: 1em;
+    .right {
+      margin-left: 1.3em;
+      .super-admin-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
   }
 </style>

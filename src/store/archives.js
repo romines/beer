@@ -66,7 +66,7 @@ export default {
       updates[`/archiveData/${archiveKey}`] = rootState.contactGroups
       if (publish) updates['published'] = archiveKey
 
-      resortRoot.update(updates)
+      return resortRoot.update(updates)
 
     },
     deleteArchive ({ rootState }, archiveKey) {

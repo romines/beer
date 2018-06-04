@@ -6,7 +6,7 @@
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
         <!-- <span @click="$store.dispatch('seedMeta')">seedMeta</span> -->
-        <router-link to="/history" v-if="$store.state.user && $store.state.user.uid">Revision History</router-link>&nbsp;
+        <router-link to="/history" v-if="$store.state.resortId">Revision History</router-link>&nbsp;
         <span
           @click="logOut"
           class="text-and-icon"

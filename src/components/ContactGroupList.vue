@@ -193,13 +193,7 @@ export default {
         })
         this.$store.dispatch('deleteContactGroup', groupIndex).then(() => {
           this.detailGroup = '',
-          this.$store.commit('SHOW_MODAL', {
-            heading: 'Contact group deleted successfully',
-            buttonLess: true
-          })
-          setTimeout(() => {
-            this.$store.commit('CLOSE_MODAL')
-          }, 1500);
+          this.$store.dispatch('showSuccessModal', 'Contact group deleted successfully')
         })
       }
 
@@ -211,7 +205,7 @@ export default {
     },
     initializeNewContact () {
       return {
-        mailto: 'asdflkjsadf',
+        mailto: '',
         name: '',
         number: '',
         rect: '',

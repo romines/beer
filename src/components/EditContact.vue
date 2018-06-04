@@ -24,7 +24,7 @@
           v-model="localState.contact.number"
           class="input"
           :class="{ 'is-danger': !phoneIsValid(localState.contact.number)}"
-          :options="{ phone: true, phoneRegionCode: $store.state.resortCountry }"
+          :options="{ phone: true, phoneRegionCode: $store.state.resortMeta.country }"
           placeholder="Phone" />
 
         <span class="icon is-small is-left">
@@ -41,7 +41,7 @@
         <cleave
           v-model="localState.contact.sms"
           class="input"
-          :options="{ phone: true, phoneRegionCode: $store.state.resortCountry }"
+          :options="{ phone: true, phoneRegionCode: $store.state.resortMeta.country }"
           :class="{ 'is-danger': !phoneIsValid(localState.contact.sms) }"
           placeholder="SMS" />
         <span class="icon is-small is-left">
@@ -484,7 +484,7 @@ export default {
       }
     },
     getPn (number) {
-      return new PhoneNumber(number, this.$store.state.resortCountry)
+      return new PhoneNumber(number, this.$store.state.resortMeta.country)
     },
     phoneIsValid (number) {
       if (!number) return true

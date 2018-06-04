@@ -35,8 +35,7 @@ const store = {
     user: {},
     resorts: [],
     resortId: '',
-    resortCountry: '',
-    mapFiles: [],
+    resortMeta: {},
     contactGroups: [],
     loading: true,
     modal: {
@@ -57,9 +56,8 @@ const store = {
     'SET_USER' (state, user) {
       state.user = {...user}
     },
-    'SET_RESORT_META' (state, { country, mapFiles }) {
-      state.resortCountry = country
-      state.mapFiles = mapFiles
+    'SET_RESORT_META' (state, resortMeta) {
+      state.resortMeta = resortMeta
     },
     'SET_CONTACT_GROUPS' (state, contactGroups) {
       console.log('SET_CONTACT_GROUPS . . .');
@@ -99,7 +97,9 @@ const store = {
         const userData = doc.data()
         user.authorizedResortIds = userData.authorizedResortIds
 
-        commit('SET_RESORT_ID', userData.authorizedResortIds[0])  // Note hardcoded to first resortId in list
+        // if not superAdmin set resortId here to first (only) resortId in authorized list
+        if (!userData.superAdmin) commit('SET_RESORT_ID', userData.authorizedResortIds[0])
+
         commit('SET_USER', {
           email: user.email,
           uid: user.uid,
@@ -127,8 +127,11 @@ const store = {
           .onSnapshot(doc => {
             let resortData = doc.data()
             commit('SET_CONTACT_GROUPS', resortData.contactGroups)
-            // commit('SET_RESORT_COUNTRY', resortData.country)
-            commit('SET_RESORT_META', { country: resortData.country, mapFiles: resortData.mapFiles })
+            commit('SET_RESORT_META', {
+              country: resortData.country,
+              mapFiles: resortData.mapFiles,
+              name: resortData.name }
+            )
             resolve()
           }, (err) => reject(`Error listening to contacts: ${err}`))
 
@@ -353,6 +356,16 @@ const store = {
         cancelButtonLabel: 'OK',
         classList: ['error']
       })
+    },
+    showSuccessModal ({ commit }, message) {
+      commit('SHOW_MODAL', {
+        heading: message,
+        buttonLess: true
+      })
+      setTimeout(() => {
+        commit('CLOSE_MODAL')
+      }, 1500)
+
     }
 
 
