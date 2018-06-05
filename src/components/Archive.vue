@@ -1,7 +1,22 @@
 <template>
   <div class="archive">
-    <site-header title="'Manage Versions'" />
+    <site-header title="Manage Versions" />
     <save-publish />
+
+    <div class="archive-filters">
+      <span class="filter-label">Filter Archives</span>
+      <span class="button starred is-small" :class="{'active': starredOnly}" @click="starredOnly = !starredOnly">Starred</span>
+      <span class="button reverse is-small" @click="newFirst = !newFirst">
+        <span class="text">Sort</span>
+        <span class="icon">
+          <i class="fas fa-long-arrow-alt-down" />
+        </span>
+        <span class="icon up">
+          <i class="fas fa-long-arrow-alt-up" />
+        </span>
+      </span>
+    </div>
+
     <ul class="archive-list">
 
       <li class="archive published-archive box" v-if="publishedArchive">
@@ -39,25 +54,7 @@
           <span class="tag is-light">Published</span>
         </div>
       </li>
-    </ul>
 
-    <div class="archive-filters">
-      <span class="filter-label">Filter</span>
-      <span class="button starred" :class="{'active': starredOnly}" @click="starredOnly = !starredOnly">Starred</span>
-      <span class="button reverse" @click="newFirst = !newFirst">
-        <span class="text">Sort</span>
-        <span class="icon">
-          <i class="fas fa-long-arrow-alt-down" />
-        </span>
-        <span class="icon up">
-          <i class="fas fa-long-arrow-alt-up" />
-        </span>
-      </span>
-    </div>
-    <ul class="archive-list">
-          <!-- <span class="icon is-small edit">
-            <i class="fas fa-edit" />
-          </span> -->
       <li class="archive box" v-for="(archive, index) in remainder" :key="archive.date">
         <div class="col-one">
           <span class="icon star" @click="$store.dispatch('toggleArchiveStar', archive)" :class="{'starred': archive.starred}">
@@ -306,10 +303,8 @@ export default {
     margin-bottom: .6em;
     display: flex;
     align-items: center;
-    justify-content: center;
-    // & > span {
-    //   margin: 0 .6em;
-    // }
+    justify-content: flex-start;
+    padding-left: 10%;
     .filter-label {
       font-size: .8em;
       opacity: .8;

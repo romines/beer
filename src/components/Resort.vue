@@ -1,18 +1,21 @@
 <template>
   <div class="resorts">
     <site-header title="Contacts" />
+    <save-publish />
     <contacts />
   </div>
 </template>
 
 <script>
-import Contacts from './Contacts.vue'
 import SiteHeader from './SiteHeader.vue'
+import SavePublish from './SavePublish.vue'
+import Contacts from './Contacts.vue'
 
 export default {
   components: {
+    SiteHeader,
+    SavePublish,
     Contacts,
-    SiteHeader
   },
   data () {
     return {}
