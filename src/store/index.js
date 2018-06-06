@@ -51,6 +51,7 @@ const store = {
       state.resortId = resortId
     },
     'SET_RESORTS' (state, resorts) {
+      console.log('SET(ing)_RESORTS . . .');
       state.resorts = resorts
     },
     'SET_USER' (state, user) {
@@ -118,6 +119,16 @@ const store = {
         commit('SET_RESORTS', resorts)
       })
     },
+    saveNewResort ({ commit, dispatch }, resortData) {
+      resortData.contactGroups = resortData.contactGroups
+        .map(addNoSort)
+        .map(addContactIdsAndFormatPhoneNumbers)
+
+      return Promise.all([
+        RESORTS_REF.doc(resortData.resortId).set(resortData),
+        dispatch('archiveFromPasted', resortData)
+      ])
+    },
     listenToContacts ({ rootState, commit }) {
 
       console.log('listen[ing]ToContacts . . .');
@@ -179,30 +190,6 @@ const store = {
 
     },
     seed ({ rootState }) {
-      const addMapIndexUuidAndHttp = (contact) => {
-        if (contact.id === undefined) contact.id = uuid()
-        if (contact.mapId === undefined) contact.mapId = 0
-        if (contact.name === 'Emergency' || contact.name === ' Ski Patrol (Emergency)') contact.emergency = true;
-        ['url', 'menu', 'reservations'].forEach(urlField => {
-          if (contact[urlField] && contact[urlField].startsWith('www')) {
-            contact[urlField] = 'http://' + contact[urlField]
-          }
-        })
-        return contact
-      }
-      const replaceNumberSpaces = (contact) => {
-        if (!contact.number) return contact
-        contact.number = contact.number.trim().replace(/ /g,'-')
-        return contact
-      }
-      const addContactIdsAndFormatPhoneNumbers = (group) => {
-        group.list = group.list.map(addMapIndexUuidAndHttp).map(replaceNumberSpaces)
-        return group
-      }
-      const addNoSort = group => {
-        if (group.noSort === undefined) group.noSort = false
-        return group
-      }
       // SEED_DATA is imported from json file
 
       const resortId = rootState.resortId
@@ -373,6 +360,37 @@ const store = {
   modules: {
     archives
   }
+}
+
+
+
+function addContactIdsAndFormatPhoneNumbers (group) {
+
+  const addMapIndexUuidAndHttp = (contact) => {
+
+    if (contact.id === undefined) contact.id = uuid()
+    if (contact.mapId === undefined) contact.mapId = 0
+    if (contact.name === 'Emergency' || contact.name === ' Ski Patrol (Emergency)') contact.emergency = true;
+    ['url', 'menu', 'reservations'].forEach(urlField => {
+      if (contact[urlField] && contact[urlField].startsWith('www')) {
+        contact[urlField] = 'http://' + contact[urlField]
+      }
+    })
+    return contact
+  }
+  const replaceNumberSpaces = (contact) => {
+    if (!contact.number) return contact
+    contact.number = contact.number.trim().replace(/ /g,'-')
+    return contact
+  }
+
+  group.list = group.list.map(addMapIndexUuidAndHttp).map(replaceNumberSpaces)
+  return group
+}
+
+function addNoSort (group) {
+  if (group.noSort === undefined) group.noSort = false
+  return group
 }
 
 export default new Vuex.Store(store)

@@ -69,6 +69,23 @@ export default {
       return resortRoot.update(updates)
 
     },
+    archiveFromPasted ({ rootState }, { resortId, contactGroups }) {
+      const resortRoot = firebase.database().ref(resortId)
+      const archiveListRef = resortRoot.child('archives').push()
+      const archiveKey = archiveListRef.key
+
+      let updates = {}
+      updates[`/archives/${archiveKey}`] = {
+        date: moment().valueOf(),
+        name: 'Initial data at resort creation',
+        description: ''
+      }
+      updates[`/archiveData/${archiveKey}`] = contactGroups
+      updates['published'] = archiveKey
+
+      return resortRoot.update(updates)
+
+    },
     deleteArchive ({ rootState }, archiveKey) {
       const resortRoot = firebase.database().ref(rootState.resortId)
       let updates = {}
@@ -104,7 +121,7 @@ export default {
 
   getters: {
     dirty: (state, getters, rootState) => {
-      if (!state.publishedContacts.length) return false
+      if (!state.publishedContacts || !state.publishedContacts.length) return false
       return JSON.stringify(state.publishedContacts) !== JSON.stringify(rootState.contactGroups)
     }
   }

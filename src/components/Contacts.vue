@@ -4,7 +4,7 @@
     <contact-group-list :new-group-identifier="newGroupIdentifier"/>
 
     <div class="add-new-bar box" @click="addingGroup = true" v-show="!addingGroup">
-      <span class="text">Add New</span>
+      <span class="text">Add New Contact Group</span>
       <span class="icon is-small">
         <i class="fas fa-plus"/>
       </span>
