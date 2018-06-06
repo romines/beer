@@ -68,6 +68,29 @@
             </span>
           </div>
         </div>
+        <div class="field is-horizontal" v-show="newResort.resortId.length">
+          <div class="field-label is-normal">
+            <label class="label">Map Files</label>
+          </div>
+
+
+          <div class="field-body manage-maps control">
+
+            <div class="map-thumbs">
+              <div class="image-container" v-for="(url, index) in newResort.mapFiles">
+                <span class="icon is-small remove" @click="removeImage(index)">
+                  <i class="fas fa-times-circle" />
+                </span>
+                <img :src="url">
+                <div class="remove-image" @click="removeImage(index)">remove map</div>
+              </div>
+            </div>
+
+            <image-upload file-name-prefix="map_" :path-prefix="`${newResort.resortId}/map_files/`" button-label="Add a map..." @uploadComplete="onMapFileUpload"/>
+
+          </div>
+        </div>
+
         <div class="field is-horizontal">
           <div class="field-label is-normal">
             <label class="label">JSON</label>
@@ -77,6 +100,7 @@
           </div>
         </div>
         <p class="help">Optional. JSON should have root property called 'contactGroups'. All other properties are ignored.</p>
+
         <div class="field is-grouped is-grouped-right">
           <p class="control no-expando">
             <a class="button is-primary" @click="saveNewResort" :disabled="!saveButtonActive">
@@ -109,7 +133,8 @@ export default {
         name: '',
         resortId: '',
         country: 'US',
-        json: ''
+        json: '',
+        mapFiles: []
       }
     }
   },
@@ -163,6 +188,12 @@ export default {
       this.$store.commit('SET_LOADING_STATE', true)
       this.$router.push(`resorts/${resortId}`)
     },
+    onMapFileUpload ({ url }) {
+      this.newResort.mapFiles.push(url)
+    },
+    removeImage (index) {
+      this.newResort.mapFiles.splice(index, 1)
+    },
     saveNewResort () {
       let pasted
       if (this.newResort.json) {
@@ -203,10 +234,29 @@ export default {
       margin-bottom: .88rem;
     }
   }
+
   .add-new-section {
     padding: 0 10px;
     p.help {
       margin: -10px 0 4px 140px;
+    }
+    .manage-maps {
+      display: block;
+      .map-thumbs {
+        display: flex;
+        align-items: stretch;
+        .image-container {
+          position: relative;
+          &:not(:first-child) {
+            margin-left: 1em;
+          }
+          .remove {
+            position: absolute;
+            top: -7px;
+            left: -7px;
+          }
+        }
+      }
     }
   }
 }

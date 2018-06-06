@@ -27,6 +27,11 @@ module.exports = functions.storage.object().onFinalize((object, context) => {
     return null;
   }
 
+  if (fileName.startsWith('map_')) {
+    console.log('Image is a map file. Do not scale.');
+    return null;
+  }
+
   // Exit if this is a move or deletion event.
   if (object.resourceState === 'not_exists') {
     console.log('This is a deletion event.');

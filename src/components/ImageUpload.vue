@@ -9,7 +9,7 @@
             <i class="fas fa-upload"/>
           </span>
           <span class="file-label">
-            Choose a file…
+            {{ buttonLabel }}
           </span>
         </span>
       </label>
@@ -22,6 +22,19 @@
 import firebase from '../firebaseInit.js'
 
 export default {
+  props: {
+    fileNamePrefix: {
+      type: String,
+      default: ''
+    },
+    pathPrefix: {
+      type: String,
+    },
+    buttonLabel: {
+      type: String,
+      default: 'Choose a file...'
+    },
+  },
   data () {
     return {
       uploading: false,
@@ -38,8 +51,9 @@ export default {
           'resortId': this.$store.state.resortId,
         }
       }
-      const fileName = (new Date().getTime()) + '.' + file.name.split('.')[file.name.split('.').length -1]
-      const newImageRef = firebase.storage().child(`${this.$store.state.resortId}/images/${fileName}`)
+      const extension = file.name.split('.')[file.name.split('.').length -1]
+      const fileName = this.fileNamePrefix + new Date().getTime()
+      const newImageRef = firebase.storage().ref().child(this.pathPrefix + fileName + '.' + extension)
       const uploadTask = newImageRef.put(file, metadata)
 
       uploadTask.on('state_changed',
@@ -49,10 +63,9 @@ export default {
           this.$store.dispatch('showErrorModal', error.message)
       }, () => {
         this.uploading = false
-        this.$store.commit('SET_UPLOAD_BUFFER_URL', uploadTask.snapshot.downloadURL)
         this.$emit('uploadComplete', {
           url: uploadTask.snapshot.downloadURL,
-          fileName
+          fileName: fileName + extension
         })
       })
     }

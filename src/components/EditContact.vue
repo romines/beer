@@ -235,10 +235,10 @@
             <i class="fas fa-times-circle" />
           </span>
           <img :src="localState.contact.imageUrl">
-          <small class="remove-image" @click="removeImage">remove image</small>
+          <div class="remove-image" @click="removeImage">remove image</div>
         </div>
 
-        <image-upload @uploadComplete="onImageUpload" v-show="!localState.contact.imageUrl" />
+        <image-upload @uploadComplete="onImageUpload" :path-prefix="$store.state.resortId + '/images/'" v-show="!localState.contact.imageUrl" />
 
       </div>
     </div>
@@ -445,6 +445,7 @@ export default {
 
     },
     onImageUpload ({ url, fileName }) {
+      this.$store.commit('SET_UPLOAD_BUFFER_URL', url)
       if (this.localState.contact.imageUrl) this.$store.dispatch('destroyImageFile', this.localState.contact.imageUrl)
       this.$store.dispatch('listenForScaledImage', { url, fileName })
       this.localState.contact.imageUrl = url
@@ -548,6 +549,10 @@ export default {
         &:hover {
           color: red;
         }
+      }
+      .remove-image {
+        padding-top: .2em;
+        font-size: .9em;
       }
     }
     .remove-image {
