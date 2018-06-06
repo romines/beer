@@ -159,7 +159,11 @@ export default {
       return !this.resorts.some(resort => resort.resortId === this.newResort.resortId)
     },
     saveButtonActive () {
-      return this.newResort.name.length && this.newResort.resortId.length && this.newResortNameIsValid && this.newResortIdIsValid
+      return this.newResort.name.length
+        && this.newResort.resortId.length
+        && this.newResort.mapFiles.length
+        && this.newResortNameIsValid
+        && this.newResortIdIsValid
     }
   },
   created () {
@@ -203,14 +207,15 @@ export default {
           this.$store.dispatch('showErrorModal', 'JSON parsing error: ' + error)
         }
       }
-      const resortData = {
-        name: this.newResort.name,
-        resortId: this.newResort.resortId,
-        country: this.newResort.country,
-        contactGroups: (pasted && pasted.contactGroups) ? pasted.contactGroups : []
-      }
+
+      let resortData = JSON.parse(JSON.stringify(this.newResort))
+      delete resortData.json
+      resortData.contactGroups = (pasted && pasted.contactGroups) ? pasted.contactGroups : []
+
       this.addingResort = false;
       this.$store.dispatch('saveNewResort', resortData).then(() => {
+        this.$store.dispatch('getResorts')
+        this.$store.dispatch('showSuccessModal', 'Resort created successfully')
         this.resetNewResortForm()
       })
     },

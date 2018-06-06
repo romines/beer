@@ -33,15 +33,6 @@
 
 <script>
 import Viewer from "v-viewer/src/component.vue"
-import thredbo from '../assets/thredbo.png'
-import jh_village from '../assets/jh_village.png'
-import russell_lands from '../assets/russell_lands.png'
-
-const imageDefinitions = {
-  jh_village,
-  russell_lands,
-  thredbo
-}
 
 export default {
   components: { Viewer },
@@ -90,7 +81,8 @@ export default {
       return (this.xCoordinate || this.yCoordinate) && !this.hidePin
     },
     images () {
-      return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
+      // return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
+      return this.$store.state.resortMeta.mapFiles
     }
   },
 

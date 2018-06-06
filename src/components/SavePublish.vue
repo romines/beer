@@ -62,10 +62,6 @@ export default {
     }
   },
   computed: {
-    // dirty () {
-    //   if (!this.$store.state.publishedContacts.length) return false
-    //   return JSON.stringify(this.$store.state.publishedContacts) !== JSON.stringify(this.$store.state.contactGroups)
-    // }
   },
   mounted () {
     this.$store.dispatch('listenToPublishedContacts')

@@ -38,12 +38,9 @@ export default {
       })
 
     },
-    listenToArchiveList ({ commit }) {
-      const resortId = 'jackson_hole' // TEMP
+    listenToArchiveList ({ rootState, commit }) {
       return new Promise((resolve, reject) => {
-        firebase.database().ref(`${resortId}/archives`).on('value', snap => {
-          // do we care that that this is an object instead of array?
-          // const archives = snap.val()
+        firebase.database().ref(`${rootState.resortId}/archives`).on('value', snap => {
           commit('SET_ARCHIVE_LIST', snap.val())
           resolve()
         })
