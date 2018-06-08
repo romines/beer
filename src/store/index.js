@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 // import Firebase from 'firebase/app'
 import firebase from '../firebaseInit.js'
-import moment from 'moment'
 
 import uuid from 'uuid/v4'
 import 'babel-polyfill'

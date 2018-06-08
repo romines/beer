@@ -27,7 +27,7 @@
             <i class="fas fa-trash-alt"/>
           </span>
         </span>
-
+        <!-- OR -->
         <div class="name-editor field is-grouped" v-show="editingNameOfGroupAtIndex === groupIndex">
           <p class="control is-expanded">
             <input class="input is-small" v-model="groupNameDraft" placeholder="Group title">
