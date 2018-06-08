@@ -8,22 +8,22 @@
 
     <div
       class="contact-group"
-      :class="detailGroup === group.section ? 'box' : ''"
+      :class="detailGroup === group.id ? 'box' : ''"
       v-for="(group, groupIndex) in myList"
-      :key="group.section">
+      :key="group.id">
 
       <div
         class="group-header"
-        :class="detailGroup === group.section ? '' : 'box'"
-        @click="onGroupHeaderClick(group.section, $event)">
+        :class="detailGroup === group.id ? '' : 'box'"
+        @click="onGroupHeaderClick(group.id, $event)">
 
         <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
           <span class="grippy" />
           <span class="name">{{ group.section }}</span>
-          <span class="icon edit-name is-small" @click.stop="editGroupTitle(groupIndex)">
+          <span class="icon edit-name is-small" v-show="!group.emergency" @click.stop="editGroupTitle(groupIndex)">
             <i class="fas fa-edit"/>
           </span>
-          <span class="icon delete-group is-small" @click.stop="deleteGroup(groupIndex)">
+          <span class="icon delete-group is-small" v-show="!group.emergency" @click.stop="deleteGroup(groupIndex)">
             <i class="fas fa-trash-alt"/>
           </span>
         </span>
@@ -38,7 +38,7 @@
           </p>
         </div>
 
-        <div class="group-sort" v-show="detailGroup === group.section">
+        <div class="group-sort" v-show="detailGroup === group.id && !group.emergency">
           <span>Custom Sort Order</span>
           <div class="toggle-container ">
             <label class="switch" @click.stop>
@@ -48,10 +48,10 @@
           </div>
         </div>
 
-        <span class="icon is-small" v-show="detailGroup !== group.section">
+        <span class="icon is-small" v-show="detailGroup !== group.id">
           <i class="fas fa-chevron-down"/>
         </span>
-        <span class="icon is-small" v-show="detailGroup === group.section">
+        <span class="icon is-small" v-show="detailGroup === group.id">
           <i class="fas fa-chevron-up"/>
         </span>
 
@@ -60,9 +60,9 @@
 
       <div
         class="group-detail"
-        v-if="detailGroup === group.section">
+        v-if="!group.emergency && detailGroup === group.id">
 
-        <contact-list :group-index="groupIndex" :group-is-open="detailGroup === group.section" />
+        <contact-list :group-index="groupIndex" :group-is-open="detailGroup === group.id" />
         <!-- end .group-detail -->
         <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
           <span class="text">Add New Contact</span>
@@ -81,6 +81,8 @@
 
       </div>
 
+      <emergency-contact-group v-if="group.emergency && detailGroup === group.id" :emergency-group="group"/>
+
       <!-- end .contact-group -->
     </div>
 
@@ -91,12 +93,14 @@
 import draggable from 'vuedraggable'
 import ContactList from './ContactList'
 import EditContact from './EditContact'
+import EmergencyContactGroup from './EmergencyContactGroup.vue'
 
 export default {
   components: {
     draggable,
     ContactList,
     EditContact,
+    EmergencyContactGroup,
   },
   props: {
     newGroupIdentifier: {
@@ -129,15 +133,15 @@ export default {
     }
   },
   methods: {
-    onGroupHeaderClick (section, event, scrollIntoView) {
+    onGroupHeaderClick (id, event, scrollIntoView) {
 
       // TODO: handle dirty contact state
 
       if (event.target.nodeName === 'INPUT') return;
 
       const groupEl = event.target.closest('.contact-group')
-      const openGroup = (section, groupEl, scrollIntoView) => {
-        this.detailGroup = section
+      const openGroup = (id, groupEl, scrollIntoView) => {
+        this.detailGroup = id
 
         scrollIntoView && this.$nextTick(() => {
           window.scrollTo({
@@ -149,13 +153,13 @@ export default {
       }
 
       if (this.detailGroup === '') {
-        // no section is open
-        openGroup(section, groupEl)
+        // no group is open
+        openGroup(id, groupEl)
       } else {
-        // a section is open, might be dirty
-        const applyGroupOpenClosedState = this.detailGroup === section
+        // a group is open, might be dirty
+        const applyGroupOpenClosedState = this.detailGroup === id
           ? () => {this.detailGroup = ''}
-          : () => openGroup(section, groupEl, true)
+          : () => openGroup(id, groupEl, true)
 
         if (this.$store.state.openContactIsDirty) {
           this.$store.commit('SHOW_MODAL', {

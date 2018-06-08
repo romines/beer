@@ -121,6 +121,7 @@ const store = {
     saveNewResort ({ commit, dispatch }, resortData) {
       resortData.contactGroups = resortData.contactGroups
         .map(addNoSort)
+        .map(addGroupId)
         .map(addContactIdsAndFormatPhoneNumbers)
 
       return Promise.all([
@@ -136,6 +137,11 @@ const store = {
         RESORTS_REF.doc(rootState.resortId)
           .onSnapshot(doc => {
             let resortData = doc.data()
+            // TEMP
+            resortData.contactGroups.forEach(group => {
+              if (group.id === undefined) group.id = uuid()
+            })
+            //
             commit('SET_CONTACT_GROUPS', resortData.contactGroups)
             commit('SET_RESORT_META', {
               country: resortData.country,
@@ -389,6 +395,11 @@ function addContactIdsAndFormatPhoneNumbers (group) {
 
 function addNoSort (group) {
   if (group.noSort === undefined) group.noSort = false
+  return group
+}
+
+function addGroupId (group) {
+  if (group.id === undefined) group.id = uuid()
   return group
 }
 

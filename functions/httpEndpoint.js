@@ -16,7 +16,8 @@ module.exports = functions.https.onRequest((request, response) => {
     if (contact.id !== undefined) delete contact.id;
     return contact
   }
-  const stripContactIdsAndEmptyFields = (group) => {
+  const stripIdsAndEmptyFields = (group) => {
+    if (group.id !== undefined) delete group.id;
     group.list = group.list
       .map(rmUuid)
       .map(stripEmptyFields)
@@ -42,7 +43,7 @@ module.exports = functions.https.onRequest((request, response) => {
       mapFiles: resortData.mapFiles,
       resortId: resortData.resortId,
       keys: resortData.keys,
-      contactGroups: resortData.archiveData[resortData.published].map(stripContactIdsAndEmptyFields)
+      contactGroups: resortData.archiveData[resortData.published].map(stripIdsAndEmptyFields)
     }
 
     const responseString = JSON.stringify(responseObject)
@@ -56,7 +57,7 @@ module.exports = functions.https.onRequest((request, response) => {
 
   // docRef.get().then(function(doc) {
   //   let resortData = doc.data()
-  //   resortData.contactGroups = resortData.contactGroups.map(stripContactIdsAndEmptyFields)
+  //   resortData.contactGroups = resortData.contactGroups.map(stripIdsAndEmptyFields)
   //   let responseString = JSON.stringify(resortData)
   //   response.send(responseString);
   // }).catch(function(error) {

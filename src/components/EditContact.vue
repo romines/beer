@@ -397,7 +397,7 @@ export default {
 
     initializeContact () {
       const defaults = JSON.parse(JSON.stringify(contactDefaults))
-      // this.localState.contact = Object.assign(defaults, this.contact)
+
       this.localState.contact = {...defaults, ...this.contact}
       if (this.contactId === 'NEW') this.localState.contact.id = uuid()
       this.contactAtInitialization = JSON.parse(JSON.stringify(this.localState.contact))

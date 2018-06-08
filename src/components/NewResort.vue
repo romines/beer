@@ -104,12 +104,20 @@
               @click="selectedEmergencyGroup = index">
               {{ name }}
             </span>
-            <span class="button is-small add-group" :class="(selectedEmergencyGroup === -2) ? 'is-danger is-outlined' : ''">
+            <span class="button is-small add-group"
+              :class="(selectedEmergencyGroup === -2) ? 'is-danger is-outlined' : ''"
+              @click="addingEmergencyGroup = true">
+
               Add Group
             </span>
           </div>
         </div>
       </div>
+
+      <emergency-contact-group
+        v-show="addingEmergencyGroup"
+        :emergency-group="emergencyGroupDefaults"
+        @groupChange="onEmergencyGroupChange" />
 
       <div class="field is-grouped is-grouped-right">
         <p class="control no-expando">
@@ -123,17 +131,21 @@
           </a>
         </p>
       </div>
+
     </div>
+
 
   </div>
 </template>
 
 <script>
 import ImageUpload from './ImageUpload.vue'
+import EmergencyContactGroup from './EmergencyContactGroup.vue'
 
 export default {
   components: {
-    ImageUpload
+    ImageUpload,
+    EmergencyContactGroup
   },
   data () {
     return {
@@ -145,7 +157,23 @@ export default {
         country: 'US',
         mapFiles: []
       },
-      selectedEmergencyGroup: -1
+      selectedEmergencyGroup: -1,
+      addingEmergencyGroup: false,
+      emergencyGroupDefaults: {
+        list: [
+          {
+            name: '',
+            number: '',
+            tags: {
+              winter: true,
+              summer: true
+            }
+          }
+        ],
+        section: 'Emergency',
+        seasonal: false
+      },
+      newEmergencyGroupData: {}
     }
   },
   computed: {
@@ -234,6 +262,9 @@ export default {
         country: 'US',
       }
       this.pastedJson = ''
+    },
+    onEmergencyGroupChange (group) {
+      this.newEmergencyGroupData = group
     }
   }
 }
@@ -263,6 +294,12 @@ export default {
           left: -7px;
         }
       }
+    }
+  }
+  .group-select {
+    .button.is-danger:hover, .button.is-danger:focus {
+      background-color: inherit;
+      color: #ff3860;
     }
   }
 }
