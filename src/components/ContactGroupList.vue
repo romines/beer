@@ -81,7 +81,10 @@
 
       </div>
 
-      <emergency-contact-group v-if="group.emergency && detailGroup === group.id" :emergency-group="group"/>
+      <emergency-contact-group
+        v-if="group.emergency && detailGroup === group.id"
+        :emergency-group="group"
+        :resort-country="$store.state.resortMeta.country"/>
 
       <!-- end .contact-group -->
     </div>

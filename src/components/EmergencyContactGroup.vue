@@ -46,16 +46,32 @@
           <label class="label">Phone</label>
         </div>
         <div class="field-body control has-icons-left">
-          <input
-            v-model.trim="contact.number"
+          <cleave
+            v-model="contact.number"
             class="input is-expanded"
-            placeholder="Phone">
+            :class="{ 'is-danger': !phoneIsValid(contact.number)}"
+            :options="{ phone: true, phoneRegionCode: resortCountry }"
+            placeholder="Phone" />
+
           <span class="icon is-small is-left">
             <i class="fas fa-phone" />
           </span>
         </div>
       </div>
 
+
+    </div>
+    <div class="field is-grouped is-grouped-right actions" v-if="!hideSave">
+      <p class="control no-expando">
+        <a class="button is-primary" @click="saveEmergencyGroup" :disabled="!saveButtonActive">
+          Save
+        </a>
+      </p>
+      <p class="control no-expando">
+        <a class="button is-light" @click="">
+          Cancel
+        </a>
+      </p>
     </div>
 
 
@@ -63,12 +79,25 @@
 </template>
 
 <script>
+import mixins from './mixins'
+import Cleave from 'vue-cleave'
+import 'cleave.js/dist/addons/cleave-phone.i18n.js'
+
 export default {
 
-  components: {},
+  components: {
+    Cleave
+  },
+  mixins: [mixins],
   props: {
     emergencyGroup: {
       type: Object
+    },
+    resortCountry: {
+      type: String
+    },
+    hideSave: {
+      type: Boolean
     }
   },
   data () {
@@ -79,6 +108,9 @@ export default {
     }
   },
   computed: {
+    saveButtonActive () {
+      return this.emergencyGroupValid(this.localState.emergencyGroup)
+    }
   },
   watch: {
     // emergencyGroup () {
@@ -100,30 +132,28 @@ export default {
     },
     toggleSeasonal () {
 
-      const existing = this.localState.emergencyGroup.list[0]
-      if (!this.localState.emergencyGroup.seasonal && tagsMissingOrMatching(existing)) {
-        existing.tags = {}
-        existing.tags.winter = true
-        existing.tags.summer = false
-      }
-
       if (this.localState.emergencyGroup.list.length < 2) {
+        this.localState.emergencyGroup.list[0].tags.winter = true
+        this.localState.emergencyGroup.list[0].tags.summer = false
         this.localState.emergencyGroup.list.push({
           name: '',
           number: '',
           tags: {
-            winter: !existing.tags.winter,
-            summer: !existing.tags.summer
+            winter: false,
+            summer: true
           }
         })
       } else {
         this.localState.emergencyGroup.list.splice(1, 1)
+        this.localState.emergencyGroup.list[0].tags.winter = true
+        this.localState.emergencyGroup.list[0].tags.summer = true
       }
 
       this.localState.emergencyGroup.seasonal = !this.localState.emergencyGroup.seasonal
 
-      function tagsMissingOrMatching (existing) { return !existing.tags || (existing.tags.winter === existing.tags.winter)}
-
+    },
+    phoneIsValid (number) {
+      return this.getPn(number) && this.getPn(number).a.valid
     },
     toggleContactSeason (currentlyActive) {
       if (!currentlyActive) {
@@ -133,7 +163,18 @@ export default {
         })
 
       }
-    }
+    },
+    saveEmergencyGroup () {
+      const formatNumberForSave = contact => {
+        return {...contact, number: this.getPn(contact.number).getNumber('international').replace(/ /g,'-')}
+      }
+      const emergencyGroup = {
+        ...this.localState.emergencyGroup,
+        list: this.localState.emergencyGroup.list.map(formatNumberForSave),
+        emergency: true
+      }
+      this.$store.dispatch('saveEmergencyContactGroup', emergencyGroup)
+    },
   }
 }
 </script>
@@ -151,6 +192,10 @@ export default {
         border: 4px solid #209cee;
       }
     }
+  }
+
+  .field.actions {
+    margin-top: 1em;
   }
 
 }

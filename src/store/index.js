@@ -122,7 +122,7 @@ const store = {
       resortData.contactGroups = resortData.contactGroups
         .map(addNoSort)
         .map(addGroupId)
-        .map(addContactIdsAndFormatPhoneNumbers)
+        .map(addMissingContactDefaults)
 
       return Promise.all([
         RESORTS_REF.doc(resortData.resortId).set(resortData),
@@ -136,12 +136,9 @@ const store = {
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId)
           .onSnapshot(doc => {
+
             let resortData = doc.data()
-            // TEMP
-            resortData.contactGroups.forEach(group => {
-              if (group.id === undefined) group.id = uuid()
-            })
-            //
+
             commit('SET_CONTACT_GROUPS', resortData.contactGroups)
             commit('SET_RESORT_META', {
               country: resortData.country,
@@ -206,13 +203,9 @@ const store = {
         const tempSeedData = SEED_DATA[resortId]
         tempSeedData.contactGroups = tempSeedData.contactGroups
           .map(addNoSort)
-          .map(addContactIdsAndFormatPhoneNumbers)
+          .map(addMissingContactDefaults)
 
         return RESORTS_REF.doc(resortId).set(tempSeedData)
-        // return RESORTS_REF.doc(resortId).update({ contactGroups: SEED_DATA[resortId].contactGroups
-        //   .map(addNoSort)
-        //   .map(addContactIdsAndFormatPhoneNumbers)
-        // })
       }
 
     },
@@ -234,6 +227,16 @@ const store = {
     saveContactGroupName ({ rootState }, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
+      RESORTS_REF.doc(rootState.resortId).update({
+        contactGroups: groups
+      })
+    },
+    saveEmergencyContactGroup ({ rootState }, updatedEmergencyGroup) {
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === updatedEmergencyGroup.id)
+
+      let groups = rootState.contactGroups.slice()
+
+      groups[groupIndex] = updatedEmergencyGroup
       RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       })
@@ -369,13 +372,35 @@ const store = {
 
 
 
-function addContactIdsAndFormatPhoneNumbers (group) {
+function addMissingContactDefaults (group) {
 
-  const addMapIndexUuidAndHttp = (contact) => {
+  const addDefaultTags = (contact) => {
+    if (!contact.tags) {
+      contact.tags = {winter: true, summer: true, dining: false}
+    }
+    return contact
+  }
 
+  const addMissingEmptyStringFields = (contact) => {
+    ['imageUrl', 'mailto', 'menu', 'name', 'number', 'sms', 'url', 'z_detail', 'z_reservations'].forEach(urlField => {
+      if (contact[urlField] === undefined) {
+        contact[urlField] = ''
+      }
+    })
+    return contact
+  }
+
+  const addMapIndex = (contact) => {
+    if (contact.mapId === undefined) contact.mapId = 0;
+    return contact
+  }
+
+  const addUuid = (contact) => {
     if (contact.id === undefined) contact.id = uuid()
-    if (contact.mapId === undefined) contact.mapId = 0
-    if (contact.name === 'Emergency' || contact.name === ' Ski Patrol (Emergency)') contact.emergency = true;
+    return contact
+  }
+
+  const addHttpPrefix = (contact) => {
     ['url', 'menu', 'reservations'].forEach(urlField => {
       if (contact[urlField] && contact[urlField].startsWith('www')) {
         contact[urlField] = 'http://' + contact[urlField]
@@ -383,14 +408,23 @@ function addContactIdsAndFormatPhoneNumbers (group) {
     })
     return contact
   }
+
   const replaceNumberSpaces = (contact) => {
     if (!contact.number) return contact
     contact.number = contact.number.trim().replace(/ /g,'-')
     return contact
   }
 
-  group.list = group.list.map(addMapIndexUuidAndHttp).map(replaceNumberSpaces)
+  group.list = group.list
+    .map(addMissingEmptyStringFields)
+    .map(addMapIndex)
+    .map(addUuid)
+    .map(addHttpPrefix)
+    .map(replaceNumberSpaces)
+    .map(addDefaultTags)
+
   return group
+
 }
 
 function addNoSort (group) {

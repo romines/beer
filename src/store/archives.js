@@ -119,6 +119,8 @@ export default {
   getters: {
     dirty: (state, getters, rootState) => {
       if (!state.publishedContacts || !state.publishedContacts.length) return false
+      // console.log(JSON.stringify(state.publishedContacts))
+      // console.log(JSON.stringify(rootState.contactGroups))
       return JSON.stringify(state.publishedContacts) !== JSON.stringify(rootState.contactGroups)
     }
   }

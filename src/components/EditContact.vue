@@ -271,9 +271,9 @@
 
 <script>
 import Cleave from 'vue-cleave'
-import PhoneNumber from 'awesome-phonenumber'
 import uuid from 'uuid/v4'
-import 'cleave.js/dist/addons/cleave-phone.us.js'
+import 'cleave.js/dist/addons/cleave-phone.i18n.js'
+import mixins from './mixins'
 import LocationSelector from './LocationSelector.vue'
 import ImageUpload from './ImageUpload.vue'
 
@@ -306,6 +306,9 @@ export default {
     LocationSelector,
     ImageUpload
   },
+
+  mixins: [ mixins ],
+
   props: {
     contact: {
       type: Object
@@ -326,9 +329,12 @@ export default {
       pendingFileDeletion: ''
     }
   },
-
   computed: {
     contactIsDirty () {
+      if (JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)) {
+        console.log(JSON.stringify(this.localState.contact))
+        console.log(JSON.stringify(this.contactAtInitialization))
+      }
       return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
     },
     formIsValid () {
@@ -455,7 +461,8 @@ export default {
       this.localState.contact.imageUrl = ''
     },
     onCoordinateClick ({ x, y, mapIndex }) {
-      this.localState.contact.rect = `{{${x},${y}}}${this.localState.contact.rect.split('}')[1]}}}`
+      const radius = this.localState.contact.rect.split('}')[1] ? this.localState.contact.rect.split('}')[1] : ',{80,80'
+      this.localState.contact.rect = `{{${x},${y}}${radius}}}`
       this.localState.contact.mapId = mapIndex
     },
     resetMapCoordinates () {
@@ -483,9 +490,6 @@ export default {
         x: this.getCoordinates(rect).x,
         y: this.getCoordinates(rect).y
       }
-    },
-    getPn (number) {
-      return new PhoneNumber(number, this.$store.state.resortMeta.country)
     },
     phoneIsValid (number) {
       if (!number) return true

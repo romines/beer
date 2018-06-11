@@ -92,21 +92,21 @@
       </div>
       <p class="help">Optional. JSON should have root property called 'contactGroups'. All other properties are ignored.</p>
 
-      <div class="field is-horizontal">
+      <div class="field is-horizontal emergency-group-select">
         <div class="field-label is-normal">
           <label class="label">Emergency Contact Group</label>
         </div>
         <div class="field-body">
-          <div class="group-select">
+          <div class="group-select-buttons">
             <span class="button is-small group-name"
-              :class="(selectedEmergencyGroup === index) ? 'is-danger is-outlined' : ''"
+              :class="(selectedEmergencyGroup === index) ? 'is-active' : ''"
               v-for="(name, index) in groupNames"
-              @click="selectedEmergencyGroup = index">
+              @click="selectedEmergencyGroup = index; addingEmergencyGroup = false">
               {{ name }}
             </span>
             <span class="button is-small add-group"
-              :class="(selectedEmergencyGroup === -2) ? 'is-danger is-outlined' : ''"
-              @click="addingEmergencyGroup = true">
+              :class="(selectedEmergencyGroup === -2) ? 'is-active' : ''"
+              @click="selectedEmergencyGroup = -2; addingEmergencyGroup = true">
 
               Add Group
             </span>
@@ -117,7 +117,10 @@
       <emergency-contact-group
         v-show="addingEmergencyGroup"
         :emergency-group="emergencyGroupDefaults"
-        @groupChange="onEmergencyGroupChange" />
+        :resort-country="newResort.country"
+        class="box"
+        @groupChange="onEmergencyGroupChange"
+        hide-save />
 
       <div class="field is-grouped is-grouped-right">
         <p class="control no-expando">
@@ -141,12 +144,14 @@
 <script>
 import ImageUpload from './ImageUpload.vue'
 import EmergencyContactGroup from './EmergencyContactGroup.vue'
+import mixins from './mixins'
 
 export default {
   components: {
     ImageUpload,
     EmergencyContactGroup
   },
+  mixins: [ mixins ],
   data () {
     return {
       addingResort: false,
@@ -203,10 +208,16 @@ export default {
       if (!this.pastedData || !this.pastedData.contactGroups) return []
       return this.pastedData.contactGroups.map(group => group.section)
     },
+    emergencyGroupValidState () {
+      if (this.selectedEmergencyGroup === -2) return this.emergencyGroupValid(this.newEmergencyGroupData)
+      return (this.selectedEmergencyGroup > -1)
+    },
     saveButtonActive () {
+
       return this.newResort.name.length
         && this.newResort.resortId.length
         && this.newResort.mapFiles.length
+        && this.emergencyGroupValidState
         && this.newResortNameIsValid
         && this.newResortIdIsValid
         && !this.jsonError
@@ -247,6 +258,19 @@ export default {
       let resortData = JSON.parse(JSON.stringify(this.newResort))
       resortData.contactGroups = (this.pastedData && this.pastedData.contactGroups) ? this.pastedData.contactGroups : []
 
+
+      if (this.selectedEmergencyGroup === -2) {
+        resortData.contactGroups.forEach(group => {
+          if (group.emergency) delete group.emergency
+        })
+        resortData.contactGroups.push({
+          ...this.newEmergencyGroupData,
+          emergency: true
+        })
+      } else {
+        resortData.contactGroups[this.selectedEmergencyGroup].emergency = true
+      }
+
       this.addingResort = false;
 
       this.$store.dispatch('saveNewResort', resortData).then(() => {
@@ -271,7 +295,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+@import '../sharedStyles.scss';
 
 .new-resort {
   padding: 0 10px;
@@ -296,12 +320,24 @@ export default {
       }
     }
   }
-  .group-select {
-    .button.is-danger:hover, .button.is-danger:focus {
-      background-color: inherit;
-      color: #ff3860;
+  .emergency-group-select {
+    .field-body {
+      padding-top: .6em;
     }
+    .group-select-buttons {
+      .button {
+        margin: .2em;
+        &.is-active {
+          border-width: 2px;
+        }
+      }
+
+    }
+
   }
+  // .emergency-contact-group {
+  //   border: 1px solid grey;
+  // }
 }
 
 
