@@ -1,7 +1,7 @@
 <template>
   <div class="home">
 
-    <site-header title="'Contact Management'" />
+    <site-header title="Contact Management" />
     <save-publish />
     <contacts />
 

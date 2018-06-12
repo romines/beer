@@ -13,7 +13,7 @@ import ExportJson from '../components/ExportJson'
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: 'Home',
     component: Home,
     meta: {
       requiresAuth: true,
@@ -30,7 +30,7 @@ const routes = [
   },
   {
     path: '/history',
-    name: 'history',
+    name: 'History',
     component: Archive,
     meta: {
       requiresAuth: true,
@@ -50,7 +50,7 @@ const routes = [
   },
   {
     path: '/resorts',
-    name: 'resorts',
+    name: 'Resorts',
     component: Resorts,
     meta: {
       requiresAuth: true,
@@ -66,7 +66,7 @@ const routes = [
   },
   {
     path: '/resorts/:resortId',
-    name: 'resort',
+    name: 'Resort Home',
     component: Resort,
     meta: {
       requiresAuth: true,
@@ -86,12 +86,12 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'login',
+    name: 'Login',
     component: Login
   },
   {
     path: '/sign-up/:encodedResortId',
-    name: 'sign-up',
+    name: 'Sign-up',
     component: SignUp,
     props: true
   },

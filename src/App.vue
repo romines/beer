@@ -73,6 +73,9 @@ export default {
 .top-nav {
   margin-right: 2.2em;
   color: blue !important;
+  a {
+    color: blue !important;
+  }
   & > *:not(.text-and-icon) {
     text-decoration: underline;
   }

@@ -5,11 +5,12 @@
     </div>
     <div class="right">
 
-      <div class="super-admin-nav" v-if="$route.name === 'resort'">
-        <span class="icon back is-small" @click="$router.push('/')" title="Back to All Resorts">
+      <div class="back" v-if="showBack" @click="$router.go(-1)" title="Go Back">
+        <span class="icon back is-small">
           <i class="fas fa-arrow-left"/>
         </span>
-        <span class="resort-name">{{ $store.state.resortMeta.name }}</span>
+        <span class="resort-name" v-show="$store.state.user.superAdmin">{{ $store.state.resortMeta.name }}</span>
+        <span class="resort-name" v-show="!$store.state.user.superAdmin">Back</span>
       </div>
 
       <h1 class="title page-title is-primary">{{ title }}</h1>
@@ -35,6 +36,13 @@ export default {
     return {}
   },
   computed: {
+    showBack () {
+      if (this.$store.state.user.superAdmin) {
+        return this.$route.path !== '/resorts'
+      } else {
+        return this.$route.path !== '/'
+      }
+    }
   },
   created () {
   },
@@ -51,10 +59,11 @@ export default {
     align-items: flex-start;
     .right {
       margin-left: 1.3em;
-      .super-admin-nav {
+      .back {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        cursor: pointer;
       }
     }
   }
