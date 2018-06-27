@@ -109,7 +109,7 @@ export default {
   },
   computed: {
     saveButtonActive () {
-      return this.emergencyGroupValid(this.localState.emergencyGroup)
+      return this.emergencyGroupValid(this.localState.emergencyGroup, this.resortCountry)
     }
   },
   watch: {
@@ -128,7 +128,7 @@ export default {
   },
   methods: {
     initializeGroup () {
-      this.localState.emergencyGroup = {...this.emergencyGroup}
+      this.localState.emergencyGroup = this.clone(this.emergencyGroup)
     },
     toggleSeasonal () {
 
@@ -153,7 +153,7 @@ export default {
 
     },
     phoneIsValid (number) {
-      return this.getPn(number) && this.getPn(number).a.valid
+      return this.getPn(number, this.resortCountry) && this.getPn(number, this.resortCountry).a.valid
     },
     toggleContactSeason (currentlyActive) {
       if (!currentlyActive) {
@@ -166,7 +166,7 @@ export default {
     },
     saveEmergencyGroup () {
       const formatNumberForSave = contact => {
-        return {...contact, number: this.getPn(contact.number).getNumber('international').replace(/ /g,'-')}
+        return {...contact, number: this.getPhoneNumberForSaving(contact.number, this.resortCountry)}
       }
       const emergencyGroup = {
         ...this.localState.emergencyGroup,

@@ -331,10 +331,6 @@ export default {
   },
   computed: {
     contactIsDirty () {
-      if (JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)) {
-        console.log(JSON.stringify(this.localState.contact))
-        console.log(JSON.stringify(this.contactAtInitialization))
-      }
       return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
     },
     formIsValid () {
@@ -402,15 +398,15 @@ export default {
   methods: {
 
     initializeContact () {
-      const defaults = JSON.parse(JSON.stringify(contactDefaults))
+      const defaults = this.clone(contactDefaults)
 
       this.localState.contact = {...defaults, ...this.contact}
       if (this.contactId === 'NEW') this.localState.contact.id = uuid()
-      this.contactAtInitialization = JSON.parse(JSON.stringify(this.localState.contact))
+      this.contactAtInitialization = this.clone(this.localState.contact)
     },
     saveContact () {
-      const number = this.localState.contact.number ? this.getPn(this.localState.contact.number).getNumber('international').replace(/ /g,'-') : ''
-      const sms = this.localState.contact.sms ? this.getPn(this.localState.contact.sms).getNumber('international') : ''
+      const number = this.localState.contact.number ? this.getPn(this.localState.contact.number, this.$store.state.resortMeta.country).getNumber('international').replace(/ /g,'-') : ''
+      const sms = this.localState.contact.sms ? this.getPn(this.localState.contact.sms, this.$store.state.resortMeta.country).getNumber('international') : ''
       const contact = {
         ...this.localState.contact,
         number,
@@ -492,8 +488,9 @@ export default {
       }
     },
     phoneIsValid (number) {
+      const regionCode = this.$store.state.resortMeta.country
       if (!number) return true
-      return this.getPn(number).a.valid
+      return this.getPn(number, regionCode).a.valid
     },
     emailIsValid (email) {
       if (!email) return true

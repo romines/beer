@@ -2,12 +2,16 @@ import PhoneNumber from 'awesome-phonenumber'
 
 export default {
   methods: {
-    getPn (userInput) {
-      return new PhoneNumber(userInput, this.$store.state.resortMeta.country)
+    getPn (userInput, countryRegionCode) {
+      return new PhoneNumber(userInput, countryRegionCode)
     },
-    emergencyGroupValid (emergencyGroup) {
+    getPhoneNumberForSaving(userInput, countryRegionCode) {
+      if (!userInput) return ''
+      return this.getPn(userInput, countryRegionCode).getNumber('international').replace(/ /g,'-')
+    },
+    emergencyGroupValid (emergencyGroup, countryRegionCode) {
       const contactIsValid = (contact) => {
-        return contact.name.length && this.getPn(contact.number) && this.getPn(contact.number).a.valid
+        return contact.name.length && this.getPn(contact.number, countryRegionCode) && this.getPn(contact.number, countryRegionCode).a.valid
       }
       const seasonalStateValid = () => {
         if (!emergencyGroup.seasonal) return true
@@ -18,6 +22,9 @@ export default {
 
       return emergencyGroup.list.every(contactIsValid) && seasonalStateValid()
 
+    },
+    clone (serializable) {
+      return JSON.parse(JSON.stringify(serializable))
     }
 
   },

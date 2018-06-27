@@ -209,7 +209,7 @@ export default {
       return this.pastedData.contactGroups.map(group => group.section)
     },
     emergencyGroupValidState () {
-      if (this.selectedEmergencyGroup === -2) return this.emergencyGroupValid(this.newEmergencyGroupData)
+      if (this.selectedEmergencyGroup === -2) return this.emergencyGroupValid(this.newEmergencyGroupData, this.newResort.country)
       return (this.selectedEmergencyGroup > -1)
     },
     saveButtonActive () {
@@ -255,16 +255,21 @@ export default {
     },
     saveNewResort () {
 
-      let resortData = JSON.parse(JSON.stringify(this.newResort))
-      resortData.contactGroups = (this.pastedData && this.pastedData.contactGroups) ? this.pastedData.contactGroups : []
+      const formatNumberForSave = contact => {
+        return {...contact, number: this.getPhoneNumberForSaving(contact.number, this.newResort.country)}
+      }
+      let resortData = this.clone(this.newResort)
+      let emergencyGroup = this.clone(this.newEmergencyGroupData)
+      emergencyGroup.list = emergencyGroup.list.map(formatNumberForSave)
 
+      resortData.contactGroups = (this.pastedData && this.pastedData.contactGroups) ? this.pastedData.contactGroups : []
 
       if (this.selectedEmergencyGroup === -2) {
         resortData.contactGroups.forEach(group => {
           if (group.emergency) delete group.emergency
         })
         resortData.contactGroups.push({
-          ...this.newEmergencyGroupData,
+          ...emergencyGroup,
           emergency: true
         })
       } else {

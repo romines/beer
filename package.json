@@ -11,7 +11,6 @@
     "stage": "cross-env NODE_ENV=staging webpack --progress --hide-modules && firebase deploy -P staging"
   },
   "dependencies": {
-    "animate.css": "^3.6.1",
     "awesome-phonenumber": "^2.2.5",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
