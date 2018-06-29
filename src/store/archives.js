@@ -4,8 +4,8 @@ import moment from 'moment'
 export default {
   state: {
     publishedContactsKey: '',
-    publishedContacts: [],
-    archives: {},
+    publishedContacts: {},
+    archiveList: {},
   },
   mutations: {
     'SET_PUBLISHED_CONTACTS' (state, {key, publishedContacts}) {
@@ -14,7 +14,7 @@ export default {
       state.publishedContacts = publishedContacts
     },
     'SET_ARCHIVE_LIST' (state, archives) {
-      state.archives = archives
+      state.archiveList = archives
     },
   },
   actions: {
@@ -40,7 +40,7 @@ export default {
     },
     listenToArchiveList ({ rootState, commit }) {
       return new Promise((resolve, reject) => {
-        firebase.database().ref(`${rootState.resortId}/archives`).on('value', snap => {
+        firebase.database().ref(`${rootState.resortId}/archiveList`).on('value', snap => {
           commit('SET_ARCHIVE_LIST', snap.val())
           resolve()
         })
@@ -49,35 +49,38 @@ export default {
     },
     archive ({ rootState }, { name, description, publish }) {
       const resortRoot = firebase.database().ref(rootState.resortId)
-      const archiveListRef = resortRoot.child('archives').push()
+      const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
       const now = moment()
       const archiveName = name ? name : now.format('llll')
 
       let updates = {}
-      updates[`/archives/${archiveKey}`] = {
+      updates[`/archiveList/${archiveKey}`] = {
         date: now.valueOf(),
         name: archiveName,
         description
       }
-      updates[`/archiveData/${archiveKey}`] = rootState.contactGroups
+      updates[`/archiveData/${archiveKey}`] = {
+        contactGroups: rootState.contactGroups,
+        emergencyGroup: rootState.emergencyGroup
+      }
       if (publish) updates['published'] = archiveKey
 
       return resortRoot.update(updates)
 
     },
-    archiveFromPasted ({ rootState }, { resortId, contactGroups }) {
+    archiveFromPasted ({ rootState }, { resortId, contactGroups, emergencyGroup }) {
       const resortRoot = firebase.database().ref(resortId)
-      const archiveListRef = resortRoot.child('archives').push()
+      const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
 
       let updates = {}
-      updates[`/archives/${archiveKey}`] = {
+      updates[`/archiveList/${archiveKey}`] = {
         date: moment().valueOf(),
         name: 'Initial data at resort creation',
         description: ''
       }
-      updates[`/archiveData/${archiveKey}`] = contactGroups
+      updates[`/archiveData/${archiveKey}`] = { contactGroups, emergencyGroup }
       updates['published'] = archiveKey
 
       return resortRoot.update(updates)
@@ -86,16 +89,16 @@ export default {
     deleteArchive ({ rootState }, archiveKey) {
       const resortRoot = firebase.database().ref(rootState.resortId)
       let updates = {}
-      updates[`/archives/${archiveKey}`] = null
+      updates[`/archiveList/${archiveKey}`] = null
       updates[`/archiveData/${archiveKey}`] = null
       resortRoot.update(updates)
     },
     toggleArchiveStar ({ rootState }, { key, starred }) {
-      firebase.database().ref(`${rootState.resortId}/archives/${key}/starred/`).set(!starred)
+      firebase.database().ref(`${rootState.resortId}/archiveList/${key}/starred/`).set(!starred)
     },
     saveArchiveName ({ rootState }, { key, name }) {
       const updates = { name }
-      return firebase.database().ref(`${rootState.resortId}/archives/${key}`).update(updates)
+      return firebase.database().ref(`${rootState.resortId}/archiveList/${key}`).update(updates)
     },
     restoreArchive ({ rootState, commit }, { key }) {
 
@@ -104,10 +107,11 @@ export default {
       return new Promise((resolve, reject) => {
 
         resortRef.child(`archiveData/${key}`).on('value', snap => {
-          const contactGroups = snap.val()
+          const archiveData = snap.val()
 
           firebase.firestore().collection('resorts').doc(rootState.resortId).update({
-            contactGroups
+            contactGroups: archiveData.contactGroups,
+            emergencyGroup: archiveData.emergencyGroup
           }).then(resolve)
         })
 
@@ -118,10 +122,17 @@ export default {
 
   getters: {
     dirty: (state, getters, rootState) => {
-      if (!state.publishedContacts || !state.publishedContacts.length) return false
+      // if (!state.publishedContacts.contactGroups || !state.publishedContacts.contactGroups.length) return false
+      if (!rootState.contactGroups.length) return false
       // console.log(JSON.stringify(state.publishedContacts))
-      // console.log(JSON.stringify(rootState.contactGroups))
-      return JSON.stringify(state.publishedContacts) !== JSON.stringify(rootState.contactGroups)
+      // console.log(JSON.stringify({
+      //   contactGroups: rootState.contactGroups,
+      //   emergencyGroup: rootState.emergencyGroup
+      // }))
+      return JSON.stringify(state.publishedContacts) !== JSON.stringify({
+        contactGroups: rootState.contactGroups,
+        emergencyGroup: rootState.emergencyGroup
+      })
     }
   }
 }

@@ -117,10 +117,10 @@ export default {
   },
   computed: {
     archives () {
-      if (!this.$store.state.archives.archives) return []
-      const sorted = Object.keys(this.$store.state.archives.archives).map(key => {
+      if (!this.$store.state.archives.archiveList) return []
+      const sorted = Object.keys(this.$store.state.archives.archiveList).map(key => {
         return {
-          ...this.$store.state.archives.archives[key],
+          ...this.$store.state.archives.archiveList[key],
           key
         }
       }).sort((a, b) => a.date - b.date)
@@ -135,7 +135,7 @@ export default {
     },
   },
   created () {
-    // if (!this.$store.state.archives.archives.length) debugger
+    // if (!this.$store.state.archives.archiveList.length) debugger
   },
   methods: {
     getDateString (time) {

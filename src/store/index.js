@@ -36,6 +36,7 @@ const store = {
     resortId: '',
     resortMeta: {},
     contactGroups: [],
+    emergencyGroup: {},
     loading: true,
     modal: {
       show: false,
@@ -59,9 +60,10 @@ const store = {
     'SET_RESORT_META' (state, resortMeta) {
       state.resortMeta = resortMeta
     },
-    'SET_CONTACT_GROUPS' (state, contactGroups) {
+    'SET_CONTACT_GROUPS' (state, { contactGroups, emergencyGroup }) {
       console.log('SET_CONTACT_GROUPS . . .');
       state.contactGroups = contactGroups
+      state.emergencyGroup = emergencyGroup
     },
     'SHOW_MODAL' (state, contents) {
       state.modal.show = true
@@ -137,14 +139,24 @@ const store = {
         RESORTS_REF.doc(rootState.resortId)
           .onSnapshot(doc => {
 
-            let resortData = doc.data()
+            const resortData = doc.data()
+            // TEMP
+            if (!resortData.emergencyGroup) {
+              const index = resortData.contactGroups.findIndex(group => group.emergency)
+              if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
+              else            { console.log('WARNING: no emergency group found!!!!') }
+            }
+            resortData.emergencyGroup.list.forEach(contact => {
+              if (contact.emergency !== undefined) delete contact.emergency
+            })
+            // End TEMP
 
-            commit('SET_CONTACT_GROUPS', resortData.contactGroups)
+            commit('SET_CONTACT_GROUPS', resortData)
             commit('SET_RESORT_META', {
               country: resortData.country,
               mapFiles: resortData.mapFiles,
-              name: resortData.name }
-            )
+              name: resortData.name
+            })
             resolve()
           }, (err) => reject(`Error listening to contacts: ${err}`))
 
@@ -167,7 +179,7 @@ const store = {
       .signOut()
       .then(() => {
         commit('SET_USER', {})
-        commit('SET_CONTACT_GROUPS', [])
+        commit('SET_CONTACT_GROUPS', {})
       });
     },
     createUser ({ rootState, commit, dispatch }, { email, password, resortId, onSuccess }) {
@@ -232,13 +244,13 @@ const store = {
       })
     },
     saveEmergencyContactGroup ({ rootState }, updatedEmergencyGroup) {
-      const groupIndex = rootState.contactGroups.findIndex(group => group.id === updatedEmergencyGroup.id)
+      // const groupIndex = rootState.contactGroups.findIndex(group => group.id === updatedEmergencyGroup.id)
 
-      let groups = rootState.contactGroups.slice()
+      // let groups = rootState.contactGroups.slice()
 
-      groups[groupIndex] = updatedEmergencyGroup
+      // groups[groupIndex] = updatedEmergencyGroup
       RESORTS_REF.doc(rootState.resortId).update({
-        contactGroups: groups
+        emergencyGroup: updatedEmergencyGroup
       })
     },
     deleteContactGroup ({ rootState }, groupIndex) {

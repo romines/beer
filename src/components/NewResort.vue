@@ -1,7 +1,7 @@
 <template>
   <div class="new-resort">
 
-    <div class="add-new-bar box" @click="addingResort = true" v-show="!addingResort">
+    <div class="add-new-bar box" @click="addResort" v-show="!addingResort">
       <span class="text">Add New</span>
       <span class="icon is-small">
         <i class="fas fa-plus"/>
@@ -17,7 +17,8 @@
           <input
             v-model.trim="newResort.name"
             class="input is-expanded"
-            placeholder="Name">
+            placeholder="Name"
+            ref="resortName">
           <span class="icon is-small is-left">
             <i class="fas fa-address-book" />
           </span>
@@ -216,7 +217,7 @@ export default {
 
       return this.newResort.name.length
         && this.newResort.resortId.length
-        && this.newResort.mapFiles.length
+        // && this.newResort.mapFiles.length
         && this.emergencyGroupValidState
         && this.newResortNameIsValid
         && this.newResortIdIsValid
@@ -224,6 +225,10 @@ export default {
     }
   },
   created () {
+    // Temp
+    console.log('WARNING: not validating map upload . . .');
+    // End Temp
+
     // keep this ugly multi-line string out of reactive state
     this.jsonPlaceholder= `{
   "contactGroups": [
@@ -247,6 +252,12 @@ export default {
 
   },
   methods: {
+    addResort () {
+      this.addingResort = true
+      this.$nextTick(() => {
+        this.$refs.resortName.focus()
+      })
+    },
     onMapFileUpload ({ url }) {
       this.newResort.mapFiles.push(url)
     },
@@ -255,28 +266,21 @@ export default {
     },
     saveNewResort () {
 
-      const formatNumberForSave = contact => {
-        return {...contact, number: this.getPhoneNumberForSaving(contact.number, this.newResort.country)}
-      }
       let resortData = this.clone(this.newResort)
-      let emergencyGroup = this.clone(this.newEmergencyGroupData)
-      emergencyGroup.list = emergencyGroup.list.map(formatNumberForSave)
 
       resortData.contactGroups = (this.pastedData && this.pastedData.contactGroups) ? this.pastedData.contactGroups : []
 
       if (this.selectedEmergencyGroup === -2) {
-        resortData.contactGroups.forEach(group => {
-          if (group.emergency) delete group.emergency
-        })
-        resortData.contactGroups.push({
-          ...emergencyGroup,
-          emergency: true
-        })
+        resortData.emergencyGroup = {
+          ...this.newEmergencyGroupData,
+          list: this.newEmergencyGroupData.list.map(contact => this.formatContactNumbersForSave(contact, this.newResort.country))
+        }
       } else {
-        resortData.contactGroups[this.selectedEmergencyGroup].emergency = true
+        resortData.emergencyGroup = this.clone(resortData.contactGroups[this.selectedEmergencyGroup])
+        resortData.contactGroups = resortData.contactGroups.filter((group, index) => index !== this.selectedEmergencyGroup)
       }
 
-      this.addingResort = false;
+      this.addingResort = false
 
       this.$store.dispatch('saveNewResort', resortData).then(() => {
         this.$store.dispatch('getResorts')

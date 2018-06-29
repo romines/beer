@@ -165,12 +165,9 @@ export default {
       }
     },
     saveEmergencyGroup () {
-      const formatNumberForSave = contact => {
-        return {...contact, number: this.getPhoneNumberForSaving(contact.number, this.resortCountry)}
-      }
       const emergencyGroup = {
         ...this.localState.emergencyGroup,
-        list: this.localState.emergencyGroup.list.map(formatNumberForSave),
+        list: this.localState.emergencyGroup.list.map(contact => this.formatContactNumbersForSave(contact, this.resortCountry)),
         emergency: true
       }
       this.$store.dispatch('saveEmergencyContactGroup', emergencyGroup)

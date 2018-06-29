@@ -351,6 +351,7 @@ export default {
       return this.getCoordinates(this.localState.contact.rect)
     },
     matchingLocations () {
+      if (!(this.myCoordinates.x || this.myCoordinates.y)) return []
       return this.flattenedContacts.filter(contact => {
         if (!contact.rect || !this.myCoordinates) return false
         if (contact.id === this.localState.contact.id) return false

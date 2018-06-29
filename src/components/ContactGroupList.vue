@@ -136,7 +136,7 @@ export default {
     }
   },
   methods: {
-    onGroupHeaderClick (id, event, scrollIntoView) {
+    onGroupHeaderClick (id, event) {
 
       // TODO: handle dirty contact state
 

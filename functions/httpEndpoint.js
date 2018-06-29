@@ -12,38 +12,51 @@ module.exports = functions.https.onRequest((request, response) => {
   // const resortRoot = db.ref(resortId);
   let _deleteCount = 0;
 
-  const rmUuid = (contact) => {
-    if (contact.id !== undefined) delete contact.id;
-    return contact
-  }
-  const stripIdsAndEmptyFields = (group) => {
+  function stripIdsAndEmptyFields(group) {
+
+    const rmUuid = (contact) => {
+      if (contact.id !== undefined) delete contact.id;
+      return contact
+    }
+
+    const stripEmptyFields = (contact) => {
+        if (STRIP_EMPTY) {
+          Object.keys(contact).forEach(key => {
+            if ((contact[key]) !== 0 && !contact[key]) {
+            delete contact[key];
+            _deleteCount += 1;
+          }
+        });
+      }
+      return contact
+    }
+
     if (group.id !== undefined) delete group.id;
     group.list = group.list
       .map(rmUuid)
       .map(stripEmptyFields)
-      return group
-    }
-    const stripEmptyFields = (contact) => {
-      if (STRIP_EMPTY) {
-        Object.keys(contact).forEach(key => {
-          if ((contact[key]) !== 0 && !contact[key]) {
-          delete contact[key];
-          _deleteCount += 1;
-        }
-      });
-    }
-    return contact
+
+    return group;
+
   }
+
+
 
   db.ref(resortId).once('value', snapshot => {
 
     const resortData = snapshot.val();
+    const emergencyGroup = stripIdsAndEmptyFields(resortData.archiveData[resortData.published].emergencyGroup)
+    let contactGroups = resortData.archiveData[resortData.published].contactGroups
+      .map(stripIdsAndEmptyFields);
+    contactGroups.push(emergencyGroup);
+
     const responseObject = {
       name: resortData.name,
       mapFiles: resortData.mapFiles,
       resortId: resortData.resortId,
       keys: resortData.keys,
-      contactGroups: resortData.archiveData[resortData.published].map(stripIdsAndEmptyFields)
+      contactGroups,
+      emergencyGroup
     }
 
     const responseString = JSON.stringify(responseObject)
@@ -54,14 +67,5 @@ module.exports = functions.https.onRequest((request, response) => {
   }).catch(function(error) {
     response.send(error);
   });
-
-  // docRef.get().then(function(doc) {
-  //   let resortData = doc.data()
-  //   resortData.contactGroups = resortData.contactGroups.map(stripIdsAndEmptyFields)
-  //   let responseString = JSON.stringify(resortData)
-  //   response.send(responseString);
-  // }).catch(function(error) {
-  //   response.send(error);
-  // });
 
 });

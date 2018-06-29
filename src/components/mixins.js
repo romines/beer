@@ -9,6 +9,13 @@ export default {
       if (!userInput) return ''
       return this.getPn(userInput, countryRegionCode).getNumber('international').replace(/ /g,'-')
     },
+    formatContactNumbersForSave (contact, countryRegionCode) {
+      return {
+        ...contact,
+        number: this.getPhoneNumberForSaving(contact.number, countryRegionCode),
+        sms: this.getPhoneNumberForSaving(contact.sms, countryRegionCode)
+      }
+    },
     emergencyGroupValid (emergencyGroup, countryRegionCode) {
       const contactIsValid = (contact) => {
         return contact.name.length && this.getPn(contact.number, countryRegionCode) && this.getPn(contact.number, countryRegionCode).a.valid
