@@ -1,95 +1,129 @@
 <template>
-  <draggable
-    class="contact-group-list"
-    v-model="myList"
-    :options="{handle:'.grippy'}"
-    @start="drag=true; editingNameOfGroupAtIndex = -1;"
-    @end="drag=false">
 
+  <div class="contact-group-list">
+
+    <draggable
+      v-model="myList"
+      :options="{handle:'.grippy'}"
+      @start="drag=true; editingNameOfGroupAtIndex = -1;"
+      @end="drag=false">
+
+      <div
+        class="contact-group"
+        :class="detailGroup === group.id ? 'box' : ''"
+        v-for="(group, groupIndex) in myList"
+        :key="group.id">
+
+        <div
+          class="group-header"
+          :class="detailGroup === group.id ? '' : 'box'"
+          @click="onGroupHeaderClick(group.id, $event)">
+
+          <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
+            <span class="grippy" />
+            <span class="name">{{ group.section }}</span>
+            <span class="icon edit-name is-small" v-show="!group.emergency" @click.stop="editGroupTitle(groupIndex)">
+              <i class="fas fa-edit"/>
+            </span>
+            <span class="icon delete-group is-small" v-show="!group.emergency" @click.stop="deleteGroup(groupIndex)">
+              <i class="fas fa-trash-alt"/>
+            </span>
+          </span>
+          <!-- OR -->
+          <div class="name-editor field is-grouped" v-show="editingNameOfGroupAtIndex === groupIndex">
+            <p class="control is-expanded">
+              <input class="input is-small" v-model="groupNameDraft" placeholder="Group title">
+            </p>
+            <p class="control" @click.stop>
+              <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
+              <button class="button is-small" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
+            </p>
+          </div>
+
+          <div class="group-sort" v-show="detailGroup === group.id && !group.emergency">
+            <span>Custom Sort Order</span>
+            <div class="toggle-container ">
+              <label class="switch" @click.stop>
+                <input type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort" @click.stop.prevent.self="toggleSortable(groupIndex)">
+                <span class="slider round" />
+              </label>
+            </div>
+          </div>
+
+          <span class="icon is-small" v-show="detailGroup !== group.id">
+            <i class="fas fa-chevron-down"/>
+          </span>
+          <span class="icon is-small" v-show="detailGroup === group.id">
+            <i class="fas fa-chevron-up"/>
+          </span>
+
+          <!-- end .group-header -->
+        </div>
+
+        <div
+          class="group-detail"
+          v-if="!group.emergency && detailGroup === group.id">
+
+          <contact-list :group-index="groupIndex" :group-is-open="detailGroup === group.id" />
+          <!-- end .group-detail -->
+          <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
+            <span class="text">Add New Contact</span>
+            <span class="icon is-small">
+              <i class="fas fa-plus"/>
+            </span>
+          </div>
+
+          <div class="add-new-contact box" v-if="addingContactAtIndex === groupIndex">
+            <edit-contact
+              :group-index="groupIndex"
+              :contact-id="'NEW'"
+              :contact="{}"
+              @closeContact="addingContactAtIndex = -1"/>
+          </div>
+
+        </div>
+
+        <!-- end .contact-group -->
+      </div>
+
+    </draggable>
+    <!-- Emergency Group -->
     <div
-      class="contact-group"
-      :class="detailGroup === group.id ? 'box' : ''"
-      v-for="(group, groupIndex) in myList"
-      :key="group.id">
+      class="contact-group emergency-group"
+      :class="detailGroup === 'EMERGENCY' ? 'box' : ''">
 
       <div
         class="group-header"
-        :class="detailGroup === group.id ? '' : 'box'"
-        @click="onGroupHeaderClick(group.id, $event)">
+        :class="detailGroup === 'EMERGENCY' ? '' : 'box'"
+        @click="onGroupHeaderClick('EMERGENCY', $event)">
 
-        <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
-          <span class="grippy" />
-          <span class="name">{{ group.section }}</span>
-          <span class="icon edit-name is-small" v-show="!group.emergency" @click.stop="editGroupTitle(groupIndex)">
-            <i class="fas fa-edit"/>
-          </span>
-          <span class="icon delete-group is-small" v-show="!group.emergency" @click.stop="deleteGroup(groupIndex)">
-            <i class="fas fa-trash-alt"/>
-          </span>
-        </span>
+        <div class="name-and-icon">
+          <img src="../assets/cross.svg" class="cross">
+          <span class="name">Emergency</span>
+        </div>
         <!-- OR -->
-        <div class="name-editor field is-grouped" v-show="editingNameOfGroupAtIndex === groupIndex">
-          <p class="control is-expanded">
-            <input class="input is-small" v-model="groupNameDraft" placeholder="Group title">
-          </p>
-          <p class="control" @click.stop>
-            <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
-            <button class="button is-small" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
-          </p>
-        </div>
 
-        <div class="group-sort" v-show="detailGroup === group.id && !group.emergency">
-          <span>Custom Sort Order</span>
-          <div class="toggle-container ">
-            <label class="switch" @click.stop>
-              <input type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort" @click.stop.prevent.self="toggleSortable(groupIndex)">
-              <span class="slider round" />
-            </label>
-          </div>
-        </div>
-
-        <span class="icon is-small" v-show="detailGroup !== group.id">
+        <span class="icon is-small" v-show="detailGroup !== 'EMERGENCY'">
           <i class="fas fa-chevron-down"/>
         </span>
-        <span class="icon is-small" v-show="detailGroup === group.id">
+        <span class="icon is-small" v-show="detailGroup === 'EMERGENCY'">
           <i class="fas fa-chevron-up"/>
         </span>
 
         <!-- end .group-header -->
       </div>
 
-      <div
-        class="group-detail"
-        v-if="!group.emergency && detailGroup === group.id">
-
-        <contact-list :group-index="groupIndex" :group-is-open="detailGroup === group.id" />
-        <!-- end .group-detail -->
-        <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
-          <span class="text">Add New Contact</span>
-          <span class="icon is-small">
-            <i class="fas fa-plus"/>
-          </span>
-        </div>
-
-        <div class="add-new-contact box" v-if="addingContactAtIndex === groupIndex">
-          <edit-contact
-            :group-index="groupIndex"
-            :contact-id="'NEW'"
-            :contact="{}"
-            @closeContact="addingContactAtIndex = -1"/>
-        </div>
-
-      </div>
 
       <emergency-contact-group
-        v-if="group.emergency && detailGroup === group.id"
-        :emergency-group="group"
-        :resort-country="$store.state.resortMeta.country"/>
+        v-if="detailGroup === 'EMERGENCY'"
+        :emergency-group="$store.state.emergencyGroup"
+        :resort-country="$store.state.resortMeta.country"
+        @emergencyGroupSave="detailGroup = ''"/>
 
       <!-- end .contact-group -->
     </div>
+  </div>
 
-  </draggable>
 </template>
 
 <script>
@@ -260,6 +294,20 @@ export default {
         width: auto;
         margin-left: 1.2em;
         display: inline-flex;
+      }
+    }
+  }
+  .emergency-group {
+    .name-and-icon {
+      display: flex;
+      align-items: center;
+      img.cross {
+        width: 1em;
+        margin-top: -1px;
+        opacity: .4;
+      }
+      .name {
+        margin-left: .9em;
       }
     }
   }

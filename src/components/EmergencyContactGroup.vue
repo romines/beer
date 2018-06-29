@@ -68,7 +68,7 @@
         </a>
       </p>
       <p class="control no-expando">
-        <a class="button is-light" @click="">
+        <a class="button is-light" @click="$emit('emergencyGroupSave')">
           Cancel
         </a>
       </p>
@@ -104,12 +104,16 @@ export default {
     return {
       localState: {
         emergencyGroup: {}
-      }
+      },
+      groupAtInitialization: {}
     }
   },
   computed: {
+    groupIsDirty () {
+      return JSON.stringify(this.localState.emergencyGroup) !== JSON.stringify(this.contactAtInitialization)
+    },
     saveButtonActive () {
-      return this.emergencyGroupValid(this.localState.emergencyGroup, this.resortCountry)
+      return this.emergencyGroupValid(this.localState.emergencyGroup, this.resortCountry) && this.groupIsDirty
     }
   },
   watch: {
@@ -129,6 +133,7 @@ export default {
   methods: {
     initializeGroup () {
       this.localState.emergencyGroup = this.clone(this.emergencyGroup)
+      this.contactAtInitialization = this.clone(this.emergencyGroup)
     },
     toggleSeasonal () {
 
@@ -171,6 +176,7 @@ export default {
         emergency: true
       }
       this.$store.dispatch('saveEmergencyContactGroup', emergencyGroup)
+      this.$emit('emergencyGroupSave')
     },
   }
 }
