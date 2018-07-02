@@ -6,11 +6,13 @@
         <label class="label">Seasonal</label>
       </div>
 
-      <div class="field-body toggle-container">
-        <label class="switch" @click.stop>
-          <input type="checkbox" v-model="localState.emergencyGroup.seasonal" @click.stop.prevent.self="toggleSeasonal">
-          <span class="slider round" />
-        </label>
+      <div class="field-body">
+        <p class="control">
+          <label class="switch control" @click.stop>
+            <input type="checkbox" v-model="localState.emergencyGroup.seasonal" @click.stop.prevent.self="toggleSeasonal">
+            <span class="slider round" />
+          </label>
+        </p>
       </div>
     </div>
 
@@ -20,9 +22,11 @@
         <div class="field-label is-normal">
           <label class="label">Season</label>
         </div>
-        <div class="field-body control has-icons-left">
-          <span class="button season" :class="{'active': contact.tags.winter}" @click="toggleContactSeason(contact.tags.winter)">Winter</span>
-          <span class="button season" :class="{'active': contact.tags.summer}" @click="toggleContactSeason(contact.tags.summer)">Summer</span>
+        <div class="field-body has-icons-left">
+          <p class="control">
+            <span class="button season" :class="{'active': contact.tags.winter}" @click="toggleContactSeason(contact.tags.winter)">Winter</span>
+            <span class="button season" :class="{'active': contact.tags.summer}" @click="toggleContactSeason(contact.tags.summer)">Summer</span>
+          </p>
         </div>
       </div>
 
@@ -30,14 +34,16 @@
         <div class="field-label is-normal">
           <label class="label">Contact Name</label>
         </div>
-        <div class="field-body control has-icons-left">
-          <input
-            v-model.trim="contact.name"
-            class="input is-expanded"
-            placeholder="Name">
-          <span class="icon is-small is-left">
-            <i class="fas fa-address-book" />
-          </span>
+        <div class="field-body ">
+          <p class="control has-icons-left">
+            <input
+              v-model.trim="contact.name"
+              class="input is-expanded"
+              placeholder="Name">
+            <span class="icon is-small is-left">
+              <i class="fas fa-address-book" />
+            </span>
+          </p>
         </div>
       </div>
 
@@ -45,17 +51,20 @@
         <div class="field-label is-normal">
           <label class="label">Phone</label>
         </div>
-        <div class="field-body control has-icons-left">
-          <cleave
-            v-model="contact.number"
-            class="input is-expanded"
-            :class="{ 'is-danger': !phoneIsValid(contact.number)}"
-            :options="{ phone: true, phoneRegionCode: resortCountry }"
-            placeholder="Phone" />
+        <div class="field-body">
+          <p class="control has-icons-left">
+            <cleave
+              v-model="contact.number"
+              class="input is-expanded"
+              :class="{ 'is-danger': !phoneIsValid(contact.number)}"
+              :options="{ phone: true, phoneRegionCode: resortCountry }"
+              placeholder="Phone" />
 
-          <span class="icon is-small is-left">
-            <i class="fas fa-phone" />
-          </span>
+            <span class="icon is-small is-left">
+              <i class="fas fa-phone" />
+            </span>
+
+          </p>
         </div>
       </div>
 

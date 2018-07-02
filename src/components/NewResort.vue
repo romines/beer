@@ -13,15 +13,17 @@
         <div class="field-label is-normal">
           <label class="label">Name</label>
         </div>
-        <div class="field-body control has-icons-left">
-          <input
-            v-model.trim="newResort.name"
-            class="input is-expanded"
-            placeholder="Name"
-            ref="resortName">
-          <span class="icon is-small is-left">
-            <i class="fas fa-address-book" />
-          </span>
+        <div class="field-body">
+          <p class="control has-icons-left">
+            <input
+              v-model.trim="newResort.name"
+              class="input is-expanded"
+              placeholder="Name"
+              ref="resortName">
+            <span class="icon is-small is-left">
+              <i class="fas fa-address-book" />
+            </span>
+          </p>
         </div>
       </div>
       <p class="help is-danger" v-show="!newResortNameIsValid">
@@ -31,14 +33,16 @@
         <div class="field-label is-normal">
           <label class="label">Resort Id</label>
         </div>
-        <div class="field-body control has-icons-left">
-          <input
-            v-model.trim="newResort.resortId"
-            class="input is-expanded"
-            placeholder="resort_id">
-          <span class="icon is-small is-left">
-            <i class="fas fa-address-book" />
-          </span>
+        <div class="field-body">
+          <p class="control has-icons-left">
+            <input
+              v-model.trim="newResort.resortId"
+              class="input is-expanded"
+              placeholder="resort_id">
+            <span class="icon is-small is-left">
+              <i class="fas fa-address-book" />
+            </span>
+          </p>
         </div>
       </div>
       <p class="help is-danger" v-show="!newResortIdIsValid">
@@ -48,16 +52,18 @@
         <div class="field-label is-normal">
           <label class="label">Country</label>
         </div>
-        <div class="field-body control has-icons-left">
-          <div class="select">
-            <select v-model="newResort.country">
-              <option value="US">US</option>
-              <option value="AU">AU</option>
-            </select>
-          </div>
-          <span class="icon is-left">
-            <i class="fas fa-globe" />
-          </span>
+        <div class="field-body">
+          <p class="control has-icons-left">
+            <span class="select">
+              <select v-model="newResort.country">
+                <option value="US">US</option>
+                <option value="AU">AU</option>
+              </select>
+            </span>
+            <span class="icon is-left">
+              <i class="fas fa-globe" />
+            </span>
+          </p>
         </div>
       </div>
       <div class="field is-horizontal" v-show="newResort.resortId.length">
@@ -87,8 +93,10 @@
         <div class="field-label is-normal">
           <label class="label">JSON</label>
         </div>
-        <div class="field-body control">
-          <textarea class="textarea is-small" type="text" v-model="pastedJson" :placeholder="jsonPlaceholder" />
+        <div class="field-body">
+          <div class="control">
+            <textarea class="textarea is-small" type="text" v-model="pastedJson" :placeholder="jsonPlaceholder" />
+          </div>
         </div>
       </div>
       <p class="help">Optional. JSON should have root property called 'contactGroups'. All other properties are ignored.</p>
