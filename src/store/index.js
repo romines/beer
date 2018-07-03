@@ -9,7 +9,7 @@ import 'babel-polyfill'
 import archives from './archives'
 
 import mayExport from '../../utils/firestore-export.json'
-import userData from '../../utils/userData.json'
+// import userData from '../../utils/userData.json'
 
 const RESORTS_REF = firebase.firestore().collection('resorts') // is there a better way to call attention to module scoped var
 
@@ -141,6 +141,13 @@ const store = {
 
             const resortData = doc.data()
             // TEMP
+
+
+            resortData.contactGroups = resortData.contactGroups
+              .map(addNoSort)
+              .map(addGroupId)
+              .map(addMissingContactDefaults)
+
             if (!resortData.emergencyGroup) {
               const index = resortData.contactGroups.findIndex(group => group.emergency)
               if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
@@ -149,6 +156,7 @@ const store = {
             resortData.emergencyGroup.list.forEach(contact => {
               if (contact.emergency !== undefined) delete contact.emergency
             })
+
             // End TEMP
 
             commit('SET_CONTACT_GROUPS', resortData)
@@ -428,6 +436,9 @@ function addMissingContactDefaults (group) {
   }
 
   group.list = group.list
+    // TEMP
+    .filter(li => li !== 'wtf')
+    // end TEMP
     .map(addMissingEmptyStringFields)
     .map(addMapIndex)
     .map(addUuid)
@@ -445,7 +456,11 @@ function addNoSort (group) {
 }
 
 function addGroupId (group) {
-  if (group.id === undefined) group.id = uuid()
+
+  if (group.id === undefined) {
+    debugger
+    group.id = uuid()
+  }
   return group
 }
 

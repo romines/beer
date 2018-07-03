@@ -31,10 +31,20 @@ module.exports = functions.https.onRequest((request, response) => {
       return contact
     }
 
+    const cleanEmergencyContact = (emergencyContact) => {
+      if (emergencyContact.tags) delete emergencyContact.tags
+      if (emergencyContact.mapId !== undefined) delete emergencyContact.mapId
+      return emergencyContact
+    };
+
     if (group.id !== undefined) delete group.id;
     group.list = group.list
       .map(rmUuid)
-      .map(stripEmptyFields)
+      .map(stripEmptyFields);
+
+    if (group.emergency) {
+      group.list = group.list.map(cleanEmergencyContact);
+    }
 
     return group;
 

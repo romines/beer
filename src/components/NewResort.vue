@@ -72,21 +72,25 @@
         </div>
 
 
-        <div class="field-body manage-maps control">
+        <div class="field-body manage-maps">
 
-          <div class="map-thumbs">
-            <div class="image-container" v-for="(url, index) in newResort.mapFiles">
-              <span class="icon is-small remove" @click="removeImage(index)">
-                <i class="fas fa-times-circle" />
-              </span>
-              <img :src="url">
-              <div class="remove-image" @click="removeImage(index)">remove map</div>
+          <div class="control">
+            <div class="map-thumbs">
+              <div class="image-container" v-for="(url, index) in newResort.mapFiles">
+                <span class="icon is-small remove" @click="removeImage(index)">
+                  <i class="fas fa-times-circle" />
+                </span>
+                <img :src="url">
+                <div class="remove-image" @click="removeImage(index)">remove map</div>
+              </div>
             </div>
+
+            <image-upload file-name-prefix="map_" :path-prefix="`${newResort.resortId}/map_files/`" button-label="Add a map..." @uploadComplete="onMapFileUpload"/>
+
           </div>
 
-          <image-upload file-name-prefix="map_" :path-prefix="`${newResort.resortId}/map_files/`" button-label="Add a map..." @uploadComplete="onMapFileUpload"/>
-
         </div>
+
       </div>
 
       <div class="field is-horizontal">
@@ -94,8 +98,10 @@
           <label class="label">JSON</label>
         </div>
         <div class="field-body">
-          <div class="control">
-            <textarea class="textarea is-small" type="text" v-model="pastedJson" :placeholder="jsonPlaceholder" />
+          <div class="field">
+            <div class="control">
+              <textarea class="textarea is-small" type="text" v-model="pastedJson" :placeholder="jsonPlaceholder" />
+            </div>
           </div>
         </div>
       </div>
@@ -225,7 +231,7 @@ export default {
 
       return this.newResort.name.length
         && this.newResort.resortId.length
-        // && this.newResort.mapFiles.length
+        && this.newResort.mapFiles.length
         && this.emergencyGroupValidState
         && this.newResortNameIsValid
         && this.newResortIdIsValid
@@ -233,9 +239,6 @@ export default {
     }
   },
   created () {
-    // Temp
-    console.log('WARNING: not validating map upload . . .');
-    // End Temp
 
     // keep this ugly multi-line string out of reactive state
     this.jsonPlaceholder= `{
@@ -267,6 +270,7 @@ export default {
       })
     },
     onMapFileUpload ({ url }) {
+      console.log(url)
       this.newResort.mapFiles.push(url)
     },
     removeImage (index) {

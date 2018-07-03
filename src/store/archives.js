@@ -29,7 +29,7 @@ export default {
         resortRef.child('published').on('value', snap => {
           const key = snap.val()
 
-          resortRef.child(`archiveData/${key}`).on('value', snap => {
+          resortRef.child(`archiveData/${key}`).once('value', snap => {
             commit('SET_PUBLISHED_CONTACTS', {key, publishedContacts: snap.val()})
             resolve()
           })
@@ -124,15 +124,23 @@ export default {
     dirty: (state, getters, rootState) => {
       // if (!state.publishedContacts.contactGroups || !state.publishedContacts.contactGroups.length) return false
       if (!rootState.contactGroups.length) return false
-      // console.log(JSON.stringify(state.publishedContacts))
-      // console.log(JSON.stringify({
-      //   contactGroups: rootState.contactGroups,
-      //   emergencyGroup: rootState.emergencyGroup
-      // }))
-      return JSON.stringify(state.publishedContacts) !== JSON.stringify({
+      if (Object.keys(state.publishedContacts).length === 0) return false
+
+      const different = (JSON.stringify(state.publishedContacts) !== JSON.stringify({
         contactGroups: rootState.contactGroups,
         emergencyGroup: rootState.emergencyGroup
-      })
+      }))
+
+      // if (different) {
+      //   console.log(JSON.stringify(state.publishedContacts))
+      //   console.log(JSON.stringify({
+      //     contactGroups: rootState.contactGroups,
+      //     emergencyGroup: rootState.emergencyGroup
+      //   }))
+      // }
+
+      return different
+
     }
   }
 }
