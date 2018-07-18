@@ -60,8 +60,8 @@ export default {
   },
   data () {
     return {
-      email: 'adam.romines@gmail.com',
-      password: 'password',
+      email: '',
+      password: '',
     }
   },
   computed: {

@@ -166,8 +166,10 @@ export default {
       this.localState.emergencyGroup.seasonal = !this.localState.emergencyGroup.seasonal
 
     },
-    phoneIsValid (number) {
-      return this.getPn(number, this.resortCountry) && this.getPn(number, this.resortCountry).a.valid
+    phoneIsValid (num) {
+      console.log(num);
+      if (num === '000') return true
+      return this.getPn(num, this.resortCountry) && this.getPn(num, this.resortCountry).a.valid
     },
     toggleContactSeason (currentlyActive) {
       if (!currentlyActive) {

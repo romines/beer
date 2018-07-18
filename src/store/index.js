@@ -15,7 +15,6 @@ const RESORTS_REF = firebase.firestore().collection('resorts') // is there a bet
 
 const SEED_DATA = mayExport.resorts
 // const USER_DATA = userData.users
-
 const defaultModalContents = {
   heading: '',
   message: '',
@@ -402,7 +401,7 @@ function addMissingContactDefaults (group) {
   }
 
   const addMissingEmptyStringFields = (contact) => {
-    ['imageUrl', 'mailto', 'menu', 'name', 'number', 'sms', 'url', 'z_detail', 'z_reservations'].forEach(urlField => {
+    ['imageUrl', 'mailto', 'menu', 'name', 'number', 'rect', 'sms', 'url', 'z_detail', 'z_reservations'].forEach(urlField => {
       if (contact[urlField] === undefined) {
         contact[urlField] = ''
       }
@@ -458,7 +457,6 @@ function addNoSort (group) {
 function addGroupId (group) {
 
   if (group.id === undefined) {
-    debugger
     group.id = uuid()
   }
   return group
