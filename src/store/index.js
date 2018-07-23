@@ -152,9 +152,9 @@ const store = {
               if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
               else            { console.log('WARNING: no emergency group found!!!!') }
             }
-            resortData.emergencyGroup.list.forEach(contact => {
-              if (contact.emergency !== undefined) delete contact.emergency
-            })
+            // resortData.emergencyGroup.list.forEach(contact => {
+            //   if (contact.emergency !== undefined) delete contact.emergency
+            // })
 
             // End TEMP
 

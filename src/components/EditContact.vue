@@ -212,7 +212,7 @@
           </li>
         </ul>
         <small>
-          Click location(s) above to apply existing coordinates. This ensures contacts which share a location are grouped together in app
+          Click location(s) above to apply existing coordinates. This ensures contacts which share a location appear together on the map
         </small>
       </div>
     </div>
@@ -492,6 +492,7 @@ export default {
     phoneIsValid (number) {
       const regionCode = this.$store.state.resortMeta.country
       if (!number) return true
+      if (number === '000') return true
       return this.getPn(number, regionCode).a.valid
     },
     emailIsValid (email) {
