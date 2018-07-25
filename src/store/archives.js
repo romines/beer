@@ -1,5 +1,6 @@
 import firebase from '../firebaseInit.js'
 import moment from 'moment'
+import equal from 'deep-equal'
 
 export default {
   state: {
@@ -126,17 +127,19 @@ export default {
       if (!rootState.contactGroups.length) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
 
-      const different = (JSON.stringify(state.publishedContacts) !== JSON.stringify({
+      const published = state.publishedContacts
+      const working = {
         contactGroups: rootState.contactGroups,
         emergencyGroup: rootState.emergencyGroup
-      }))
+      }
+
+      const different = !equal(working, published)
 
       // if (different) {
-      //   console.log(JSON.stringify(state.publishedContacts))
-      //   console.log(JSON.stringify({
-      //     contactGroups: rootState.contactGroups,
-      //     emergencyGroup: rootState.emergencyGroup
-      //   }))
+      //   console.log('PUBLISHED: ')
+      //   console.log(JSON.stringify(published))
+      //   console.log('WORKING: ')
+      //   console.log(JSON.stringify(working))
       // }
 
       return different

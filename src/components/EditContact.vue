@@ -153,15 +153,15 @@
       </div>
       <div class="control has-icons-left has-icons-right">
         <input
-          v-model.trim="localState.contact.reservations"
-          :class="{ 'is-danger': !urlIsValid(localState.contact.reservations) }"
+          v-model.trim="localState.contact.z_reservations"
+          :class="{ 'is-danger': !urlIsValid(localState.contact.z_reservations) }"
           class="input"
           placeholder="Reservations URL">
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
         </span>
-        <span class="icon is-small is-right test-link" v-show="localState.contact.reservations && urlIsValid(localState.contact.reservations)">
-          <a :href="localState.contact.reservations" target="_blank">
+        <span class="icon is-small is-right test-link" v-show="localState.contact.z_reservations && urlIsValid(localState.contact.z_reservations)">
+          <a :href="localState.contact.z_reservations" target="_blank">
             <i class="fas fa-external-link-alt" />
           </a>
         </span>
@@ -334,7 +334,7 @@ export default {
       return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
     },
     formIsValid () {
-      return ['url', 'menu', 'reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
+      return ['url', 'menu', 'z_reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
         && this.phoneIsValid(this.localState.contact.number)
         && this.phoneIsValid(this.localState.contact.sms)
         && this.emailIsValid(this.localState.contact.mailto)

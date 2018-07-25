@@ -167,7 +167,6 @@ export default {
 
     },
     phoneIsValid (num) {
-      console.log(num);
       if (num === '000') return true
       return this.getPn(num, this.resortCountry) && this.getPn(num, this.resortCountry).a.valid
     },
@@ -184,8 +183,10 @@ export default {
       const emergencyGroup = {
         ...this.localState.emergencyGroup,
         list: this.localState.emergencyGroup.list.map(contact => this.formatContactNumbersForSave(contact, this.resortCountry)),
-        emergency: true
       }
+      // TEMP
+      if (emergencyGroup.emergency !== undefined) delete emergencyGroup.emergency
+      // end TEMP
       this.$store.dispatch('saveEmergencyContactGroup', emergencyGroup)
       this.$emit('emergencyGroupSave')
     },

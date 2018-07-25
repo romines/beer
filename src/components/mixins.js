@@ -6,7 +6,6 @@ export default {
       return new PhoneNumber(userInput, countryRegionCode)
     },
     getPhoneNumberForSaving(userInput, countryRegionCode) {
-      console.log(userInput)
       if (!userInput) return ''
       if (userInput === '000') return '000'
       return this.getPn(userInput, countryRegionCode).getNumber('international').replace(/ /g,'-')

@@ -32,8 +32,9 @@ module.exports = functions.https.onRequest((request, response) => {
     }
 
     const cleanEmergencyContact = (emergencyContact) => {
-      if (emergencyContact.tags) delete emergencyContact.tags
+      if (emergencyContact.tags && (emergencyContact.tags.dining !== undefined)) delete emergencyContact.tags.dining
       if (emergencyContact.mapId !== undefined) delete emergencyContact.mapId
+      if (emergencyContact.noSort !== undefined) delete emergencyContact.noSort
       return emergencyContact
     };
 

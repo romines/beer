@@ -120,10 +120,13 @@ const store = {
       })
     },
     saveNewResort ({ commit, dispatch }, resortData) {
+
       resortData.contactGroups = resortData.contactGroups
         .map(addNoSort)
         .map(addGroupId)
         .map(addMissingContactDefaults)
+
+      resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
 
       return Promise.all([
         RESORTS_REF.doc(resortData.resortId).set(resortData),
@@ -152,9 +155,8 @@ const store = {
               if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
               else            { console.log('WARNING: no emergency group found!!!!') }
             }
-            // resortData.emergencyGroup.list.forEach(contact => {
-            //   if (contact.emergency !== undefined) delete contact.emergency
-            // })
+
+            resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
 
             // End TEMP
 
@@ -410,6 +412,7 @@ function addMissingContactDefaults (group) {
   }
 
   const addMapIndex = (contact) => {
+    if (contact.rect === '') contact.mapId = -1;
     if (contact.mapId === undefined) contact.mapId = 0;
     return contact
   }
@@ -434,9 +437,20 @@ function addMissingContactDefaults (group) {
     return contact
   }
 
+  const moveReservations = (contact) => {
+    if (contact.reservations) {
+      contact.z_reservations = contact.reservations
+      delete contact.reservations
+      console.log('====================================');
+      console.log('moving reservations prop for ' + contact.name);
+      console.log('====================================');
+    }
+    return contact
+  }
+
   group.list = group.list
     // TEMP
-    .filter(li => li !== 'wtf')
+    .map(moveReservations)
     // end TEMP
     .map(addMissingEmptyStringFields)
     .map(addMapIndex)
