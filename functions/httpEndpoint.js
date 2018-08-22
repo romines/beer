@@ -16,8 +16,13 @@ module.exports = functions.https.onRequest((request, response) => {
 
     const rmUuid = (contact) => {
       if (contact.id !== undefined) delete contact.id;
-      return contact
-    }
+      return contact;
+    };
+
+    const fixCoordinates = (contact) => {
+      if (contact.rect === '{{0,0}{80,80}}') contact.rect = '{{0,0},{80,80}}';
+      return contact;
+    };
 
     const stripEmptyFields = (contact) => {
         if (STRIP_EMPTY) {
@@ -28,20 +33,21 @@ module.exports = functions.https.onRequest((request, response) => {
           }
         });
       }
-      return contact
-    }
+      return contact;
+    };
 
     const cleanEmergencyContact = (emergencyContact) => {
-      if (emergencyContact.tags && (emergencyContact.tags.dining !== undefined)) delete emergencyContact.tags.dining
-      if (emergencyContact.mapId !== undefined) delete emergencyContact.mapId
-      if (emergencyContact.noSort !== undefined) delete emergencyContact.noSort
-      return emergencyContact
+      if (emergencyContact.tags && (emergencyContact.tags.dining !== undefined)) delete emergencyContact.tags.dining;
+      if (emergencyContact.mapId !== undefined) delete emergencyContact.mapId;
+      if (emergencyContact.noSort !== undefined) delete emergencyContact.noSort;
+      return emergencyContact;
     };
 
     if (group.id !== undefined) delete group.id;
-    group.list = group.list
+    group.list = group.list ? group.list
       .map(rmUuid)
-      .map(stripEmptyFields);
+      .map(fixCoordinates)
+      .map(stripEmptyFields) : [];
 
     if (group.emergency) {
       group.list = group.list.map(cleanEmergencyContact);
@@ -56,7 +62,7 @@ module.exports = functions.https.onRequest((request, response) => {
   db.ref(resortId).once('value', snapshot => {
 
     const resortData = snapshot.val();
-    const emergencyGroup = stripIdsAndEmptyFields(resortData.archiveData[resortData.published].emergencyGroup)
+    const emergencyGroup = stripIdsAndEmptyFields(resortData.archiveData[resortData.published].emergencyGroup);
     let contactGroups = resortData.archiveData[resortData.published].contactGroups
       .map(stripIdsAndEmptyFields);
     contactGroups.push(emergencyGroup);
@@ -68,9 +74,9 @@ module.exports = functions.https.onRequest((request, response) => {
       keys: resortData.keys,
       contactGroups,
       emergencyGroup
-    }
+    };
 
-    const responseString = JSON.stringify(responseObject)
+    const responseString = JSON.stringify(responseObject);
     console.log(`${_deleteCount} fields deleted . . .`);
 
     response.send(responseString);

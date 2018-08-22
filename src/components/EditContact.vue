@@ -285,7 +285,7 @@ const contactDefaults = {
   name: '',
   mailto: '',
   number: '',
-  rect :  '{{0,0}{80,80}}',
+  rect :  '{{0,0},{80,80}}',
   url: '',
   mapId : -1,
   tags :  {
@@ -464,7 +464,7 @@ export default {
       this.localState.contact.mapId = mapIndex
     },
     resetMapCoordinates () {
-      this.localState.contact.rect =  '{{0,0}{80,80}}'
+      this.localState.contact.rect =  '{{0,0},{80,80}}'
       this.localState.contact.mapId =  -1
     },
     getCoordinates (coordinateString) {

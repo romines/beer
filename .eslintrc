@@ -8,6 +8,7 @@
     "vue/html-indent": "off",
     "vue/require-default-prop": "off",
     "vue/max-attributes-per-line": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "semi": [2, "never"]
   }
 }
