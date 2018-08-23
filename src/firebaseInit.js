@@ -7,6 +7,13 @@ import 'firebase/storage'
 import config from './firebaseConfig.js'
 
 const environment = (process.env.NODE_ENV === 'production') ? 'production' : 'staging'
-console.log('Initializing firebase with environment: ' + environment);
+console.log('Initializing firebase with environment: ' + environment)
 
-export default Firebase.initializeApp(config[environment])
+const firebase = Firebase.initializeApp(config[environment])
+
+export const firestore = firebase.firestore()
+export const database = firebase.database()
+export const auth = firebase.auth()
+export const storage = firebase.storage()
+
+firestore.settings({timestampsInSnapshots: true})

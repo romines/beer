@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import firebase from './firebaseInit.js'
-import router from './router'
+import { auth } from './firebaseInit.js'
+import router from './router.js'
 import store from './store'
 import App from './App.vue'
 
@@ -15,7 +15,7 @@ Vue.use(vClickOutside)
 
 Vue.config.productionTip = false
 
-firebase.auth().onAuthStateChanged(() => {
+auth.onAuthStateChanged(() => {
 
   new Vue({
     el: '#app',

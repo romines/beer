@@ -1,4 +1,4 @@
-import firebase from '../firebaseInit.js'
+import { database, firestore } from '../firebaseInit.js'
 import moment from 'moment'
 import equal from 'deep-equal'
 
@@ -23,7 +23,7 @@ export default {
     listenToPublishedContacts ({ rootState, commit }) {
 
       console.log('listen[ing]ToPublished . . .');
-      const resortRef = firebase.database().ref(rootState.resortId)
+      const resortRef = database.ref(rootState.resortId)
 
       return new Promise((resolve, reject) => {
 
@@ -41,7 +41,7 @@ export default {
     },
     listenToArchiveList ({ rootState, commit }) {
       return new Promise((resolve, reject) => {
-        firebase.database().ref(`${rootState.resortId}/archiveList`).on('value', snap => {
+        database.ref(`${rootState.resortId}/archiveList`).on('value', snap => {
           commit('SET_ARCHIVE_LIST', snap.val())
           resolve()
         })
@@ -49,7 +49,7 @@ export default {
       })
     },
     archive ({ rootState }, { name, description, publish }) {
-      const resortRoot = firebase.database().ref(rootState.resortId)
+      const resortRoot = database.ref(rootState.resortId)
       const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
       const now = moment()
@@ -71,7 +71,7 @@ export default {
 
     },
     archiveFromPasted ({ rootState }, { resortId, contactGroups, emergencyGroup }) {
-      const resortRoot = firebase.database().ref(resortId)
+      const resortRoot = database.ref(resortId)
       const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
 
@@ -88,29 +88,29 @@ export default {
 
     },
     deleteArchive ({ rootState }, archiveKey) {
-      const resortRoot = firebase.database().ref(rootState.resortId)
+      const resortRoot = database.ref(rootState.resortId)
       let updates = {}
       updates[`/archiveList/${archiveKey}`] = null
       updates[`/archiveData/${archiveKey}`] = null
       resortRoot.update(updates)
     },
     toggleArchiveStar ({ rootState }, { key, starred }) {
-      firebase.database().ref(`${rootState.resortId}/archiveList/${key}/starred/`).set(!starred)
+      database.ref(`${rootState.resortId}/archiveList/${key}/starred/`).set(!starred)
     },
     saveArchiveName ({ rootState }, { key, name }) {
       const updates = { name }
-      return firebase.database().ref(`${rootState.resortId}/archiveList/${key}`).update(updates)
+      return database.ref(`${rootState.resortId}/archiveList/${key}`).update(updates)
     },
     restoreArchive ({ rootState, commit }, { key }) {
 
-      const resortRef = firebase.database().ref(rootState.resortId)
+      const resortRef = database.ref(rootState.resortId)
 
       return new Promise((resolve, reject) => {
 
         resortRef.child(`archiveData/${key}`).on('value', snap => {
           const archiveData = snap.val()
 
-          firebase.firestore().collection('resorts').doc(rootState.resortId).update({
+          firestore.collection('resorts').doc(rootState.resortId).update({
             contactGroups: archiveData.contactGroups,
             emergencyGroup: archiveData.emergencyGroup
           }).then(resolve)

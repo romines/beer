@@ -6,11 +6,12 @@
       <span class="top-nav">
         <!-- <router-link to="/">home</router-link> -->
         <!-- <span @click="$store.dispatch('seedMeta')">seedMeta</span> -->
-        <router-link to="/history" v-if="$store.state.resortId">Revision History</router-link>&nbsp;
+        <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>&nbsp;
         <span
-          @click="logOut"
+          v-if="$store.state.user && $store.state.user.uid"
           class="text-and-icon"
-          v-if="$store.state.user && $store.state.user.uid">
+          @click="logOut"
+          >
           <span class="log-out">logout</span>
           <span class="icon is-small">
             <i class="fas fa-power-off" /></span>&nbsp;
@@ -22,7 +23,7 @@
 
     <!-- main content area -->
     <loading-spinner v-if="$store.state.loading" />
-    <router-view class="main" v-if="!$store.state.loading" />
+    <router-view v-if="!$store.state.loading" class="main" />
     <!--  -->
 
   </div>

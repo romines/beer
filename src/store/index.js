@@ -1,7 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import Firebase from 'firebase/app'
-import firebase from '../firebaseInit.js'
+import {
+  auth,
+  firestore,
+  storage,
+  database
+} from '../firebaseInit.js'
 
 import uuid from 'uuid/v4'
 import 'babel-polyfill'
@@ -11,7 +15,7 @@ import archives from './archives'
 import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
 
-const RESORTS_REF = firebase.firestore().collection('resorts') // is there a better way to call attention to module scoped var
+const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
 const SEED_DATA = mayExport.resorts
 // const USER_DATA = userData.users
@@ -50,7 +54,7 @@ const store = {
       state.resortId = resortId
     },
     'SET_RESORTS' (state, resorts) {
-      console.log('SET(ing)_RESORTS . . .');
+      console.log('SET(ing)_RESORTS . . .')
       state.resorts = resorts
     },
     'SET_USER' (state, user) {
@@ -60,7 +64,7 @@ const store = {
       state.resortMeta = resortMeta
     },
     'SET_CONTACT_GROUPS' (state, { contactGroups, emergencyGroup }) {
-      console.log('SET_CONTACT_GROUPS . . .');
+      console.log('SET_CONTACT_GROUPS . . .')
       state.contactGroups = contactGroups
       state.emergencyGroup = emergencyGroup
     },
@@ -74,7 +78,7 @@ const store = {
     },
     'SET_LOADING_STATE' (state, loading) {
 
-      console.log('SET_LOADING_STATE . . .');
+      console.log('SET_LOADING_STATE . . .')
 
       state.loading = loading
     },
@@ -92,9 +96,9 @@ const store = {
   actions: {
 
     getUserData ({ rootState, commit, dispatch }, user) {
-      console.log('getUserData dispatched . . .');
+      console.log('getUserData dispatched . . .')
 
-      return firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
+      return firestore.collection('users').doc(user.uid).get().then(doc => {
         const userData = doc.data()
         user.authorizedResortIds = userData.authorizedResortIds
 
@@ -135,7 +139,7 @@ const store = {
     },
     listenToContacts ({ rootState, commit }) {
 
-      console.log('listen[ing]ToContacts . . .');
+      console.log('listen[ing]ToContacts . . .')
 
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId)
@@ -175,7 +179,7 @@ const store = {
     },
 
     logIn ({ commit, dispatch }, { email, password, onSuccess }) {
-      return firebase.auth()
+      return auth
         .signInWithEmailAndPassword(email, password)
         .then(onSuccess, error => {
           commit('SET_LOADING_STATE', false)
@@ -184,21 +188,21 @@ const store = {
         })
     },
     logOut ({ commit }) {
-      firebase.auth()
+      auth
       .signOut()
       .then(() => {
         commit('SET_USER', {})
         commit('SET_CONTACT_GROUPS', {})
-      });
+      })
     },
     createUser ({ rootState, commit, dispatch }, { email, password, resortId, onSuccess }) {
       let firebaseUser
-      return firebase.auth()
+      return auth
         .createUserWithEmailAndPassword(email, password)
         .then( user => {
           firebaseUser = user
           firebaseUser.authorizedResortIds = [resortId]
-          return firebase.firestore().collection('users').doc(firebaseUser.uid).set({
+          return firestore.collection('users').doc(firebaseUser.uid).set({
             authorizedResortIds: [resortId],
             email
           })
@@ -220,7 +224,7 @@ const store = {
       if (!SEED_DATA[resortId].contactGroups || !Object.keys(SEED_DATA[resortId].contactGroups).length) {
         return console.log(`No resort data found for ${resortId}!`)
       } else {
-        console.log(`updating contact for ${resortId} . . .`);
+        console.log(`updating contact for ${resortId} . . .`)
         const tempSeedData = SEED_DATA[resortId]
         tempSeedData.contactGroups = tempSeedData.contactGroups
           .map(addNoSort)
@@ -231,7 +235,7 @@ const store = {
 
     },
     seedMeta ({ rootState }) {
-      firebase.database().ref(rootState.resortId).set(SEED_DATA[rootState.resortId])
+      database.ref(rootState.resortId).set(SEED_DATA[rootState.resortId])
     },
 
 
@@ -241,7 +245,7 @@ const store = {
         section: groupName,
         list: []
       })
-      return firebase.firestore().collection('resorts').doc(rootState.resortId).update({
+      return firestore.collection('resorts').doc(rootState.resortId).update({
         contactGroups: groups
       })
     },
@@ -322,31 +326,31 @@ const store = {
       })
     },
     destroyImageFile ({ rootState, commit }, url) {
-      const refToDestroy = firebase.storage().refFromURL(url)
-      if (!refToDestroy) { console.log('hey! empty ref cannot be destroyed!'); return; }
+      const refToDestroy = storage.refFromURL(url)
+      if (!refToDestroy) { console.log('hey! empty ref cannot be destroyed!'); return }
       return refToDestroy.delete().then(() => {
         console.log('File deleted successfully')
         commit('SET_UPLOAD_BUFFER_URL', '')
       }).catch(error => {
-        console.log(error.message);
+        console.log(error.message)
       })
     },
     listenForScaledImage ({ rootState, commit }, { fileName, url }) {
-      console.log('Listening for scaled image . . .');
+      console.log('Listening for scaled image . . .')
       RESORTS_REF.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
         if (!doc.data()) return
         const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
 
         if (rootState.uploadBufferUrl && (rootState.uploadBufferUrl === url)) {
           // image has been uploaded, but contact has not been saved
-          console.log('setting upload buffer url to newly scaled image');
+          console.log('setting upload buffer url to newly scaled image')
           commit('SET_UPLOAD_BUFFER_URL', scaledUrl)
         } else {
           // use .some to break loop as soon as we find the Contact Group and Contact whose url needs updating
           rootState.contactGroups.some((group, groupIndex) => {
             return group.list.some((contact, contactIndex) => {
               if (contact.imageUrl === url) {
-                console.log(`setting ${rootState.contactGroups[groupIndex].section} > ${rootState.contactGroups[groupIndex].list[contactIndex].name} imageUrl to that of newly scaled image . . .`);
+                console.log(`setting ${rootState.contactGroups[groupIndex].section} > ${rootState.contactGroups[groupIndex].list[contactIndex].name} imageUrl to that of newly scaled image . . .`)
                 commit('UPDATE_IMAGE_URL', { groupIndex, contactIndex, scaledUrl })
                 return true
               }
@@ -417,8 +421,8 @@ function addMissingContactDefaults (group) {
   }
 
   const addMapIndex = (contact) => {
-    if (contact.rect === '') contact.mapId = -1;
-    if (contact.mapId === undefined) contact.mapId = 0;
+    if (contact.rect === '') contact.mapId = -1
+    if (contact.mapId === undefined) contact.mapId = 0
     return contact
   }
 
@@ -446,9 +450,9 @@ function addMissingContactDefaults (group) {
     if (contact.reservations) {
       contact.z_reservations = contact.reservations
       delete contact.reservations
-      console.log('====================================');
-      console.log('moving reservations prop for ' + contact.name);
-      console.log('====================================');
+      console.log('====================================')
+      console.log('moving reservations prop for ' + contact.name)
+      console.log('====================================')
     }
     return contact
   }

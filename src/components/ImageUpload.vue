@@ -6,7 +6,7 @@
         <input class="file-input" @change="onFileAdded" type="file" accept="image/*" name="resume">
         <span class="file-cta">
           <span class="file-icon">
-            <i class="fas fa-upload"/>
+            <i class="fas fa-upload" />
           </span>
           <span class="file-label">
             {{ buttonLabel }}
@@ -14,12 +14,12 @@
         </span>
       </label>
     </div>
-    <progress class="progress is-info" v-show="uploading" :value="uploadProgress" max="100" />
+    <progress v-show="uploading" class="progress is-info" :value="uploadProgress" max="100" />
   </div>
 </template>
 
 <script>
-import firebase from '../firebaseInit.js'
+import { storage } from '../firebaseInit.js'
 
 export default {
   props: {
@@ -53,7 +53,7 @@ export default {
       }
       const extension = file.name.split('.')[file.name.split('.').length -1]
       const fileName = this.fileNamePrefix + new Date().getTime()
-      const newImageRef = firebase.storage().ref().child(this.pathPrefix + fileName + '.' + extension)
+      const newImageRef = storage.ref().child(this.pathPrefix + fileName + '.' + extension)
       const uploadTask = newImageRef.put(file, metadata)
 
       uploadTask.on('state_changed',

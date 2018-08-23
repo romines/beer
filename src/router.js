@@ -1,14 +1,14 @@
-import store from '../store'
+import store from './store'
 import VueRouter from 'vue-router'
-import firebase from '../firebaseInit.js'
+import { auth } from './firebaseInit.js'
 
-import Home from '../components/Home'
-import Archive from '../components/Archive'
-import Login from '../components/Login'
-import SignUp from '../components/SignUp'
-import Resorts from '../components/Resorts'
-import Resort from '../components/Resort'
-import ExportJson from '../components/ExportJson'
+import Home from './components/Home'
+import Archive from './components/Archive'
+import Login from './components/Login'
+import SignUp from './components/SignUp'
+import Resorts from './components/Resorts'
+import Resort from './components/Resort'
+import ExportJson from './components/ExportJson'
 
 const routes = [
   {
@@ -107,13 +107,13 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!firebase.auth().currentUser) {           // why not check for user in store?
+    if (!auth.currentUser) {           // why not check for user in store?
       next({
         path: '/login'
       })
     } else {
 
-      store.dispatch('getUserData', firebase.auth().currentUser).then(() => {
+      store.dispatch('getUserData', auth.currentUser).then(() => {
         if (to.matched.some(record => record.meta.requiresSuperAdmin)) {
           // route requires superAdmin. check vuex state
           // user, redirect if not superAdmin
