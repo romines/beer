@@ -22,14 +22,14 @@
            :class="{'box': !contactOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
            @click.stop="onContactHeaderClick(contact.id)">
         <span class="name">
-          <span class="grippy" v-if="sortable"/>
+          <span class="grippy" v-if="sortable" />
           {{ contact.name }}
         </span>
         <span class="icon is-small" v-show="!contactOpen(contact.id)">
-          <i class="fas fa-chevron-down"/>
+          <i class="fas fa-chevron-down" />
         </span>
         <span class="icon is-small" v-show="contactOpen(contact.id)">
-          <i class="fas fa-chevron-up"/>
+          <i class="fas fa-chevron-up" />
         </span>
       <!-- end .contact-header -->
       </div>
@@ -39,7 +39,7 @@
         :group-index="groupIndex"
         :contact-id="contact.id"
         :contact="contact"
-        @closeContact="closeContact"/>
+        @closeContact="closeContact" />
 
     <!-- end .contact -->
     </div>
@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     contactOpen (id) {
-      return id === this.editingContactId;
+      return id === this.editingContactId
     },
     contactHighlighted (id) {
       return id === this.highlightedContactId
@@ -113,7 +113,7 @@ export default {
           this.highlightedContactId = contactId
           setTimeout(() => {
             this.highlightedContactId = ''
-          }, 2600);
+          }, 2600)
         }
 
         if (this.$store.state.uploadBufferUrl) this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)

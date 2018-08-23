@@ -211,7 +211,7 @@ export default {
         // window resize
         window.addEventListener('resize', () => {
           this.resetMapUI()
-        });
+        })
 
       }
 

@@ -16,6 +16,7 @@
     "vue/html-indent": "off",
     "vue/require-default-prop": "off",
     "vue/max-attributes-per-line": "off",
+    "vue/html-closing-bracket-newline": "off",
     "vue/attributes-order": "off",
     "no-console": "off",
     "for-direction": "off",

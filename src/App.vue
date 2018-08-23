@@ -50,8 +50,8 @@ export default {
 <style lang="scss">
 @import "~bulma/sass/utilities/initial-variables";
 @import "~bulma/sass/utilities/functions";
-@import 'sharedStyles';
 @import '~bulma/bulma';
+@import 'sharedStyles';
 @import "~vue-wysiwyg/dist/vueWysiwyg.css";
 
 // .contact-margin-setter:last-child .box {
