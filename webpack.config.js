@@ -93,21 +93,13 @@ module.exports = {
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   module.exports.devtool = '#source-map'
   module.exports.mode = 'production'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    // new webpack.DefinePlugin({
-    //   'process.env': {
-    //     NODE_ENV: JSON.stringify(process.env.NODE_ENV)
-    //   }
-    // }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
+  module.exports.optimization = {
+    minimize: true
+  }
+}
+if (process.env.NODE_ENV === 'staging') {
+  module.exports.optimization = {
+    minimize: true,
+    nodeEnv: 'staging'
+  }
 }
