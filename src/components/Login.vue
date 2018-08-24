@@ -31,7 +31,7 @@
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" v-model="password" type="password" placeholder="Password">
+              <input class="input" v-model="password" type="password" placeholder="Password" @keyup.enter="logIn">
               <span class="icon is-small is-left">
                 <i class="fas fa-lock" />
               </span>
