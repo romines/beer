@@ -1,47 +1,50 @@
 <template>
-  <transition name="slide">
+  <div class="save-publish-container">
 
-    <div class="save-publish" v-show="$store.getters.dirty">
+    <transition name="slide">
 
-      <div class="notice-and-buttons">
+      <div class="save-publish" v-show="$store.getters.dirty">
 
-        <span class="notice">You have unpublished changes</span>
-        <span class="control name-edit has-icons-right" @click="startNameEdit">
-          <input
-            v-model.trim="newArchive.name"
-            v-click-outside="onClickOutsideInput"
-            :disabled="!editingName"
-            class="input"
-            ref="archiveNameInput"
-            placeholder="Name">
-          <span class="icon is-small is-right">
-            <i class="fas fa-edit" />
-          </span>
-        </span>
+        <div class="notice-and-buttons">
 
-        <span class="actions">
-          <span class="button is-info" @click="saveAndPublish" title="Publish changes">Publish</span>
-          <span class="button is-success" @click="saveNewArchive" title="Save a copy without publishing">
-            <span class="icon is-small">
-              <i class="fas fa-save" />
+          <span class="notice">You have unpublished changes</span>
+          <span class="control name-edit has-icons-right" @click="startNameEdit">
+            <input
+              v-model.trim="newArchive.name"
+              v-click-outside="onClickOutsideInput"
+              :disabled="!editingName"
+              class="input"
+              ref="archiveNameInput"
+              placeholder="Name">
+            <span class="icon is-small is-right">
+              <i class="fas fa-edit" />
             </span>
           </span>
-        </span>
+
+          <span class="actions">
+            <span class="button is-info" @click="saveAndPublish" title="Publish changes">Publish</span>
+            <span class="button is-success" @click="saveNewArchive" title="Save a copy without publishing">
+              <span class="icon is-small">
+                <i class="fas fa-save" />
+              </span>
+            </span>
+          </span>
+
+        </div>
+
+        <!-- <div class="name-and-notes" v-show="editingNotes">
+          <div class="field">
+            <div class="control">
+
+            </div>
+          </div>
+          <textarea class="textarea" placeholder="Describe what's changed . . ." rows="3" v-model="newArchive.description"/>
+        </div> -->
 
       </div>
 
-      <!-- <div class="name-and-notes" v-show="editingNotes">
-        <div class="field">
-          <div class="control">
-
-          </div>
-        </div>
-        <textarea class="textarea" placeholder="Describe what's changed . . ." rows="3" v-model="newArchive.description"/>
-      </div> -->
-
-    </div>
-
-  </transition>
+    </transition>
+  </div>
 
 </template>
 
@@ -98,17 +101,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .save-publish-container {
+    overflow: hidden;
+  }
   .slide-enter-active, .slide-leave-active {
-    transition: height 1.4s;
-    height: 55px;
+    transition: transform 1.4s ease;
+    transform: translateY(0);
   }
   .slide-enter, .slide-leave-to {
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
+    transform: translateY(-100%);
   }
   .save-publish {
-    overflow: hidden;
     .notice-and-buttons {
       padding: .6em;
       display: flex;

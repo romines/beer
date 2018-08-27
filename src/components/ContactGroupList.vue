@@ -23,10 +23,10 @@
             <span class="grippy" />
             <span class="name">{{ group.section }}</span>
             <span class="icon edit-name is-small" v-show="!group.emergency" @click.stop="editGroupTitle(groupIndex)">
-              <i class="fas fa-edit"/>
+              <i class="fas fa-edit" />
             </span>
             <span class="icon delete-group is-small" v-show="!group.emergency" @click.stop="deleteGroup(groupIndex)">
-              <i class="fas fa-trash-alt"/>
+              <i class="fas fa-trash-alt" />
             </span>
           </span>
           <!-- OR -->
@@ -51,10 +51,10 @@
           </div>
 
           <span class="icon is-small" v-show="detailGroup !== group.id">
-            <i class="fas fa-chevron-down"/>
+            <i class="fas fa-chevron-down" />
           </span>
           <span class="icon is-small" v-show="detailGroup === group.id">
-            <i class="fas fa-chevron-up"/>
+            <i class="fas fa-chevron-up" />
           </span>
 
           <!-- end .group-header -->
@@ -69,7 +69,7 @@
           <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
             <span class="text">Add New Contact</span>
             <span class="icon is-small">
-              <i class="fas fa-plus"/>
+              <i class="fas fa-plus" />
             </span>
           </div>
 
@@ -78,7 +78,7 @@
               :group-index="groupIndex"
               :contact-id="'NEW'"
               :contact="{}"
-              @closeContact="addingContactAtIndex = -1"/>
+              @closeContact="addingContactAtIndex = -1" />
           </div>
 
         </div>
@@ -104,10 +104,10 @@
         <!-- OR -->
 
         <span class="icon is-small" v-show="detailGroup !== 'EMERGENCY'">
-          <i class="fas fa-chevron-down"/>
+          <i class="fas fa-chevron-down" />
         </span>
         <span class="icon is-small" v-show="detailGroup === 'EMERGENCY'">
-          <i class="fas fa-chevron-up"/>
+          <i class="fas fa-chevron-up" />
         </span>
 
         <!-- end .group-header -->
@@ -118,7 +118,7 @@
         v-if="detailGroup === 'EMERGENCY'"
         :emergency-group="$store.state.emergencyGroup"
         :resort-country="$store.state.resortMeta.country"
-        @emergencyGroupSave="detailGroup = ''"/>
+        @emergencyGroupSave="detailGroup = ''" />
 
       <!-- end .contact-group -->
     </div>
@@ -174,7 +174,7 @@ export default {
 
       // TODO: handle dirty contact state
 
-      if (event.target.nodeName === 'INPUT') return;
+      if (event.target.nodeName === 'INPUT') return
 
       const groupEl = event.target.closest('.contact-group')
       const openGroup = (id, groupEl, scrollIntoView) => {
@@ -185,7 +185,7 @@ export default {
             'behavior': 'smooth',
             'left': 0,
             'top': groupEl.offsetTop -45
-          });
+          })
         })
       }
 
@@ -215,8 +215,8 @@ export default {
 
     },
     editGroupTitle (groupIndex) {
-      this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section;
-      this.editingNameOfGroupAtIndex = groupIndex;
+      this.groupNameDraft = this.$store.state.contactGroups[groupIndex].section
+      this.editingNameOfGroupAtIndex = groupIndex
     },
     toggleSortable (groupIndex) {
       this.$store.dispatch('toggleSortable', groupIndex)

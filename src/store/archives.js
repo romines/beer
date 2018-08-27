@@ -1,4 +1,5 @@
 import { database, firestore } from '../firebaseInit.js'
+import { addMissingContactDefaults } from './utils.js'
 import moment from 'moment'
 import equal from 'deep-equal'
 
@@ -67,6 +68,9 @@ export default {
       }
       if (publish) updates['published'] = archiveKey
 
+      const length = rootState.contactGroups.filter(group => group.list === undefined).length
+      if (length) debugger
+
       return resortRoot.update(updates)
 
     },
@@ -127,7 +131,10 @@ export default {
       if (!rootState.contactGroups.length) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
 
-      const published = state.publishedContacts
+      const published = {
+        contactGroups: state.publishedContacts.contactGroups.map(addMissingContactDefaults),
+        emergencyGroup: addMissingContactDefaults(state.publishedContacts.emergencyGroup)
+      }
       const working = {
         contactGroups: rootState.contactGroups,
         emergencyGroup: rootState.emergencyGroup

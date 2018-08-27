@@ -1,12 +1,12 @@
 <template>
   <div class="contacts">
 
-    <contact-group-list :new-group-identifier="newGroupIdentifier"/>
+    <contact-group-list :new-group-identifier="newGroupIdentifier" />
 
     <div class="add-new-bar box" @click="addingGroup = true" v-show="!addingGroup">
       <span class="text">Add New Contact Group</span>
       <span class="icon is-small">
-        <i class="fas fa-plus"/>
+        <i class="fas fa-plus" />
       </span>
     </div>
     <div class="add-new-bar box new-group field is-grouped" v-show="addingGroup">
