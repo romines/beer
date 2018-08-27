@@ -127,6 +127,7 @@ export default {
 
   getters: {
     dirty: (state, getters, rootState) => {
+
       // if (!state.publishedContacts.contactGroups || !state.publishedContacts.contactGroups.length) return false
       if (!rootState.contactGroups.length) return false
       if (Object.keys(state.publishedContacts).length === 0) return false

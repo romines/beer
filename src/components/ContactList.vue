@@ -25,11 +25,32 @@
           <span class="grippy" v-if="sortable" />
           {{ contact.name }}
         </span>
-        <span class="icon is-small" v-show="!contactOpen(contact.id)">
-          <i class="fas fa-chevron-down" />
-        </span>
-        <span class="icon is-small" v-show="contactOpen(contact.id)">
-          <i class="fas fa-chevron-up" />
+
+        <span class="tags-and-chevron">
+          <span class="tag-group">
+            <span class="tag winter" :class="{'is-active': contact.tags.winter}">
+              <span class="icon is-small">
+                <i class="fas fa-snowflake" />
+              </span>
+              Winter
+            </span>
+            <span class="tag summer" :class="{'is-active': contact.tags.summer}">
+              <span class="icon is-small">
+                <i class="fas fa-umbrella-beach" />
+              </span>
+              Summer
+            </span>
+            <span class="tag dining" :class="{'is-active': contact.tags.dining}">
+              <img src="../assets/knife-and-fork.svg" class="">
+              Dining
+            </span>
+          </span>
+          <span class="icon is-small" v-show="!contactOpen(contact.id)">
+            <i class="fas fa-chevron-down" />
+          </span>
+          <span class="icon is-small" v-show="contactOpen(contact.id)">
+            <i class="fas fa-chevron-up" />
+          </span>
         </span>
       <!-- end .contact-header -->
       </div>
@@ -190,6 +211,25 @@ export default {
     .contact.highlighted &.box {
       border-width: 5px;
       transition: none;
+    }
+    .tags-and-chevron {
+      display: flex;
+      align-items: center;
+      .tag-group {
+        display: flex;
+        align-items: center;
+        .tag {
+          margin-right: .3em;
+          &:not(.is-active) { opacity: .3;}
+          &:not(.dining) .icon { margin-right: .4em; }
+          &.dining img {
+            height: 1em;
+            margin-right: .3em;
+            opacity: .7;
+          }
+
+        }
+      }
     }
   }
 </style>

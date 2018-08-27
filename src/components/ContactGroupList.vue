@@ -40,7 +40,7 @@
             </p>
           </div>
 
-          <div class="group-sort" v-show="detailGroup === group.id && !group.emergency">
+          <div class="group-sort" v-show="detailGroup === group.id">
             <span>Custom Sort Order</span>
             <div class="toggle-container ">
               <label class="switch" @click.stop>
@@ -87,6 +87,7 @@
       </div>
 
     </draggable>
+
     <!-- Emergency Group -->
     <div
       class="contact-group emergency-group"
