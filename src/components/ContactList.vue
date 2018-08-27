@@ -223,7 +223,8 @@ export default {
           &:not(.is-active) { opacity: .3;}
           &:not(.dining) .icon { margin-right: .4em; }
           &.dining img {
-            height: 1em;
+            width: 12px;
+            height: 12px;
             margin-right: .3em;
             opacity: .7;
           }

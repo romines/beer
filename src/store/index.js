@@ -379,13 +379,15 @@ const store = {
       })
     },
     showSuccessModal ({ commit }, message) {
+
+      const closeModal = () => { commit('CLOSE_MODAL') }
       commit('SHOW_MODAL', {
         heading: message,
-        buttonLess: true
+        confirmButtonLabel: 'OK',
+        hideCancel: true,
+        onConfirm: closeModal
       })
-      setTimeout(() => {
-        commit('CLOSE_MODAL')
-      }, 1500)
+      setTimeout(closeModal, 5500)
 
     }
 

@@ -144,8 +144,9 @@ export default {
     deleteArchive (archive) {
 
       const onConfirm = () => {
-        this.$store.dispatch('deleteArchive', archive.key)
-        this.$store.commit('CLOSE_MODAL')
+        this.$store.dispatch('deleteArchive', archive.key).then(() => {
+          this.$store.dispatch('showSuccessModal', 'Archive deleted successfully')
+        })
       }
 
       this.$store.commit('SHOW_MODAL', {
@@ -153,6 +154,7 @@ export default {
         message: 'This cannot be undone.',
         onConfirm
       })
+
     },
 
     editArchiveName (archive, index) {

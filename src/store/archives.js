@@ -96,7 +96,7 @@ export default {
       let updates = {}
       updates[`/archiveList/${archiveKey}`] = null
       updates[`/archiveData/${archiveKey}`] = null
-      resortRoot.update(updates)
+      return resortRoot.update(updates)
     },
     toggleArchiveStar ({ rootState }, { key, starred }) {
       database.ref(`${rootState.resortId}/archiveList/${key}/starred/`).set(!starred)
