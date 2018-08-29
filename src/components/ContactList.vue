@@ -95,6 +95,7 @@ export default {
   computed: {
     myList: {
       get() {
+        if (this.$store.state.contactGroups[this.groupIndex].list === undefined) return []
         if (this.$store.state.contactGroups[this.groupIndex].noSort) {
           return this.$store.state.contactGroups[this.groupIndex].list
         } else {

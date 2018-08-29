@@ -60,6 +60,8 @@ export function addMissingContactDefaults (group) {
     return contact
   }
 
+  console.log('addMissingContactDefaults . . . ');
+
   group.list = group.list
     ? group.list
       // TEMP
@@ -76,4 +78,20 @@ export function addMissingContactDefaults (group) {
 
   return group
 
+}
+
+export function standardizeArchive({contactGroups, emergencyGroup}) {
+
+  // firestore allows saving of empty arrays, firebase does not, so map undefined lists to
+  // empty arrays before comparison
+
+  const noUndefinedLists = (group) => {
+    if (group.list === undefined) group.list = []
+    return group
+  }
+
+  return {
+    contactGroups: contactGroups.map(noUndefinedLists),
+    emergencyGroup: noUndefinedLists(emergencyGroup)
+  }
 }

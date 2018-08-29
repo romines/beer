@@ -147,21 +147,22 @@ const store = {
           .onSnapshot(doc => {
 
             const resortData = doc.data()
+
+            // In event of a structural change to the model, standardize/sanitize here
             // TEMP
 
+            // resortData.contactGroups = resortData.contactGroups
+            //   .map(addNoSort)
+            //   .map(addGroupId)
+            //   .map(addMissingContactDefaults)
 
-            resortData.contactGroups = resortData.contactGroups
-              .map(addNoSort)
-              .map(addGroupId)
-              .map(addMissingContactDefaults)
+            // if (!resortData.emergencyGroup) {
+            //   const index = resortData.contactGroups.findIndex(group => group.emergency)
+            //   if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
+            //   else            { console.log('WARNING: no emergency group found!!!!') }
+            // }
 
-            if (!resortData.emergencyGroup) {
-              const index = resortData.contactGroups.findIndex(group => group.emergency)
-              if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
-              else            { console.log('WARNING: no emergency group found!!!!') }
-            }
-
-            resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
+            // resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
 
             // End TEMP
 
@@ -218,7 +219,8 @@ const store = {
 
     },
     seed ({ rootState }) {
-      // SEED_DATA is imported from json file
+      // legacy action that allows population of resort data imported from json file. Assumes existence of
+      // SEED_DATA global
 
       const resortId = rootState.resortId
 
@@ -229,6 +231,7 @@ const store = {
         const tempSeedData = SEED_DATA[resortId]
         tempSeedData.contactGroups = tempSeedData.contactGroups
           .map(addNoSort)
+          .map(addGroupId)
           .map(addMissingContactDefaults)
 
         return RESORTS_REF.doc(resortId).set(tempSeedData)

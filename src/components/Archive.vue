@@ -31,7 +31,7 @@
           <div class="row-one" v-show="editingNameOfArchiveAtIndex !== -2">
               <span class="name">{{ publishedArchive.name }}</span>
               <span class="icon edit is-small" @click.stop="editArchiveName(publishedArchive, -2)">
-                <i class="fas fa-edit"/>
+                <i class="fas fa-edit" />
               </span>
           </div>
           <!-- Or -->
@@ -85,7 +85,7 @@
         <div class="col col-three actions">
           <span class="button is-small is-info restore" @click="restoreArchive(archive)">Restore</span>
           <span class="button delete-archive is-small" @click="deleteArchive(archive)">
-            <i class="fas fa-trash-alt"/>
+            <i class="fas fa-trash-alt" />
           </span>
         </div>
       </li>

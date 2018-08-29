@@ -1,5 +1,5 @@
 <template>
-  <div class="save-publish-container">
+  <div class="save-publish-container box">
 
     <transition name="slide">
 
@@ -13,7 +13,7 @@
               v-model.trim="newArchive.name"
               v-click-outside="onClickOutsideInput"
               :disabled="!editingName"
-              class="input"
+              class="input is-small"
               ref="archiveNameInput"
               placeholder="Name">
             <span class="icon is-small is-right">
@@ -26,6 +26,11 @@
             <span class="button is-success" @click="saveNewArchive" title="Save a copy without publishing">
               <span class="icon is-small">
                 <i class="fas fa-save" />
+              </span>
+            </span>
+            <span class="button is-danger discard" @click="discardChanges" title="Discard changes">
+              <span class="icon is-small">
+                <i class="fas fa-trash-alt" />
               </span>
             </span>
           </span>
@@ -92,6 +97,33 @@ export default {
       this.resetForm()
       this.$emit('cancelSaveNew')
     },
+    discardChanges () {
+
+      const doDiscard = async () => {
+
+        this.$store.commit('SET_LOADING_STATE', true)
+        await this.$store.dispatch('discardChanges')
+        this.$store.commit('SET_LOADING_STATE', false)
+
+        this.$store.dispatch('showModal', {
+          heading: 'Changes discarded',
+          message: '',
+          confirmButtonLabel: 'OK',
+          hideCancel: true,
+        })
+        setTimeout(() => {
+          this.$store.commit('CLOSE_MODAL')
+        }, 7000)
+
+      }
+
+      this.$store.commit('SHOW_MODAL', {
+        heading: 'Discard unpublished changes?',
+        message: 'Are you sure you want to discard changes? This cannot be undone.',
+        onConfirm: doDiscard
+      })
+
+    },
     resetForm () {
       this.newArchive.name = `Contact Updates - ${moment().format('ll')}`
       this.newArchive.description = ''
@@ -101,8 +133,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import '../sharedStyles.scss';
   .save-publish-container {
     overflow: hidden;
+    background-color: $boneGrey;
+    border: 3px $dark solid;
   }
   .slide-enter-active, .slide-leave-active {
     transition: transform 1.4s ease;
@@ -113,20 +148,34 @@ export default {
   }
   .save-publish {
     .notice-and-buttons {
-      padding: .6em;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      .input {
+        font-size: 1em;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 16em;
+      }
       .input[disabled] {
         cursor: default;
       }
       .notice {
-        font-size: 1.2em;
+        font-size: 1.1em;
         font-weight: bold;
+      }
+      .actions {
+        & > span {
+          margin-left: .1em;
+        }
       }
     }
   }
-  .buttons {
-    padding-top: .6em;
+  .discard.is-danger {
+    background-color: rgba(246, 55, 24, 0.71);
+    &:hover {
+      background-color: rgb(246, 55, 24);
+    }
   }
 </style>

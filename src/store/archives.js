@@ -1,5 +1,5 @@
 import { database, firestore } from '../firebaseInit.js'
-import { addMissingContactDefaults } from './utils.js'
+import { standardizeArchive } from './utils.js'
 import moment from 'moment'
 import equal from 'deep-equal'
 
@@ -23,7 +23,7 @@ export default {
 
     listenToPublishedContacts ({ rootState, commit }) {
 
-      console.log('listen[ing]ToPublished . . .');
+      console.log('listen[ing]ToPublished . . .')
       const resortRef = database.ref(rootState.resortId)
 
       return new Promise((resolve, reject) => {
@@ -121,6 +121,17 @@ export default {
         })
 
       })
+    },
+    async discardChanges ({ rootState }) {
+
+      const resortRef = database.ref(rootState.resortId)
+
+      const publishedKey = await resortRef.child('published').once('value')
+      const publishedData = await resortRef.child(`archiveData/${publishedKey.val()}`).once('value')
+      const standardized = standardizeArchive(publishedData.val())
+
+      return firestore.collection('resorts').doc(rootState.resortId).update(standardized)
+
     }
 
   },
@@ -128,14 +139,11 @@ export default {
   getters: {
     dirty: (state, getters, rootState) => {
 
-      // if (!state.publishedContacts.contactGroups || !state.publishedContacts.contactGroups.length) return false
       if (!rootState.contactGroups.length) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
 
-      const published = {
-        contactGroups: state.publishedContacts.contactGroups.map(addMissingContactDefaults),
-        emergencyGroup: addMissingContactDefaults(state.publishedContacts.emergencyGroup)
-      }
+      const published = standardizeArchive(state.publishedContacts)
+
       const working = {
         contactGroups: rootState.contactGroups,
         emergencyGroup: rootState.emergencyGroup
