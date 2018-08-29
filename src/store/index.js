@@ -15,6 +15,7 @@ import { addMissingContactDefaults } from './utils.js'
 
 import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
+let lastResortData
 
 const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
@@ -185,14 +186,13 @@ const store = {
         .signInWithEmailAndPassword(email, password)
         .then(onSuccess, error => {
           commit('SET_LOADING_STATE', false)
-
           dispatch('showErrorModal', error.message)
         })
     },
     logOut ({ commit }) {
-      auth
-      .signOut()
+      auth.signOut()
       .then(() => {
+        commit('SET_RESORT_ID', '')
         commit('SET_USER', {})
         commit('SET_CONTACT_GROUPS', {})
       })

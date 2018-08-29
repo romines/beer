@@ -71,9 +71,6 @@ export default {
   },
   computed: {
   },
-  mounted () {
-    this.$store.dispatch('listenToPublishedContacts')
-  },
   methods: {
     startNameEdit () {
       if (this.editingName) return

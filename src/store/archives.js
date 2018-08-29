@@ -32,7 +32,7 @@ export default {
           const key = snap.val()
 
           resortRef.child(`archiveData/${key}`).once('value', snap => {
-            commit('SET_PUBLISHED_CONTACTS', {key, publishedContacts: snap.val()})
+            commit('SET_PUBLISHED_CONTACTS', {key, publishedContacts: standardizeArchive(snap.val())})
             resolve()
           })
         })
@@ -122,15 +122,15 @@ export default {
 
       })
     },
-    async discardChanges ({ rootState }) {
+    discardChanges ({ state, rootState }) {
 
-      const resortRef = database.ref(rootState.resortId)
+      // const resortRef = database.ref(rootState.resortId)
 
-      const publishedKey = await resortRef.child('published').once('value')
-      const publishedData = await resortRef.child(`archiveData/${publishedKey.val()}`).once('value')
-      const standardized = standardizeArchive(publishedData.val())
+      // const publishedKey = await resortRef.child('published').once('value')
+      // const publishedData = await resortRef.child(`archiveData/${publishedKey.val()}`).once('value')
+      // const standardized = standardizeArchive(publishedData.val())
 
-      return firestore.collection('resorts').doc(rootState.resortId).update(standardized)
+      return firestore.collection('resorts').doc(rootState.resortId).update(state.publishedContacts)
 
     }
 
@@ -139,17 +139,16 @@ export default {
   getters: {
     dirty: (state, getters, rootState) => {
 
-      if (!rootState.contactGroups.length) return false
+      if (!rootState.resortId) return false
+      if (!(rootState.contactGroups && rootState.contactGroups.length)) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
-
-      const published = standardizeArchive(state.publishedContacts)
 
       const working = {
         contactGroups: rootState.contactGroups,
         emergencyGroup: rootState.emergencyGroup
       }
 
-      const different = !equal(working, published)
+      const different = !equal(working, state.publishedContacts)
 
       // if (different) {
       //   console.log('PUBLISHED: ')

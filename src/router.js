@@ -21,7 +21,10 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (store.state.user.superAdmin) return next('/resorts')
 
-      store.dispatch('listenToContacts').then(() => {
+      Promise.all([
+        store.dispatch('listenToContacts'),
+        store.dispatch('listenToPublishedContacts')
+      ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })
@@ -75,7 +78,10 @@ const routes = [
       store.dispatch('getResorts')
         .then(() => {
           store.commit('SET_RESORT_ID', to.params.resortId)
-          return store.dispatch('listenToContacts')
+          return Promise.all([
+            store.dispatch('listenToContacts'),
+            store.dispatch('listenToPublishedContacts')
+          ])
         })
         .then(() => {
           store.commit('SET_LOADING_STATE', false)
