@@ -129,12 +129,6 @@ export default {
     },
     discardChanges ({ state, rootState }) {
 
-      // const resortRef = database.ref(rootState.resortId)
-
-      // const publishedKey = await resortRef.child('published').once('value')
-      // const publishedData = await resortRef.child(`archiveData/${publishedKey.val()}`).once('value')
-      // const standardized = standardizeArchive(publishedData.val())
-
       return firestore.collection('resorts').doc(rootState.resortId).update(state.publishedContacts)
 
     }
@@ -148,16 +142,16 @@ export default {
       if (!(rootState.contactGroups && rootState.contactGroups.length)) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
 
-      const working = {
+      const working = standardizeArchive({
         contactGroups: rootState.contactGroups,
         emergencyGroup: rootState.emergencyGroup
-      }
+      })
 
       const different = !equal(working, state.publishedContacts)
 
       // if (different) {
       //   console.log('PUBLISHED: ')
-      //   console.log(JSON.stringify(published))
+      //   console.log(JSON.stringify(state.publishedContacts))
       //   console.log('WORKING: ')
       //   console.log(JSON.stringify(working))
       // }

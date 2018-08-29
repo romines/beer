@@ -292,8 +292,12 @@ export default {
       }
 
       &.published-archive {
-        border: 2px solid $dark;
-        background-color: $boneGrey;
+        border: 2px solid $mildNavy;
+        margin-bottom: calc(1.5rem - 2px);
+        .tag {
+          border: 1px solid $boneGrey;
+        }
+
       }
 
     }

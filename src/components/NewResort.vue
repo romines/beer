@@ -85,7 +85,7 @@
               </div>
             </div>
 
-            <image-upload file-name-prefix="map_" :path-prefix="`${newResort.resortId}/map_files/`" button-label="Add a map..." @uploadComplete="onMapFileUpload"/>
+            <image-upload file-name-prefix="map_" :path-prefix="`${newResort.resortId}/map_files/`" button-label="Add a map..." @uploadComplete="onMapFileUpload" />
 
           </div>
 

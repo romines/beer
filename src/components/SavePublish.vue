@@ -3,7 +3,7 @@
 
     <transition name="slide">
 
-      <div class="save-publish" v-show="$store.getters.dirty">
+      <div class="save-publish" v-if="$store.getters.dirty">
 
         <div class="notice-and-buttons">
 
@@ -39,14 +39,15 @@
 
       </div>
 
+      <div class="last-published" v-else>
+        <span><strong>All changes published.</strong> Last published: {{ lastPublished }}</span>
+        <span class="icon is-small has-text-success">
+          <i class="fas fa-check" />
+        </span>
+      </div>
+
     </transition>
 
-    <div class="last-published" v-show="!$store.getters.dirty">
-      <span><strong>All changes published.</strong> Last published: {{ lastPublished }}</span>
-      <span class="icon is-small has-text-success">
-        <i class="fas fa-check" />
-      </span>
-    </div>
   </div>
 
 </template>
