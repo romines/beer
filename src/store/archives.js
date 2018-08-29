@@ -6,6 +6,7 @@ import equal from 'deep-equal'
 export default {
   state: {
     publishedContactsKey: '',
+    lastPublished: '',
     publishedContacts: {},
     archiveList: {},
   },
@@ -14,6 +15,9 @@ export default {
       console.log('SET_PUBLISHED_CONTACTS . . .');
       state.publishedContactsKey = key
       state.publishedContacts = publishedContacts
+    },
+    'SET_LAST_PUBLISHED' (state, lastPublished) {
+      state.lastPublished = lastPublished
     },
     'SET_ARCHIVE_LIST' (state, archives) {
       state.archiveList = archives
@@ -28,13 +32,17 @@ export default {
 
       return new Promise((resolve, reject) => {
 
-        resortRef.child('published').on('value', snap => {
+        resortRef.child('published').on('value', (snap) => {
           const key = snap.val()
-
-          resortRef.child(`archiveData/${key}`).once('value', snap => {
-            commit('SET_PUBLISHED_CONTACTS', {key, publishedContacts: standardizeArchive(snap.val())})
+          Promise.all([
+            resortRef.child(`archiveData/${key}`).once('value'),
+            resortRef.child(`archiveList/${key}`).once('value')
+          ]).then(([ publishedContacts, archiveMeta ]) => {
+            const lastPublished = archiveMeta.val().date
+            commit('SET_PUBLISHED_CONTACTS', {key, publishedContacts: standardizeArchive(publishedContacts.val())})
+            commit('SET_LAST_PUBLISHED', lastPublished)
             resolve()
-          })
+           })
         })
 
       })
@@ -67,9 +75,6 @@ export default {
         emergencyGroup: rootState.emergencyGroup
       }
       if (publish) updates['published'] = archiveKey
-
-      const length = rootState.contactGroups.filter(group => group.list === undefined).length
-      if (length) debugger
 
       return resortRoot.update(updates)
 

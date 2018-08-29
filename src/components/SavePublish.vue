@@ -1,5 +1,5 @@
 <template>
-  <div class="save-publish-container box">
+  <div class="save-publish-container box" :class="{'dirty': $store.getters.dirty}">
 
     <transition name="slide">
 
@@ -37,18 +37,16 @@
 
         </div>
 
-        <!-- <div class="name-and-notes" v-show="editingNotes">
-          <div class="field">
-            <div class="control">
-
-            </div>
-          </div>
-          <textarea class="textarea" placeholder="Describe what's changed . . ." rows="3" v-model="newArchive.description"/>
-        </div> -->
-
       </div>
 
     </transition>
+
+    <div class="last-published" v-show="!$store.getters.dirty">
+      <span><strong>All changes published.</strong> Last published: {{ lastPublished }}</span>
+      <span class="icon is-small has-text-success">
+        <i class="fas fa-check" />
+      </span>
+    </div>
   </div>
 
 </template>
@@ -70,6 +68,14 @@ export default {
     }
   },
   computed: {
+    lastPublished () {
+      const lastPublishedMoment = moment(this.$store.state.archives.lastPublished)
+      if (lastPublishedMoment.diff(moment(), 'days') > 0) {
+        return lastPublishedMoment.format('lll')
+      } else {
+        return lastPublishedMoment.fromNow()
+      }
+    }
   },
   methods: {
     startNameEdit () {
@@ -134,7 +140,11 @@ export default {
   .save-publish-container {
     overflow: hidden;
     background-color: $boneGrey;
-    border: 3px $dark solid;
+    border: 1px #92979b solid;
+    transition : border 1.4s ease-out;
+    &.dirty {
+      border: 3px $dark solid;
+    }
   }
   .slide-enter-active, .slide-leave-active {
     transition: transform 1.4s ease;
@@ -168,11 +178,19 @@ export default {
         }
       }
     }
+    .discard.is-danger {
+      background-color: rgba(246, 55, 24, 0.71);
+      &:hover {
+        background-color: rgb(246, 55, 24);
+      }
+    }
   }
-  .discard.is-danger {
-    background-color: rgba(246, 55, 24, 0.71);
-    &:hover {
-      background-color: rgb(246, 55, 24);
+  .last-published {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .icon {
+      // color:
     }
   }
 </style>
