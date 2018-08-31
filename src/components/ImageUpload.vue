@@ -62,10 +62,14 @@ export default {
         }, (error) => {
           this.$store.dispatch('showErrorModal', error.message)
       }, () => {
-        this.uploading = false
-        this.$emit('uploadComplete', {
-          url: uploadTask.snapshot.downloadURL,
-          fileName: fileName + extension
+
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log('File available at', downloadURL)
+          this.uploading = false
+          this.$emit('uploadComplete', {
+            url: downloadURL,
+            fileName: fileName + extension
+          })
         })
       })
     }
