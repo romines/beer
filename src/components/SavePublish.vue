@@ -143,7 +143,7 @@ export default {
     overflow: hidden;
     background-color: $boneGrey;
     border: 1px #92979b solid;
-    transition : border 1.4s ease-out;
+    // transition : border 1.4s ease-out;
     &.dirty {
       border: 3px $dark solid;
     }

@@ -3,7 +3,7 @@
   <div class="contact-group-list">
 
     <draggable
-      v-model="myList"
+      v-model="draggableList"
       :options="{handle:'.grippy'}"
       @start="drag=true; editingNameOfGroupAtIndex = -1;"
       @end="drag=false">
@@ -12,7 +12,7 @@
         class="contact-group"
         :class="detailGroup === group.id ? 'box' : ''"
         :data-group-id="group.id"
-        v-for="(group, groupIndex) in myList"
+        v-for="(group, groupIndex) in draggableList"
         :key="group.id">
 
         <div
@@ -156,7 +156,7 @@ export default {
     }
   },
   computed: {
-    myList: {
+    draggableList: {
       get() {
         return this.$store.state.contactGroups
       },

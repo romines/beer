@@ -291,6 +291,7 @@ const store = {
       })
     },
     saveContactGroupList ({ rootState }, { updatedList }) {
+      // currently unused, but could DRY out contact mutation methods below
       return RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: updatedList
       })
@@ -338,9 +339,11 @@ const store = {
       }
     },
 
-    saveContactList ({ rootState }, payload) {
-      let groups = rootState.contactGroups.slice()
-      groups[payload.groupIndex].list = payload.updatedList
+    saveContactList ({ rootState }, { groupId, updatedList }) {
+      // Used by <draggable /> in ContactList for contact re-ordering
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
+      const groups = rootState.contactGroups.slice()
+      groups[groupIndex].list = updatedList
       RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: groups
       })

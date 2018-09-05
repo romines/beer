@@ -1,14 +1,14 @@
 <template>
   <draggable
     class="contact-list"
-    v-model="myList"
+    v-model="draggableList"
     :options="{handle:'.grippy'}"
     @start="drag=true; editingContactId = '';"
     @end="drag=false">
 
     <div
       class="contact contact-margin-setter"
-      v-for="contact in myList"
+      v-for="contact in draggableList"
       :key="contact.id"
       :ref="'contact_' + contact.id.substring(0, 8)"
       :class="{'box': contactOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}">
@@ -97,7 +97,7 @@ export default {
     }
   },
   computed: {
-    myList: {
+    draggableList: {
       get() {
         if (this.$store.state.contactGroups[this.groupIndex].list === undefined) return []
         if (this.$store.state.contactGroups[this.groupIndex].noSort) {
@@ -107,7 +107,7 @@ export default {
         }
       },
       set(updatedList) {
-        this.$store.dispatch('saveContactList', { updatedList, groupIndex: this.groupIndex })
+        this.$store.dispatch('saveContactList', { updatedList, groupId: this.groupId })
       }
     },
     sortable () {
@@ -231,11 +231,11 @@ export default {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: border-width 0.6s linear;
+    // transition: border-width 0.6s linear;
     border: solid 0 rgba(66, 79, 173, 0.43);
     .contact.highlighted &.box {
       border-width: 5px;
-      transition: none;
+      // transition: none;
     }
     .tags-and-chevron {
       display: flex;
