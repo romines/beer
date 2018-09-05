@@ -47,8 +47,12 @@ export default {
   methods: {
     createNewGroup () {
       if (!this.groupNameDraft) return
-      this.$store.dispatch('saveNewEmptyGroup', this.groupNameDraft).then(() => {
-        this.newGroupIdentifier = this.groupNameDraft
+
+      this.$store.commit('SET_LOADING_STATE', true)
+
+      this.$store.dispatch('saveNewEmptyGroup', this.groupNameDraft).then((groupId) => {
+        this.$store.commit('SET_LOADING_STATE', false)
+        this.newGroupIdentifier = groupId
         this.addingGroup = false
         this.groupNameDraft = ''
       })

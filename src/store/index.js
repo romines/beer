@@ -245,13 +245,26 @@ const store = {
 
     saveNewEmptyGroup ({ rootState }, groupName) {
       let groups = rootState.contactGroups.slice()
+      const groupId = uuid()
+
       groups.push({
         section: groupName,
-        list: []
+        list: [],
+        id: groupId
       })
-      return firestore.collection('resorts').doc(rootState.resortId).update({
-        contactGroups: groups
+
+      return new Promise((resolve, reject) => {
+
+        firestore.collection('resorts').doc(rootState.resortId).update({
+          contactGroups: groups
+        }).then(() => {
+          resolve(groupId)
+        }).catch((error) => {
+          // The document probably doesn't exist.
+          reject(error)
+        })
       })
+
     },
     saveContactGroupName ({ rootState }, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
@@ -290,8 +303,11 @@ const store = {
       })
     },
 
-    saveContact ({ rootState, commit }, { groupIndex, updatedContact}) {
+    saveContact ({ rootState, commit }, { groupId, updatedContact}) {
+
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(contact => contact.id === updatedContact.id)
+
       let groups = rootState.contactGroups.slice()
       updatedContact.imageUrl = rootState.uploadBufferUrl ? rootState.uploadBufferUrl : updatedContact.imageUrl
       if (contactIndex === -1) {

@@ -313,6 +313,9 @@ export default {
     contact: {
       type: Object
     },
+    groupId: {
+      type: String
+    },
     groupIndex: {
       type: Number
     },
@@ -415,7 +418,7 @@ export default {
         sms
       }
       this.$store.dispatch('saveContact', {
-        groupIndex: this.groupIndex,
+        groupId: this.groupId,
         updatedContact: contact
       }).then(() => {
         if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)

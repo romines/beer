@@ -11,6 +11,7 @@
       <div
         class="contact-group"
         :class="detailGroup === group.id ? 'box' : ''"
+        :data-group-id="group.id"
         v-for="(group, groupIndex) in myList"
         :key="group.id">
 
@@ -64,7 +65,7 @@
           class="group-detail"
           v-if="!group.emergency && detailGroup === group.id">
 
-          <contact-list :group-index="groupIndex" :group-is-open="detailGroup === group.id" />
+          <contact-list :group-index="groupIndex" :group-id="group.id" :group-is-open="detailGroup === group.id" />
           <!-- end .group-detail -->
           <div class="add-new-bar box" @click="addingContactAtIndex = groupIndex" v-show="addingContactAtIndex !== groupIndex">
             <span class="text">Add New Contact</span>
@@ -166,38 +167,42 @@ export default {
 
   },
   watch: {
-    newGroupIdentifier (value) {
-      this.detailGroup = value
+    newGroupIdentifier (id) {
+      if (id === '') return
+      this.$nextTick(() => {
+        const newGroupEl = document.querySelector(`[data-group-id='${id}']`)
+        this.openGroup(id, newGroupEl, true)
+      })
     }
   },
   methods: {
-    onGroupHeaderClick (id, event) {
+    openGroup (id, groupEl, scrollIntoView) {
+      this.detailGroup = id
 
-      // TODO: handle dirty contact state
+      scrollIntoView && this.$nextTick(() => {
+        window.scrollTo({
+          'behavior': 'smooth',
+          'left': 0,
+          'top': groupEl.offsetTop -45
+        })
+      })
+    },
+    onGroupHeaderClick (id, event) {
 
       if (event.target.nodeName === 'INPUT') return
 
-      const groupEl = event.target.closest('.contact-group')
-      const openGroup = (id, groupEl, scrollIntoView) => {
-        this.detailGroup = id
+      const applyGroupOpenClosedState = this.detailGroup === id
+      ? () => { this.detailGroup = '' }
+      : () => this.openGroup(id, groupEl, true)
 
-        scrollIntoView && this.$nextTick(() => {
-          window.scrollTo({
-            'behavior': 'smooth',
-            'left': 0,
-            'top': groupEl.offsetTop -45
-          })
-        })
-      }
+      // get handle on DOM element for scrolling
+      const groupEl = event.target.closest('.contact-group')
 
       if (this.detailGroup === '') {
         // no group is open
-        openGroup(id, groupEl)
+        this.openGroup(id, groupEl)
       } else {
         // a group is open, might be dirty
-        const applyGroupOpenClosedState = this.detailGroup === id
-          ? () => {this.detailGroup = ''}
-          : () => openGroup(id, groupEl, true)
 
         if (this.$store.state.openContactIsDirty) {
           this.$store.commit('SHOW_MODAL', {
@@ -209,6 +214,8 @@ export default {
               applyGroupOpenClosedState()
             }
           })
+
+
         } else {
           return applyGroupOpenClosedState()
         }

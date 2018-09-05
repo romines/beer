@@ -22,8 +22,8 @@
     <modal />
 
     <!-- main content area -->
-    <loading-spinner v-if="$store.state.loading" />
-    <router-view v-if="!$store.state.loading" class="main" />
+    <loading-spinner v-show="$store.state.loading" />
+    <router-view v-show="!$store.state.loading" class="main" />
     <!--  -->
 
   </div>

@@ -58,6 +58,7 @@
       <edit-contact
         v-if="contactOpen(contact.id)"
         :group-index="groupIndex"
+        :group-id="groupId"
         :contact-id="contact.id"
         :contact="contact"
         @closeContact="closeContact" />
@@ -80,6 +81,9 @@ export default {
   props: {
     groupIndex: {
       type: Number
+    },
+    groupId: {
+      type: String
     },
     groupIsOpen: {
       type: Boolean
