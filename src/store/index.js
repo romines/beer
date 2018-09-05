@@ -385,6 +385,7 @@ const store = {
         ...rootState.modal.contents,
         onConfirm() { console.log('default onConfirm . . .'); commit('CLOSE_MODAL') },
         onCancel() { commit('CLOSE_MODAL') },
+        message: '',
         ...contents
       }
       commit('SHOW_MODAL', mergedContents)

@@ -28,19 +28,19 @@
 
         <span class="tags-and-chevron">
           <span class="tag-group">
-            <span class="tag winter" :class="{'is-active': contact.tags.winter}">
+            <span class="tag winter" :class="{'is-active': contact.tags.winter}" @click.stop="toggleTag(contact, 'winter')">
               <span class="icon is-small">
                 <i class="fas fa-snowflake" />
               </span>
               Winter
             </span>
-            <span class="tag summer" :class="{'is-active': contact.tags.summer}">
+            <span class="tag summer" :class="{'is-active': contact.tags.summer}" @click.stop="toggleTag(contact, 'summer')">
               <span class="icon is-small">
                 <i class="fas fa-umbrella-beach" />
               </span>
               Summer
             </span>
-            <span class="tag dining" :class="{'is-active': contact.tags.dining}">
+            <span class="tag dining" :class="{'is-active': contact.tags.dining}" @click.stop="toggleTag(contact, 'dining')">
               <img src="../assets/knife-and-fork.svg" class="">
               Dining
             </span>
@@ -183,6 +183,26 @@ export default {
         this.closeContact(closeOptions)
       }
     },
+    toggleTag (contact, tag) {
+
+      if (this.$store.state.openContactIsDirty) {
+        return this.$store.dispatch('showModal', {
+          heading: 'Operation cannot be completed: Open contact has unsaved changes',
+          message: 'Please save or cancel contact edits',
+          confirmButtonLabel: 'OK',
+          hideCancel: true,
+        })
+      }
+
+      const tags = {...contact.tags}
+      tags[tag] = !tags[tag]
+
+      this.$store.dispatch('saveContact', {
+        groupId: this.groupId,
+        updatedContact: {...contact, tags}
+      })
+
+    },
     sortByName (list) {
       return list.slice().sort((a, b) => {
         if (a.name.toUpperCase() < b.name.toUpperCase()) {
@@ -225,7 +245,14 @@ export default {
         align-items: center;
         .tag {
           margin-right: .3em;
-          &:not(.is-active) { opacity: .3;}
+          &:hover { filter: invert(4%); }
+          &:not(.is-active) {
+            opacity: .3;
+            &:hover {
+              opacity: .7;
+              filter: invert(14%);
+            }
+          }
           &:not(.dining) .icon { margin-right: .4em; }
           &.dining img {
             width: 12px;
