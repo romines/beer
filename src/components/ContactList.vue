@@ -11,7 +11,8 @@
       v-for="contact in draggableList"
       :key="contact.id"
       :ref="'contact_' + contact.id.substring(0, 8)"
-      :class="{'box': contactOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}">
+      :class="{'box': contactIsOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
+      :data-contact-id="contact.id">
       <!--
         To increase clickable surface area,
         contact header is .box if contact is closed
@@ -19,7 +20,7 @@
                                                 -->
 
       <div class="contact-header"
-           :class="{'box': !contactOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
+           :class="{'box': !contactIsOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
            @click.stop="onContactHeaderClick(contact.id)">
         <span class="name">
           <span class="grippy" v-if="sortable" />
@@ -45,10 +46,10 @@
               Dining
             </span>
           </span>
-          <span class="icon is-small" v-show="!contactOpen(contact.id)">
+          <span class="icon is-small" v-show="!contactIsOpen(contact.id)">
             <i class="fas fa-chevron-down" />
           </span>
-          <span class="icon is-small" v-show="contactOpen(contact.id)">
+          <span class="icon is-small" v-show="contactIsOpen(contact.id)">
             <i class="fas fa-chevron-up" />
           </span>
         </span>
@@ -56,12 +57,13 @@
       </div>
 
       <edit-contact
-        v-if="contactOpen(contact.id)"
+        v-if="contactIsOpen(contact.id)"
         :group-index="groupIndex"
         :group-id="groupId"
         :contact-id="contact.id"
         :contact="contact"
-        @closeContact="closeContact" />
+        @closeContact="closeContact"
+        @openSibling="openContact" />
 
     <!-- end .contact -->
     </div>
@@ -124,11 +126,32 @@ export default {
   created () {
   },
   methods: {
-    contactOpen (id) {
+    contactIsOpen (id) {
       return id === this.editingContactId
     },
     contactHighlighted (id) {
       return id === this.highlightedContactId
+    },
+    openContact ({ id, scrollTo }) {
+      // NB: dirty state should already be checked for; openContact does opening only
+      this.editingContactId = id
+      this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
+
+      if (scrollTo) {
+        this.$nextTick(() => {
+          const newContactEl = document.querySelector(`[data-contact-id='${id}']`)
+          newContactEl && window.scrollTo({
+            'behavior': 'smooth',
+            'left': 0,
+            'top': newContactEl.offsetTop -45
+          })
+          this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
+          this.highlightedContactId = id
+          setTimeout(() => {
+            this.highlightedContactId = ''
+          }, 2600)
+        })
+      }
     },
     closeContact ({ resetDirtyState, onConfirmDirtyClose, contactId }) {
 
@@ -167,18 +190,15 @@ export default {
     },
     onContactHeaderClick (id) {
 
-      const openContact = id => {
-        this.editingContactId = id
-        this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
-      }
-
       if (this.editingContactId === '') { // none are open
-        openContact(id)
+        this.openContact({ id })
       } else {
         const closeOptions = {
           contactId: id,
           resetDirtyState: false,
-          onConfirmDirtyClose: !this.contactOpen(id) ? () => { this.editingContactId = id } : null
+          onConfirmDirtyClose: !this.contactIsOpen(id)
+            ? () => { this.editingContactId = id }
+            : () => null
         }
         this.closeContact(closeOptions)
       }
@@ -226,17 +246,23 @@ export default {
   .contact-list {
     margin-top: .6em;
   }
+  .contact {
+    // regretable DOM organization leads to weird styles
+    &.highlighted {
+      .box {
+        border: solid 5px rgba(66, 79, 173, 0.43);
+      }
+    }
+    &.highlighted.box {
+      border: solid 5px rgba(66, 79, 173, 0.43);
+    }
+  }
   .contact-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
     // transition: border-width 0.6s linear;
-    border: solid 0 rgba(66, 79, 173, 0.43);
-    .contact.highlighted &.box {
-      border-width: 5px;
-      // transition: none;
-    }
     .tags-and-chevron {
       display: flex;
       align-items: center;

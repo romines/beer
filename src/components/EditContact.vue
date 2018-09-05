@@ -245,25 +245,37 @@
 
     <div class="invalid-form-warning help is-danger" v-show="!formIsValid">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
 
-    <div class="field is-grouped is-grouped-right">
-      <p class="control no-expando">
-        <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive">
-          Save
-        </a>
-      </p>
-      <p class="control no-expando">
-        <a class="button is-light" @click="initializeContact(); $emit('closeContact', { resetDirtyState: false, contactId: contactId })">
-          Cancel
-        </a>
-      </p>
-      <p class="control no-expando" v-show="contactId !== 'NEW'">
-        <a class="button is-danger is-outlined" @click="deleteContact">
-          <span>Delete</span>
-          <span class="icon is-small">
-            <i class="fas fa-trash-alt" />
-          </span>
-        </a>
-      </p>
+    <div class="bottom-buttons">
+      <div class="duplicate field is-left">
+        <p class="control no-expando">
+          <a class="button is-light" @click="duplicateContact">
+            <span>Make a Copy</span>
+            <span class="icon is-small">
+              <i class="far fa-copy" />
+            </span>
+          </a>
+        </p>
+      </div>
+      <div class="field is-grouped is-grouped-right">
+        <p class="control no-expando">
+          <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive">
+            Save
+          </a>
+        </p>
+        <p class="control no-expando">
+          <a class="button is-light" @click="initializeContact(); $emit('closeContact', { resetDirtyState: false, contactId: contactId })">
+            Cancel
+          </a>
+        </p>
+        <p class="control no-expando" v-show="contactId !== 'NEW'">
+          <a class="button is-danger is-outlined" @click="deleteContact">
+            <span>Delete</span>
+            <span class="icon is-small">
+              <i class="fas fa-trash-alt" />
+            </span>
+          </a>
+        </p>
+      </div>
     </div>
 
   </div>
@@ -435,13 +447,10 @@ export default {
           contactId: this.contactId
         }).then(() => {
           // this.$emit('cancelEdits')      // ...nerp..doesn't do shit here
-          this.$store.commit('SHOW_MODAL', {
-            heading: 'Contact deleted successfully',
-            buttonLess: true
-          })
+          this.$store.dispatch('showSuccessModal', 'Contact deleted successfully')
           setTimeout(() => {
             this.$store.commit('CLOSE_MODAL')
-          }, 1500);
+          }, 1500)
         })
       }
 
@@ -450,6 +459,18 @@ export default {
         onConfirm
       })
 
+    },
+    duplicateContact () {
+      if (this.contactIsDirty) {
+        return this.$store.dispatch('showModal', {
+          heading: 'Contact has unsaved changes',
+          message: 'Please save or cancel contact edits before duplicating',
+          confirmButtonLabel: 'OK',
+          hideCancel: true,
+        })
+      }
+      this.$store.dispatch('duplicateContact', { groupId: this.groupId, contactId: this.contactId })
+        .then(id => this.$emit('openSibling', {id, scrollTo: true}))
     },
     onImageUpload ({ url, fileName }) {
       this.$store.commit('SET_UPLOAD_BUFFER_URL', url)
@@ -599,6 +620,14 @@ export default {
   .invalid-form-warning {
     margin: .6em 0;
     text-align: right;
+  }
+  .bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .duplicate {
+      margin-bottom: 0 !important;
+    }
   }
 
 </style>

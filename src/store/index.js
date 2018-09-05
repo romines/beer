@@ -339,6 +339,38 @@ const store = {
       }
     },
 
+    duplicateContact ({ rootState }, { groupId, contactId }) {
+
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
+      const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(contact => contact.id === contactId)
+
+      const groups = rootState.contactGroups.slice()
+      const contactToCopy = rootState.contactGroups[groupIndex].list[contactIndex]
+      const id = uuid()
+
+      const newContact = {
+        ...contactToCopy,
+        name: contactToCopy.name + ' (copy)',
+        id
+      }
+      groups[groupIndex].list.splice(contactIndex + 1, 0, newContact)
+
+
+
+
+      return new Promise((resolve, reject) => {
+
+        RESORTS_REF.doc(rootState.resortId).update({
+          contactGroups: groups
+        }).then(() => {
+          resolve(id)
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+
+    },
+
     saveContactList ({ rootState }, { groupId, updatedList }) {
       // Used by <draggable /> in ContactList for contact re-ordering
       const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
@@ -349,8 +381,14 @@ const store = {
       })
     },
     destroyImageFile ({ rootState, commit }, url) {
+      const additionalReferencesExist = rootState.contactGroups.some((group) => {
+        return group.list.some((contact) => contact.imageUrl === url)
+      })
+
+      if (additionalReferencesExist) { return console.log('File was not deleted because additional references to it were found') }
+
       const refToDestroy = storage.refFromURL(url)
-      if (!refToDestroy) { console.log('hey! empty ref cannot be destroyed!'); return }
+      if (!refToDestroy) { return console.log('hey! empty ref cannot be destroyed!') }
       return refToDestroy.delete().then(() => {
         console.log('File deleted successfully')
         commit('SET_UPLOAD_BUFFER_URL', '')
