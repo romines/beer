@@ -2,7 +2,8 @@
 const functions = require('firebase-functions');
 const admin = require('./initialize');
 const db = admin.firestore();
-const gcs = require('@google-cloud/storage')();
+const gcs = require('@google-cloud/storage');
+const storage = gcs();
 const spawn = require('child-process-promise').spawn;
 const path = require('path');
 const os = require('os');
@@ -46,11 +47,11 @@ module.exports = functions.storage.object().onFinalize((object, context) => {
   }
 
   // Download file from bucket.
-  const bucket = gcs.bucket(object.bucket);
+  const bucket = storage.bucket(object.bucket);
   const tempFilePath = path.join(os.tmpdir(), fileName);
 
   console.log(object.metadata);
-  const resortId = object.metadata.resortId
+  const resortId = object.metadata.resortId;
   const metadata = {
     contentType: object.contentType,
     cacheControl: `public, max-age=${ONE_WEEK}`

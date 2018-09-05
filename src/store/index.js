@@ -399,7 +399,9 @@ const store = {
     listenForScaledImage ({ rootState, commit }, { fileName, url }) {
       console.log('Listening for scaled image . . .')
       RESORTS_REF.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
-        if (!doc.data()) return
+        // if (!doc.data()) return
+        console.log(`scaled image ready: scaled_${fileName.split('.')[0]}.png`);
+
         const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
 
         if (rootState.uploadBufferUrl && (rootState.uploadBufferUrl === url)) {
