@@ -227,6 +227,16 @@ export default {
       this.editingNameOfGroupAtIndex = groupIndex
     },
     toggleSortable (groupIndex) {
+
+      if (this.$store.state.openContactIsDirty) {
+        return this.$store.dispatch('showModal', {
+          heading: 'The open contact has unsaved changes',
+          message: 'Please save or cancel contact edits before changing sort options',
+          confirmButtonLabel: 'OK',
+          hideCancel: true,
+        })
+      }
+
       this.$store.dispatch('toggleSortable', groupIndex)
     },
     saveGroupName () {
