@@ -71,7 +71,8 @@ export default {
   computed: {
     lastPublished () {
       const lastPublishedMoment = moment(this.$store.state.archives.lastPublished)
-      if (lastPublishedMoment.diff(moment(), 'days') > 0) {
+
+      if (lastPublishedMoment.diff(moment(), 'days') < 0) {
         return lastPublishedMoment.format('lll')
       } else {
         return lastPublishedMoment.fromNow()
