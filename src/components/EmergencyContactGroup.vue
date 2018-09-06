@@ -56,7 +56,7 @@
             <cleave
               v-model="contact.number"
               class="input is-expanded"
-              :class="{ 'is-danger': !phoneIsValid(contact.number)}"
+              :class="{ 'is-danger': contact.number && !phoneIsValid(contact.number)}"
               :options="{ phone: true, phoneRegionCode: resortCountry }"
               placeholder="Phone" />
 

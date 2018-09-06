@@ -91,7 +91,7 @@ export function standardizeArchive({contactGroups, emergencyGroup}) {
   }
 
   return {
-    contactGroups: contactGroups.map(noUndefinedLists),
+    contactGroups: contactGroups ? contactGroups.map(noUndefinedLists) : [],
     emergencyGroup: noUndefinedLists(emergencyGroup)
   }
 }

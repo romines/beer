@@ -184,6 +184,8 @@ export default {
           {
             name: '',
             number: '',
+            email: '',
+            sms: '',
             tags: {
               winter: true,
               summer: true
