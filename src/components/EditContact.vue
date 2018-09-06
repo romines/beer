@@ -205,8 +205,8 @@
           </div>
 
         </div>
-        <ul class="location-group" v-for="group in groupedNearbyLocations" @click="locationGroupClick(group)">
-          <li class="location" v-for="location in group">
+        <ul class="location-group" v-for="(group, key) in groupedNearbyLocations" @click="locationGroupClick(group)" :key="key">
+          <li class="location" v-for="location in group" :key="location.name">
             <span class="name">{{ location.name }}</span>
             <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
           </li>
@@ -243,7 +243,9 @@
       </div>
     </div>
 
-    <div class="invalid-form-warning help is-danger" v-show="!formIsValid">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
+    <div class="invalid-form-warning help is-danger" v-show="!localState.contact.name">You must provide a contact name.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!localState.contact.number && !localState.contact.sms">You must provide a phone or SMS number.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!allDataVaild">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
 
     <div class="bottom-buttons">
       <div class="duplicate field is-left">
@@ -288,9 +290,6 @@ import 'cleave.js/dist/addons/cleave-phone.i18n.js'
 import mixins from './mixins'
 import LocationSelector from './LocationSelector.vue'
 import ImageUpload from './ImageUpload.vue'
-
-const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-const urlRegex = /^(?:(?:https?|ftp|file):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i
 
 // fields that might be missing should be initialized with default values to ensure reactivity
 const contactDefaults = {
@@ -348,14 +347,19 @@ export default {
     contactIsDirty () {
       return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
     },
-    formIsValid () {
-      return ['url', 'menu', 'z_reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
-        && this.phoneIsValid(this.localState.contact.number)
-        && this.phoneIsValid(this.localState.contact.sms)
-        && this.emailIsValid(this.localState.contact.mailto)
+    allRequiredFieldsPopulated () {
+      return this.localState.contact.name
+        && this.localState.contact.number || this.localState.contact.sms
+    },
+    allDataVaild () {
+      return this.phoneIsValid(this.localState.contact.number)
+      && this.phoneIsValid(this.localState.contact.sms)
+      && this.emailIsValid(this.localState.contact.mailto)
+      && this.emailIsValid(this.localState.contact.mailto)
+      && ['url', 'menu', 'z_reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
     },
     saveButtonActive () {
-      return this.contactIsDirty && this.formIsValid
+      return this.contactIsDirty && this.allRequiredFieldsPopulated && this.allDataVaild
     },
     flattenedContacts () {
       return this.$store.state.contactGroups.reduce((accumulated, group) => {
@@ -518,15 +522,7 @@ export default {
       if (!number) return true
       if (number === '000') return true
       return this.getPn(number, regionCode).a.valid
-    },
-    emailIsValid (email) {
-      if (!email) return true
-      return emailRegex.test(email.trim());
-    },
-    urlIsValid (url) {
-      if (!url) return true
-      return urlRegex.test(url.trim());
-    },
+    }
   }
 }
 </script>

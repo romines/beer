@@ -15,7 +15,6 @@ import { addMissingContactDefaults } from './utils.js'
 
 import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
-let lastResortData
 
 const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
@@ -398,7 +397,7 @@ const store = {
     },
     listenForScaledImage ({ rootState, commit }, { fileName, url }) {
       console.log('Listening for scaled image . . .')
-      RESORTS_REF.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(doc => {
+      RESORTS_REF.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(() => {
         // if (!doc.data()) return
         console.log(`scaled image ready: scaled_${fileName.split('.')[0]}.png`);
 

@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div class="contact" v-for="contact in localState.emergencyGroup.list">
+    <div class="contact" v-for="contact in localState.emergencyGroup.list" :key="contact.id">
 
       <div class="field is-horizontal" v-show="localState.emergencyGroup.seasonal">
         <div class="field-label is-normal">
@@ -68,6 +68,44 @@
         </div>
       </div>
 
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">SMS</label>
+        </div>
+        <div class="field-body">
+          <p class="control has-icons-left">
+            <cleave
+              v-model="contact.sms"
+              class="input is-expanded"
+              :class="{ 'is-danger': contact.sms && !phoneIsValid(contact.sms)}"
+              :options="{ phone: true, phoneRegionCode: resortCountry }"
+              placeholder="SMS" />
+
+            <span class="icon is-small is-left">
+              <i class="fas fa-mobile-alt" />
+            </span>
+
+          </p>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Email</label>
+        </div>
+        <div class="field-body ">
+          <p class="control has-icons-left">
+            <input
+              v-model.trim="contact.mailto"
+              class="input is-expanded"
+              :class="{ 'is-danger': !emailIsValid(contact.mailto) }"
+              placeholder="Email">
+            <span class="icon is-small is-left">
+              <i class="fas fa-address-book" />
+            </span>
+          </p>
+        </div>
+      </div>
 
     </div>
     <div class="field is-grouped is-grouped-right actions" v-if="!hideSave">
@@ -152,6 +190,8 @@ export default {
         this.localState.emergencyGroup.list.push({
           name: '',
           number: '',
+          mailto: '',
+          sms: '',
           tags: {
             winter: false,
             summer: true
