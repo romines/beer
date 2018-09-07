@@ -76,6 +76,7 @@
 
           <div class="add-new-contact box" v-if="addingContactAtIndex === groupIndex">
             <edit-contact
+              :group-id="group.id"
               :group-index="groupIndex"
               :contact-id="'NEW'"
               :contact="{}"

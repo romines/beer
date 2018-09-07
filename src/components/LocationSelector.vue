@@ -16,13 +16,20 @@
             class="thumb-container"
             :key="image">
 
-            <span class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
+
+
+            <div class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
               <span class="icon is-small remove" @click="$emit('resetMapCoordinates')">
                 <i class="fas fa-times-circle" />
               </span>
               <img :src="image">
-            </span>
-
+              <small v-if="mapId == index">
+                <span class="marker">
+                  <i class="fas fa-map-marker-alt" />
+                </span>
+                {{ `(${xCoordinate}, ${yCoordinate})` }}
+              </small>
+            </div>
           </div>
         </viewer>
       </div>
@@ -256,6 +263,7 @@ export default {
     // overflow-x: auto;
     // white-space: nowrap;
     display: flex;
+    padding-bottom: 1em;
 
     .thumb-container {
       display: inline-flex;
@@ -267,6 +275,14 @@ export default {
       .inner-container {
 
         position: relative;
+
+        small {
+          position: absolute;
+          .marker {
+            opacity: .65;
+            margin-right: .5em;
+          }
+        }
 
         &:not(.selected) {
           filter: grayscale(50%);

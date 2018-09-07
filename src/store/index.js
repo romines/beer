@@ -307,7 +307,6 @@ const store = {
 
       const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(contact => contact.id === updatedContact.id)
-
       let groups = rootState.contactGroups.slice()
       updatedContact.imageUrl = rootState.uploadBufferUrl ? rootState.uploadBufferUrl : updatedContact.imageUrl
       if (contactIndex === -1) {
