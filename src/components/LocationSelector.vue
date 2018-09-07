@@ -85,7 +85,9 @@ export default {
       return this.yMargin + this.yCoordinate * this.zoomLevel
     },
     showPin () {
-      return (this.xCoordinate || this.yCoordinate) && !this.hidePin
+      return (this.xCoordinate || this.yCoordinate)
+      && (this.mapId === this.viewingMapIndex)
+      && !this.hidePin
     },
     images () {
       // return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
@@ -263,7 +265,7 @@ export default {
     // overflow-x: auto;
     // white-space: nowrap;
     display: flex;
-    padding-bottom: 1em;
+    padding-bottom: 1.1em;
 
     .thumb-container {
       display: inline-flex;
@@ -278,6 +280,8 @@ export default {
 
         small {
           position: absolute;
+          display: inline-block;
+          padding-top: .2em;
           .marker {
             opacity: .65;
             margin-right: .5em;
