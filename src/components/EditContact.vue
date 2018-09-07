@@ -221,6 +221,7 @@
       <div class="field-label is-normal">
         <label class="label">Description</label>
       </div>
+      <!-- Annoyingly, VueWysiwyg is accessed globablly -->
       <wysiwyg v-model.trim="localState.contact.z_detail" />
     </div>
 
@@ -509,6 +510,7 @@ export default {
         y: group[0].y,
         mapIndex: this.localState.contact.mapId
       })
+      this.$store.dispatch('showSuccessModal', 'Coordinates applied successfully')
     },
     contactToLocation ({ name, rect }) {
       return {
@@ -610,8 +612,31 @@ export default {
     }
   }
 
-  .editr--toolbar div:nth-child(14) {
-    display: none;
+  .editr {
+
+    .editr--toolbar {
+      // extra seperator
+      div:nth-child(9) {
+        display: none;
+      }
+
+      div:nth-child(6) {
+        .dashboard form {
+          label {
+            display: block;
+            position: relative;
+            input {
+              position: absolute;
+              left: 4.5em;
+            }
+          }
+        }
+      }
+
+
+
+    }
+
   }
   .invalid-form-warning {
     margin: .6em 0;

@@ -29,13 +29,21 @@
 
         <span class="tags-and-chevron">
           <span class="tag-group">
-            <span class="tag winter" :class="{'is-active': contact.tags.winter}" @click.stop="toggleTag(contact, 'winter')">
+            <span class="tag winter"
+              :class="{'is-active': contact.tags.winter}"
+              @click.stop="toggleTag(contact, 'winter')"
+              v-show="$store.state.resortId !== 'russell_lands'"
+            >
               <span class="icon is-small">
                 <i class="fas fa-snowflake" />
               </span>
               Winter
             </span>
-            <span class="tag summer" :class="{'is-active': contact.tags.summer}" @click.stop="toggleTag(contact, 'summer')">
+            <span class="tag summer"
+              :class="{'is-active': contact.tags.summer}"
+              @click.stop="toggleTag(contact, 'summer')"
+              v-show="$store.state.resortId !== 'russell_lands'"
+            >
               <span class="icon is-small">
                 <i class="fas fa-umbrella-beach" />
               </span>
