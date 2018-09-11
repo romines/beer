@@ -63,8 +63,8 @@
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
         </span>
-        <span class="icon is-small is-right test-link" v-show="localState.contact.url && urlIsValid(localState.contact.url)">
-          <a :href="localState.contact.url" target="_blank">
+        <span class="icon is-small is-right test-link" v-show="localState.contact.url">
+          <a :href="localState.contact.url" target="_blank" tabindex="-1">
             <i class="fas fa-external-link-alt" />
           </a>
         </span>
@@ -139,8 +139,8 @@
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
         </span>
-        <span class="icon is-small is-right test-link" v-show="localState.contact.menu && urlIsValid(localState.contact.menu)">
-          <a :href="localState.contact.menu" target="_blank">
+        <span class="icon is-small is-right test-link" v-show="localState.contact.menu">
+          <a :href="localState.contact.menu" target="_blank" tabindex="-1">
             <i class="fas fa-external-link-alt" />
           </a>
         </span>
@@ -160,8 +160,8 @@
         <span class="icon is-small is-left">
           <i class="fas fa-globe" />
         </span>
-        <span class="icon is-small is-right test-link" v-show="localState.contact.z_reservations && urlIsValid(localState.contact.z_reservations)">
-          <a :href="localState.contact.z_reservations" target="_blank">
+        <span class="icon is-small is-right test-link" v-show="localState.contact.z_reservations">
+          <a :href="localState.contact.z_reservations" tabindex="-1" target="_blank">
             <i class="fas fa-external-link-alt" />
           </a>
         </span>
