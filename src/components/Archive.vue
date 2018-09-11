@@ -83,7 +83,8 @@
 
         </div>
         <div class="col col-three actions">
-          <span class="button is-small is-info restore" @click="restoreArchive(archive)">Restore</span>
+          <span class="button is-small is-info restore" @click="restoreAndPublish(archive)">Restore + Publish</span>
+          <span class="button is-small is-success restore-publish" @click="restoreArchive(archive)">Restore</span>
           <span class="button delete-archive is-small" @click="deleteArchive(archive)">
             <i class="fas fa-trash-alt" />
           </span>
@@ -174,11 +175,11 @@ export default {
     },
 
     restoreArchive (archive) {
-      const goHome = () => this.$router.push('/')
+
       const doRestore = () => {
         this.$store.commit('SET_LOADING_STATE', true)
         this.$store.dispatch('restoreArchive', archive).then(() => {
-          goHome()
+          this.$store.commit('SET_LOADING_STATE', false)
           this.$store.dispatch('showModal', {
             heading: 'Contacts restored successfully',
             message: 'You may edit restored contacts or publish them.',
@@ -187,7 +188,7 @@ export default {
           })
           setTimeout(() => {
             this.$store.commit('CLOSE_MODAL')
-          }, 7000);
+          }, 7000)
         })
       }
 
@@ -199,6 +200,28 @@ export default {
         })
       } else {
         doRestore()
+      }
+    },
+
+    restoreAndPublish (archive) {
+      const doRestorePublish = () => {
+        this.$store.commit('SET_LOADING_STATE', true)
+        this.$store.dispatch('restoreAndPublish', archive).then(() => {
+          this.$store.commit('SET_LOADING_STATE', false)
+          this.$store.dispatch('showSuccessModal', 'Contacts published successfully')
+          setTimeout(() => {
+            this.$store.commit('CLOSE_MODAL')
+          }, 7000)
+        })
+      }
+      if (this.$store.getters.dirty) {
+        this.$store.commit('SHOW_MODAL', {
+          heading: 'Discard unpublished changes?',
+          message: 'Restoring this version will overwrite your changes.',
+          onConfirm: doRestorePublish
+        })
+      } else {
+        doRestorePublish()
       }
     }
   }
@@ -225,7 +248,7 @@ export default {
 
       .col-three {
         flex: 0 0 9em;
-        border-left: 1px solid grey;
+        // border-left: 1px solid grey;
         justify-content: center;
         display: inline-flex;
         .button {
@@ -294,6 +317,7 @@ export default {
       &.published-archive {
         border: 2px solid $mildNavy;
         margin-bottom: calc(1.5rem - 2px);
+        margin-top: 1em;
         .tag {
           border: 1px solid $boneGrey;
         }

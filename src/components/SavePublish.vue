@@ -89,8 +89,10 @@ export default {
       this.editingName = false
     },
     saveNewArchive () {
-      this.$store.dispatch('archive', this.newArchive)
-      this.resetForm()
+      this.$store.dispatch('archive', this.newArchive).then(() => {
+        this.$store.dispatch('showSuccessModal', 'Archive saved successfully')
+        this.resetForm()
+      })
     },
     saveAndPublish () {
       this.$store.dispatch('archive', {...this.newArchive, publish: true}).then(() => {

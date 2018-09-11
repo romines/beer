@@ -439,11 +439,11 @@ const store = {
         classList: ['error']
       })
     },
-    showSuccessModal ({ commit }, message) {
+    showSuccessModal ({ commit }, heading ) {
 
       const closeModal = () => { commit('CLOSE_MODAL') }
       commit('SHOW_MODAL', {
-        heading: message,
+        heading,
         confirmButtonLabel: 'OK',
         hideCancel: true,
         onConfirm: closeModal

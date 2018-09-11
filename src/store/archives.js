@@ -64,7 +64,7 @@ export default {
       const now = moment()
       const archiveName = name ? name : now.format('llll')
 
-      let updates = {}
+      const updates = {}
       updates[`/archiveList/${archiveKey}`] = {
         date: now.valueOf(),
         name: archiveName,
@@ -84,7 +84,7 @@ export default {
       const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
 
-      let updates = {}
+      const updates = {}
       updates[`/archiveList/${archiveKey}`] = {
         date: moment().valueOf(),
         name: 'Initial data at resort creation',
@@ -98,7 +98,7 @@ export default {
     },
     deleteArchive ({ rootState }, archiveKey) {
       const resortRoot = database.ref(rootState.resortId)
-      let updates = {}
+      const updates = {}
       updates[`/archiveList/${archiveKey}`] = null
       updates[`/archiveData/${archiveKey}`] = null
       return resortRoot.update(updates)
@@ -126,6 +126,17 @@ export default {
         })
 
       })
+    },
+    restoreAndPublish ({ rootState, dispatch }, { key }) {
+      const resortRoot = database.ref(rootState.resortId)
+      const updates = {}
+      updates[`/archiveList/${key}/date`] = moment().valueOf()
+      updates['published'] = key
+
+      return Promise.all([
+        dispatch('restoreArchive', { key }),
+        resortRoot.update(updates)
+      ])
     },
     discardChanges ({ state, rootState }) {
 
