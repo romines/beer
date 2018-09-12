@@ -61,6 +61,7 @@ const routes = [
     beforeEnter: (to, from, next) => {
       store.commit('SET_RESORT_ID', '')
       store.dispatch('getResorts').then(() => {
+
         store.commit('SET_LOADING_STATE', false)
         next()
       })
@@ -110,6 +111,7 @@ const router = new VueRouter({ routes })
 
 router.beforeEach((to, from, next) => {
 
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // route requires auth, check if logged in
     // if not, redirect to login page.
@@ -119,20 +121,30 @@ router.beforeEach((to, from, next) => {
       })
     } else {
 
-      store.dispatch('getUserData', auth.currentUser).then(() => {
+      const directBasedOnUser = () => {
         if (to.matched.some(record => record.meta.requiresSuperAdmin)) {
           // route requires superAdmin. check vuex state
           // user, redirect if not superAdmin
           if (store.state.user.superAdmin) {
+            console.log('inside user is superAdmin condition');
+
             next()
           } else {
+            console.log('inside user is not superAdmin but they should be condition');
             next('/')
           }
         } else {
+          console.log('inside user is not superAdmin but they need not be condition');
           // must be authenticated, can be regular user
           next()
         }
-      })
+      }
+
+      if (store.state.user.authorizedResortIds) {
+        directBasedOnUser()
+      } else {
+        store.dispatch('getUserData', auth.currentUser).then(directBasedOnUser)
+      }
 
     }
   } else {

@@ -19,7 +19,7 @@
         <div class="card-content">
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input"
+              <input class="input email"
                      v-model="email"
                      type="email"
                      placeholder="Email"
@@ -34,7 +34,7 @@
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" v-model="password" type="password" placeholder="Password">
+              <input class="input password" v-model="password" type="password" placeholder="Password">
               <span class="icon is-small is-left">
                 <i class="fas fa-lock" />
               </span>
@@ -42,7 +42,7 @@
           </div>
           <div class="field">
             <p class="control has-icons-left">
-              <input class="input" v-model="confirmPassword" type="password" placeholder="Confirm Password">
+              <input class="input confirm-password" v-model="confirmPassword" type="password" placeholder="Confirm Password">
               <span class="icon is-small is-left">
                 <i class="fas fa-lock" />
               </span>

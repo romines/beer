@@ -113,15 +113,19 @@ const store = {
           authorizedResortIds: userData.authorizedResortIds
         })
 
+        return Promise.resolve()
+
       })
     },
     getResorts ({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
+        console.log('inside getResorts .then');
         let resorts = []
         snapshot.forEach(doc => {
           resorts.push(doc.data())
         })
         commit('SET_RESORTS', resorts)
+        return Promise.resolve()
       })
     },
     saveNewResort ({ commit, dispatch }, resortData) {

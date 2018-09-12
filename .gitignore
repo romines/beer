@@ -12,6 +12,7 @@ yarn-error.log
 # firebase credentials
 src/firebaseConfig.js
 
+utils/backups
 src/assets/*.json
 utils/*.json
 !utils/package.json
