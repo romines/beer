@@ -1,13 +1,14 @@
 /* eslint-env node */
-var admin = require("./firebaseAdmin.js");
-var fs = require('fs');
+const admin = require("./firebaseAdmin.js");
+const moment = require('moment');
+const fs = require('fs');
 
-var collectionName = process.argv[2] ? process.argv[2] : 'resorts';
-var fileName = process.argv[3] ? process.argv[3] : 'firestore-export.json';
+const collectionName = process.argv[2] ? process.argv[2] : 'resorts';
+const fileName = process.argv[3] ? process.argv[3] : `./backups/${moment().format('MMDD')}.json`;
 
-var db = admin.firestore();
+const db = admin.firestore();
 
-var data = {};
+const data = {};
 data[collectionName] = {};
 
 console.log('NOTE: exporting from production . . .');
@@ -17,19 +18,19 @@ var results = db.collection(collectionName)
   .then(snapshot => {
     snapshot.forEach(doc => {
       data[collectionName][doc.id] = doc.data();
-    })
+    });
     return data;
   })
   .catch(error => {
     console.log(error);
-  })
+  });
 
 results.then(data => {
   // Write collection to JSON file
   fs.writeFile(fileName, JSON.stringify(data), function(err) {
-      if(err) {
-          return console.log(err);
-      }
-      console.log("The file was saved!");
+    if (err) {
+      return console.log(err);
+    }
+    console.log("The file was saved!");
   });
-})
+});
