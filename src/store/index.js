@@ -13,12 +13,12 @@ import 'babel-polyfill'
 import archives from './archives'
 import { addMissingContactDefaults } from './utils.js'
 
-import mayExport from '../../utils/firestore-export.json'
+// import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
 
 const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
-const SEED_DATA = mayExport.resorts
+// const SEED_DATA = mayExport.resorts
 // const USER_DATA = userData.users
 const defaultModalContents = {
   heading: '',
@@ -211,9 +211,9 @@ const store = {
             authorizedResortIds: [resortId],
             email
           })
-      }).then(() => {
-          commit('SET_USER', firebaseUser)
-          onSuccess()
+        }).then(() => {
+          // commit('SET_USER', firebaseUser)
+          // onSuccess()
         }, error => {
           commit('SET_LOADING_STATE', false)
 
@@ -223,7 +223,7 @@ const store = {
     },
     seed ({ rootState }) {
       // legacy action that allows population of resort data imported from json file. Assumes existence of
-      // SEED_DATA global
+      // SEED_DATA global (contents of json)
 
       const resortId = rootState.resortId
 

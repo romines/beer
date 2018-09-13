@@ -2,7 +2,6 @@
 const admin = require("firebase-admin");
 const production = require("./serviceAccount-production-key.json");
 const testing = require("./serviceAccount-testing-key.json");
-const env = process.env.NODE_ENV;
 
 const keys = {
   production,
@@ -14,10 +13,14 @@ const baseUrls = {
   testing: 'rta-testing',
 };
 
-admin.initializeApp({
-  credential: admin.credential.cert(keys[env]),
-  databaseURL: `https://${baseUrls[env]}.firebaseio.com`,
-  storageBucket: `${baseUrls[env]}.appspot.com`
-});
 
-module.exports = admin;
+
+// module.exports = admin;
+module.exports = function (environment) {
+  admin.initializeApp({
+    credential: admin.credential.cert(keys[environment]),
+    databaseURL: `https://${baseUrls[environment]}.firebaseio.com`,
+    storageBucket: `${baseUrls[environment]}.appspot.com`
+  });
+  return admin;
+};

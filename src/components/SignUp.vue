@@ -116,9 +116,9 @@ export default {
         email: this.email,
         password: this.password,
         resortId: this.resortId,
-        onSuccess: () => {
-          this.$router.replace('/')
-        }
+        // onSuccess: () => {
+        //   this.$router.replace('/')
+        // }
       })
     }
   }
