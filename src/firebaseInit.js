@@ -6,7 +6,7 @@ import 'firebase/storage'
 
 import config from './firebaseConfig.js'
 
-const environment = (process.env.NODE_ENV === 'production') ? 'production' : 'staging'
+const environment = process.env.NODE_ENV
 console.log('Initializing firebase with environment: ' + environment)
 
 const firebase = Firebase.initializeApp(config[environment])

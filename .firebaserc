@@ -2,6 +2,7 @@
   "projects": {
     "tapped": "resorts-tapped-admin",
     "default": "beer-93ee7",
-    "staging": "rta-staging"
+    "staging": "rta-staging",
+    "testing": "rta-testing"
   }
 }

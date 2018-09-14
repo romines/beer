@@ -3,6 +3,9 @@ const moment = require('moment');
 const firestoreDocs = admin.firestore();
 const rtdb = admin.database();
 
+// supress dates
+firestoreDocs.settings({timestampsInSnapshots: true});
+
 const testResortDocRef = firestoreDocs.collection('resorts').doc('test_resort');
 const testResortRtdbRef = rtdb.ref('test_resort');
 
@@ -44,5 +47,9 @@ testResortRtdbRef.child(`archiveList/${archiveDataRef.key}`).set({
 });
 
 testResortRtdbRef.child('published').set(archiveDataRef.key);
+
+console.log('Seed data written');
+process.exit();
+
 
 

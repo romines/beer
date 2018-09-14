@@ -1,7 +1,7 @@
 /* eslint-env node */
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const isDev = process.env.NODE_ENV === 'development'
 
 module.exports = {
   entry: './src/main.js',
@@ -10,7 +10,10 @@ module.exports = {
     publicPath: '/dist/',
     filename: 'build.js'
   },
-  mode: 'development',
+  mode: isDev ? 'development' : 'production',
+  optimization: {
+    nodeEnv: process.env.NODE_ENV
+  },
   module: {
     rules: [
       {
@@ -86,20 +89,12 @@ module.exports = {
   },
   performance: {
     hints: false
-  },
-  devtool: '#eval-source-map'
+  }
 }
 
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-  module.exports.devtool = '#source-map'
-  module.exports.mode = 'production'
-  module.exports.optimization = {
-    minimize: true
-  }
+if (isDev) {
+  module.exports.devtool = '#eval-source-map'
 }
 if (process.env.NODE_ENV === 'staging') {
-  module.exports.optimization = {
-    minimize: true,
-    nodeEnv: 'staging'
-  }
+  module.exports.devtool = '#source-map'
 }
