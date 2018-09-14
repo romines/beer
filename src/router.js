@@ -1,6 +1,7 @@
 import store from './store'
 import VueRouter from 'vue-router'
 import { auth } from './firebaseInit.js'
+import { promiseTo } from './store/utils.js'
 
 import Home from './components/Home'
 import Archive from './components/Archive'
@@ -109,48 +110,55 @@ const routes = [
 
 const router = new VueRouter({ routes })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+
+  // auth.signOut()
 
 
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    // route requires auth, check if logged in
-    // if not, redirect to login page.
-    if (!auth.currentUser) {           // why not check for user in store?
-      next({
-        path: '/login'
-      })
-    } else {
-
-      const directBasedOnUser = () => {
-        if (to.matched.some(record => record.meta.requiresSuperAdmin)) {
-          // route requires superAdmin. check vuex state
-          // user, redirect if not superAdmin
-          if (store.state.user.superAdmin) {
-            console.log('inside user is superAdmin condition');
-
-            next()
-          } else {
-            console.log('inside user is not superAdmin but they should be condition');
-            next('/')
-          }
-        } else {
-          console.log('inside user is not superAdmin but they need not be condition');
-          // must be authenticated, can be regular user
-          next()
-        }
-      }
-
-      if (store.state.user.authorizedResortIds) {
-        directBasedOnUser()
-      } else {
-        store.dispatch('getUserData', auth.currentUser).then(directBasedOnUser)
-      }
-
-    }
-  } else {
-    // routes open to unauthenticated users
+  if (!to.matched.some(record => record.meta.requiresAuth)) {
+    // route is open to unauthenticated users
     store.commit('SET_LOADING_STATE', false)
+    return next()
+  }
+
+  /**
+  *
+  * routes requiring auth
+  *
+  */
+
+  if (!auth.currentUser) {
+    // redirect to login page.
+    next({
+      path: '/login'
+    })
+  }
+
+
+  if (!store.state.user.authorizedIds) {
+    // if no user in state, await user data
+    console.log('no user in state . . .');
+
+    const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))
+    if (err) {
+      store.commit('SET_LOADING_STATE', false)
+      console.log(err)
+      return store.dispatch('showErrorModal', err)
+    }
+  }
+
+  /**
+  *
+  * check user, route for superAdmin privileges
+  *
+  */
+
+  if (!to.matched.some(record => record.meta.requiresSuperAdmin) || store.state.user.superAdmin) {
+    // route does NOT require superAdmin or this IS a superAdmin. send user on their way
     next()
+  } else {
+    // redirect home
+    next('/')
   }
 
 

@@ -26,7 +26,6 @@ export default {
   actions: {
 
     listenToPublishedContacts ({ rootState, commit }) {
-
       console.log('listen[ing]ToPublished . . .')
       const resortRef = database.ref(rootState.resortId)
 

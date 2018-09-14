@@ -11,7 +11,7 @@ import uuid from 'uuid/v4'
 import 'babel-polyfill'
 
 import archives from './archives'
-import { addMissingContactDefaults } from './utils.js'
+import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 // import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
@@ -200,25 +200,54 @@ const store = {
         commit('SET_CONTACT_GROUPS', {})
       })
     },
-    createUser ({ rootState, commit, dispatch }, { email, password, resortId, onSuccess }) {
-      let firebaseUser
-      return auth
-        .createUserWithEmailAndPassword(email, password)
-        .then( user => {
-          firebaseUser = user
-          firebaseUser.authorizedResortIds = [resortId]
-          return firestore.collection('users').doc(firebaseUser.uid).set({
-            authorizedResortIds: [resortId],
-            email
-          })
-        }).then(() => {
-          // commit('SET_USER', firebaseUser)
-          // onSuccess()
-        }, error => {
-          commit('SET_LOADING_STATE', false)
+    async createUser ({ commit, dispatch }, { email, password, resortId }) {
 
-          dispatch('showErrorModal', error.message)
-        })
+      const [createError, firebaseUser] = await promiseTo(auth.createUserWithEmailAndPassword(email, password))
+
+      if (createError) {
+        commit('SET_LOADING_STATE', false)
+        return dispatch('showErrorModal', createError.message)
+      }
+
+      const uid = firebaseUser.user.uid
+      const user = {
+        email,
+        authorizedResortIds: [resortId]
+      }
+
+      const [rtdbSaveError] = await promiseTo(firestore.collection('users').doc(uid).set(user))
+
+      if (rtdbSaveError) {
+        commit('SET_LOADING_STATE', false)
+        return dispatch('showErrorModal', createError.message)
+      }
+
+      const userForStore = {
+        ...user,
+        uid,
+        superAdmin: false
+      }
+
+      commit('SET_USER', userForStore)
+
+      return 'User created successfully'
+
+        // .then( user => {
+        //   firebaseUser = user
+        //   firebaseUser.authorizedResortIds = [resortId]
+        //   return firestore.collection('users').doc(firebaseUser.uid).set({
+        //     authorizedResortIds: [resortId],
+        //     email
+        //   })
+        // }
+        // ).then(() => {
+        //   commit('SET_USER', firebaseUser)
+        //   onSuccess()
+        // }, error => {
+        //   commit('SET_LOADING_STATE', false)
+
+        //   dispatch('showErrorModal', error.message)
+        // })
 
     },
     seed ({ rootState }) {

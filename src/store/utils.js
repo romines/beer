@@ -80,6 +80,13 @@ export function addMissingContactDefaults (group) {
 
 }
 
+export function promiseTo(promise) {
+  return promise.then(data => {
+     return [null, data]
+  })
+  .catch(err => [err])
+}
+
 export function standardizeArchive({contactGroups, emergencyGroup}) {
 
   // firestore allows saving of empty arrays, firebase does not, so map undefined lists to

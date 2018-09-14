@@ -110,16 +110,15 @@ export default {
   created () {
   },
   methods: {
-    signUp () {
+    async signUp () {
       this.$store.commit('SET_LOADING_STATE', true)
-      this.$store.dispatch('createUser', {
+      const userCreate = await this.$store.dispatch('createUser', {
         email: this.email,
         password: this.password,
         resortId: this.resortId,
-        // onSuccess: () => {
-        //   this.$router.replace('/')
-        // }
       })
+      // debugger
+      if (userCreate) this.$router.replace('/')
     }
   }
 }
