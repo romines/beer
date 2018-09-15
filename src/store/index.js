@@ -18,7 +18,7 @@ import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
-// const SEED_DATA = mayExport.resorts
+const SEED_DATA = {} // this is going away
 // const USER_DATA = userData.users
 const defaultModalContents = {
   heading: '',
@@ -96,10 +96,11 @@ const store = {
   },
   actions: {
 
-    getUserData ({ rootState, commit, dispatch }, user) {
+    getUserData ({ commit }, user) {
       console.log('getUserData dispatched . . .')
 
       return firestore.collection('users').doc(user.uid).get().then(doc => {
+
         const userData = doc.data()
         user.authorizedResortIds = userData.authorizedResortIds
 
@@ -115,7 +116,8 @@ const store = {
 
         return Promise.resolve()
 
-      })
+      }, err => console.log(err)
+      )
     },
     getResorts ({ commit }) {
       return RESORTS_REF.get().then(snapshot => {

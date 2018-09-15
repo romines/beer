@@ -63,8 +63,8 @@ module.exports = functions.https.onRequest((request, response) => {
 
     const resortData = snapshot.val();
     const emergencyGroup = stripIdsAndEmptyFields(resortData.archiveData[resortData.published].emergencyGroup);
-    let contactGroups = resortData.archiveData[resortData.published].contactGroups
-      .map(stripIdsAndEmptyFields);
+    const contactGroups = resortData.archiveData[resortData.published].contactGroups ? resortData.archiveData[resortData.published].contactGroups
+      .map(stripIdsAndEmptyFields) : [];
     contactGroups.push(emergencyGroup);
 
     const responseObject = {

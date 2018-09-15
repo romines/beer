@@ -1,5 +1,5 @@
 import { database, firestore } from '../firebaseInit.js'
-import { standardizeArchive } from './utils.js'
+import { standardizeArchive, promiseTo } from './utils.js'
 import moment from 'moment'
 import equal from 'deep-equal'
 
@@ -12,7 +12,7 @@ export default {
   },
   mutations: {
     'SET_PUBLISHED_CONTACTS' (state, {key, publishedContacts}) {
-      console.log('SET_PUBLISHED_CONTACTS . . .');
+      console.log('SET_PUBLISHED_CONTACTS . . .')
       state.publishedContactsKey = key
       state.publishedContacts = publishedContacts
     },
@@ -41,7 +41,7 @@ export default {
             commit('SET_PUBLISHED_CONTACTS', {key, publishedContacts: standardizeArchive(publishedContacts.val())})
             commit('SET_LAST_PUBLISHED', lastPublished)
             resolve()
-           })
+           }).catch(err => reject(err))
         })
 
       })
@@ -109,7 +109,7 @@ export default {
       const updates = { name }
       return database.ref(`${rootState.resortId}/archiveList/${key}`).update(updates)
     },
-    restoreArchive ({ rootState, commit }, { key }) {
+    restoreArchive ({ rootState }, { key }) {
 
       const resortRef = database.ref(rootState.resortId)
 
@@ -121,7 +121,7 @@ export default {
           firestore.collection('resorts').doc(rootState.resortId).update({
             contactGroups: archiveData.contactGroups,
             emergencyGroup: archiveData.emergencyGroup
-          }).then(resolve)
+          }).then(resolve, reject)
         })
 
       })

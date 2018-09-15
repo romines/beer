@@ -18,13 +18,12 @@
 import { auth } from '../../src/firebaseInit.js'
 
 Cypress.Commands.add("login", () => {
-  //
-  auth.signInWithEmailAndPassword('test-jh@email.com', 'password')
+
+  auth.signInWithEmailAndPassword('cypress-test-reg-user@email.com', 'Str4ightHamma')
     .then((authCredential) => {
       authCredential.uid && console.log('cypress authenticated successfully')
     })
     .catch(error => {
-      // Handle Errors here.
       var errorMessage = error.message
       console.log(errorMessage)
   })

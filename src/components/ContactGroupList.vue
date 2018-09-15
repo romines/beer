@@ -3,6 +3,7 @@
   <div class="contact-group-list">
 
     <draggable
+      class="draggable-group-container"
       v-model="draggableList"
       :options="{handle:'.grippy'}"
       @start="drag=true; editingNameOfGroupAtIndex = -1;"

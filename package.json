@@ -13,7 +13,9 @@
     "test": "npm run test-build && npm run test-deploy && npm run test-seed",
     "test-build": "cross-env NODE_ENV=testing webpack --progress --hide-modules",
     "test-deploy": "firebase deploy -P testing",
-    "test-seed": "cd utils && node ./seedTestData.js"
+    "test-seed": "cd utils && node ./seedTestData.js",
+    "cypress:open": "cross-env CYPRESS_RUN_BINARY=../cypress/build/linux/Cypress/Cypress NODE_ENV=testing cypress open",
+    "cypress:run": "cross-env CYPRESS_RUN_BINARY=../cypress/build/linux/Cypress/Cypress NODE_ENV=testing cypress run"
   },
   "dependencies": {
     "awesome-phonenumber": "^2.2.6",
@@ -47,6 +49,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "cross-env": "^5.2.0",
     "css-loader": "^0.28.11",
+    "cypress": "^3.0.3",
     "eslint": "^5.4.0",
     "eslint-plugin-cypress": "^2.0.1",
     "eslint-plugin-vue": "^5.0.0-beta.3",

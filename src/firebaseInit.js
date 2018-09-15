@@ -6,7 +6,8 @@ import 'firebase/storage'
 
 import config from './firebaseConfig.js'
 
-const environment = process.env.NODE_ENV
+// NODE_ENV undefined for some reason when set before runnin cypress
+const environment = process.env.NODE_ENV ? process.env.NODE_ENV : 'testing'
 console.log('Initializing firebase with environment: ' + environment)
 
 const firebase = Firebase.initializeApp(config[environment])

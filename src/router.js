@@ -112,10 +112,9 @@ const router = new VueRouter({ routes })
 
 router.beforeEach(async (to, from, next) => {
 
-  // auth.signOut()
-
-
   if (!to.matched.some(record => record.meta.requiresAuth)) {
+    console.log('auth not necessary for: ' + to.path)
+
     // route is open to unauthenticated users
     store.commit('SET_LOADING_STATE', false)
     return next()
@@ -128,8 +127,9 @@ router.beforeEach(async (to, from, next) => {
   */
 
   if (!auth.currentUser) {
+  console.log('redirect to the the login page . . .')
     // redirect to login page.
-    next({
+    return next({
       path: '/login'
     })
   }
@@ -137,12 +137,12 @@ router.beforeEach(async (to, from, next) => {
 
   if (!store.state.user.authorizedIds) {
     // if no user in state, await user data
-    console.log('no user in state . . .');
+    console.log('no user in state . . .')
 
     const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))
     if (err) {
       store.commit('SET_LOADING_STATE', false)
-      console.log(err)
+      console.log(err.message)
       return store.dispatch('showErrorModal', err)
     }
   }
@@ -160,7 +160,6 @@ router.beforeEach(async (to, from, next) => {
     // redirect home
     next('/')
   }
-
 
 })
 
