@@ -14,8 +14,8 @@
         <input class="input is-small" v-model="groupNameDraft" @keyup.enter="createNewGroup" placeholder="Group title" autofocus ref="nameInput">
       </p>
       <p class="control">
-        <button class="button is-primary is-small" :disabled="!groupNameDraft.length" @click.stop="createNewGroup">Save</button>
-        <button class="button is-small" @click.stop="addingGroup = false; groupNameDraft = ''">Cancel</button>
+        <button class="button is-primary is-small save" :disabled="!groupNameDraft.length" @click.stop="createNewGroup">Save</button>
+        <button class="button is-small cancel" @click.stop="addingGroup = false; groupNameDraft = ''">Cancel</button>
       </p>
     </div>
   </div>

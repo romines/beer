@@ -98,3 +98,5 @@ if (isDev) {
 if (process.env.NODE_ENV === 'staging') {
   module.exports.devtool = '#source-map'
 }
+
+// module.exports.devtool = '#eval-source-map'

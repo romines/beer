@@ -37,8 +37,8 @@
               <input class="input is-small" v-model="groupNameDraft" placeholder="Group title">
             </p>
             <p class="control" @click.stop>
-              <button class="button is-primary is-small" @click.stop.prevent="saveGroupName">Save</button>
-              <button class="button is-small" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
+              <button class="button is-primary is-small save" @click.stop.prevent="saveGroupName">Save</button>
+              <button class="button is-small cancel" @click.stop="editingNameOfGroupAtIndex = -1; groupNameDraft = '';">Cancel</button>
             </p>
           </div>
 

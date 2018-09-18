@@ -10,10 +10,10 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot --overlay",
     "export": "cd utils && node ./export.js",
     "stage": "cross-env NODE_ENV=staging webpack --progress --hide-modules && firebase deploy -P staging",
-    "test": "npm run test-build && npm run test-deploy && npm run test-seed",
-    "test-build": "cross-env NODE_ENV=testing webpack --progress --hide-modules",
-    "test-deploy": "firebase deploy -P testing",
-    "test-seed": "cd utils && node ./seedTestData.js",
+    "test": "npm run test:seed && npm run cypress:run",
+    "test:build": "cross-env NODE_ENV=testing webpack --progress --hide-modules",
+    "test:deploy": "firebase deploy -P testing",
+    "test:seed": "cd utils && node ./seedTestData.js",
     "cypress:open": "cross-env CYPRESS_RUN_BINARY=../cypress/build/linux/Cypress/Cypress NODE_ENV=testing cypress open",
     "cypress:run": "cross-env CYPRESS_RUN_BINARY=../cypress/build/linux/Cypress/Cypress NODE_ENV=testing cypress run"
   },
@@ -36,11 +36,6 @@
     "vuedraggable": "^2.16.0",
     "vuex": "^3.0.1"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ],
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-eslint": "^9.0.0-beta.3",
@@ -49,7 +44,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "cross-env": "^5.2.0",
     "css-loader": "^0.28.11",
-    "cypress": "^3.0.3",
+    "cypress": "^3.1.0",
     "eslint": "^5.4.0",
     "eslint-plugin-cypress": "^2.0.1",
     "eslint-plugin-vue": "^5.0.0-beta.3",
@@ -61,5 +56,10 @@
     "webpack": "^4.17.1",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5"
-  }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
 }

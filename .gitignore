@@ -19,3 +19,6 @@ utils/*.json
 !utils/package-lock.json
 utils/*.json.bak
 **/*-key.json
+
+# cypress
+cypress/screenshots

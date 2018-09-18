@@ -8,20 +8,10 @@ firestoreDocs.settings({timestampsInSnapshots: true});
 
 const testResortDocRef = firestoreDocs.collection('resorts').doc('test_resort');
 const testResortRtdbRef = rtdb.ref('test_resort');
-
-testResortDocRef.set({
-  contactGroups: [],
-  country: 'US',
-  mapFiles: ['https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fmap_files%2Fmap_1532556795502.png?alt=media&token=73c03159-16a9-48cd-a4b5-63476bdefda7', 'https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fmap_files%2Fmap_1532556804981.png?alt=media&token=448cc70e-4865-40aa-8664-6639b155cbe5'],
-  name: 'Cypress Hills Resort',
-  resortId: 'test_resort'
-});
-
-const archiveDataRef = testResortRtdbRef.child('archiveData').push();
-
-archiveDataRef.set({
-  emergencyGroup: {
-    list: [{
+const writeOperations = [];
+const emergencyGroup = {
+  list: [
+    {
       email: '',
       imageUrl: '',
       mailto: '',
@@ -34,22 +24,39 @@ archiveDataRef.set({
       url: '',
       z_detail: '',
       z_reservations: ''
-    }],
-    seasonal: false,
-    section: 'Emergency'
-  }
-});
+    }
+  ],
+  seasonal: false,
+  section: 'Emergency'
+};
 
-testResortRtdbRef.child(`archiveList/${archiveDataRef.key}`).set({
+writeOperations.push(testResortDocRef.set({
+  contactGroups: [],
+  country: 'US',
+  mapFiles: ['https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fmap_files%2Fmap_1532556795502.png?alt=media&token=73c03159-16a9-48cd-a4b5-63476bdefda7', 'https://firebasestorage.googleapis.com/v0/b/resorts-tapped-admin.appspot.com/o/jackson_hole%2Fmap_files%2Fmap_1532556804981.png?alt=media&token=448cc70e-4865-40aa-8664-6639b155cbe5'],
+  name: 'Cypress Hills Resort',
+  resortId: 'test_resort',
+  emergencyGroup
+}));
+
+const archiveDataRef = testResortRtdbRef.child('archiveData').push();
+
+writeOperations.push(archiveDataRef.set({
+  emergencyGroup
+}));
+
+writeOperations.push(testResortRtdbRef.child(`archiveList/${archiveDataRef.key}`).set({
   date: moment().valueOf(),
   description: '',
   name: 'Initial data at resort creation'
-});
+}));
 
-testResortRtdbRef.child('published').set(archiveDataRef.key);
+writeOperations.push(testResortRtdbRef.child('published').set(archiveDataRef.key));
 
-console.log('Seed data written');
-process.exit();
+Promise.all(writeOperations).then(() => {
+  console.log('Seed data written');
+  process.exit();
+}, err => console.error(err));
 
 
 
