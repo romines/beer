@@ -221,8 +221,9 @@
       <div class="field-label is-normal">
         <label class="label">Description</label>
       </div>
-      <!-- Annoyingly, VueWysiwyg is accessed globablly -->
-      <wysiwyg v-model.trim="localState.contact.z_detail" />
+      <!-- eslint-disable-next-line vue/attribute-hyphenation -->
+      <vue-editor v-model="localState.contact.z_detail" :editorToolbar="toolbarButtons" class="quill-editor" />
+      <!-- <vue-editor v-model="localState.contact.z_detail" /> -->
     </div>
 
     <div class="field is-horizontal">
@@ -286,6 +287,7 @@
 
 <script>
 import Cleave from 'vue-cleave'
+import { VueEditor } from 'vue2-editor'
 import uuid from 'uuid/v4'
 import 'cleave.js/dist/addons/cleave-phone.i18n.js'
 import mixins from './mixins'
@@ -316,7 +318,8 @@ export default {
   components: {
     Cleave,
     LocationSelector,
-    ImageUpload
+    ImageUpload,
+    VueEditor
   },
 
   mixins: [ mixins ],
@@ -341,7 +344,14 @@ export default {
         contact: {},
       },
       contactAtInitialization: {},
-      pendingFileDeletion: ''
+      pendingFileDeletion: '',
+      toolbarButtons: [
+        [{ 'header': [1, 2, 3, 4, false] }],
+        ['bold', 'italic', 'strike', 'link'],
+        [{ 'indent': '-1'}, { 'indent': '+1' }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['clean']
+      ]
     }
   },
   computed: {
@@ -564,6 +574,13 @@ export default {
     .field.toggle { margin-bottom: .2em; }
   }
 
+  .quill-editor {
+    width: 480px;
+    .ql-container {
+      height: auto;
+    }
+  }
+
   .manage-image {
     .image-container {
       position: relative;
@@ -612,32 +629,6 @@ export default {
     }
   }
 
-  .editr {
-
-    .editr--toolbar {
-      // extra seperator
-      div:nth-child(9) {
-        display: none;
-      }
-
-      div:nth-child(6) {
-        .dashboard form {
-          label {
-            display: block;
-            position: relative;
-            input {
-              position: absolute;
-              left: 4.5em;
-            }
-          }
-        }
-      }
-
-
-
-    }
-
-  }
   .invalid-form-warning {
     margin: .6em 0;
     text-align: right;

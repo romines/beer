@@ -6,11 +6,9 @@ import router from './router.js'
 import store from './store'
 import App from './App.vue'
 
-import wysiwyg from "vue-wysiwyg"
 import vClickOutside from 'v-click-outside'
 
 Vue.use(VueRouter)
-Vue.use(wysiwyg, { hideModules: { 'image': true, 'table': true  }})
 Vue.use(vClickOutside)
 
 Vue.config.productionTip = false
