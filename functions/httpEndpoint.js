@@ -10,7 +10,6 @@ module.exports = functions.https.onRequest((request, response) => {
   console.log(`STRIP_EMPTY: ${STRIP_EMPTY}`);
   // const docRef = db.doc('resorts/' + resortId);
   // const resortRoot = db.ref(resortId);
-  let _deleteCount = 0;
 
   function stripIdsAndEmptyFields(group) {
 
@@ -29,7 +28,6 @@ module.exports = functions.https.onRequest((request, response) => {
           Object.keys(contact).forEach(key => {
             if ((contact[key]) !== 0 && !contact[key]) {
             delete contact[key];
-            _deleteCount += 1;
           }
         });
       }
@@ -44,10 +42,10 @@ module.exports = functions.https.onRequest((request, response) => {
     };
 
     if (group.id !== undefined) delete group.id;
-    group.list = group.list ? group.list
+    group.list = group.list
       .map(rmUuid)
       .map(fixCoordinates)
-      .map(stripEmptyFields) : [];
+      .map(stripEmptyFields);
 
     if (group.emergency) {
       group.list = group.list.map(cleanEmergencyContact);
@@ -64,6 +62,7 @@ module.exports = functions.https.onRequest((request, response) => {
     const resortData = snapshot.val();
     const emergencyGroup = stripIdsAndEmptyFields(resortData.archiveData[resortData.published].emergencyGroup);
     const contactGroups = resortData.archiveData[resortData.published].contactGroups ? resortData.archiveData[resortData.published].contactGroups
+      .filter(group => group.list)
       .map(stripIdsAndEmptyFields) : [];
     contactGroups.push(emergencyGroup);
 
@@ -77,7 +76,6 @@ module.exports = functions.https.onRequest((request, response) => {
     };
 
     const responseString = JSON.stringify(responseObject);
-    console.log(`${_deleteCount} fields deleted . . .`);
 
     response.send(responseString);
 
