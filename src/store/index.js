@@ -396,11 +396,20 @@ const store = {
         RESORTS_REF.doc(rootState.resortId).update({
           contactGroups: groups
         }).then(() => {
-          resolve(id)
+          resolve(newContact)
         }).catch((error) => {
           reject(error)
         })
       })
+
+    },
+
+    // eslint-disable-next-line
+    toggleOpenContactTag ({ }, { updatedContact }) {
+
+      // special case. action is dispatched by ContactList and listened to by EditContact.
+      // allows mutation of currently open contact's local state, overriding default list
+      // level tag toggle behavior, which is to save new state of tags directly
 
     },
 

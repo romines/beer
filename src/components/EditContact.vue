@@ -426,6 +426,10 @@ export default {
   },
   created () {
     this.initializeContact()
+    this.listenForTagChange()
+  },
+  destroyed () {
+    if (this.unsubscribeTagChangeListener) this.unsubscribeTagChangeListener()
   },
   methods: {
 
@@ -435,6 +439,13 @@ export default {
       this.localState.contact = {...defaults, ...this.contact}
       if (this.contactId === 'NEW') this.localState.contact.id = uuid()
       this.contactAtInitialization = this.clone(this.localState.contact)
+    },
+    listenForTagChange () {
+      console.log('listening for tag change')
+      this.unsubscribeTagChangeListener = this.$store.subscribeAction((action, state) => {
+        if (action.type !== 'toggleOpenContactTag') return
+        this.localState.contact.tags = action.payload
+      })
     },
     saveContact () {
       const number = this.localState.contact.number ? this.getPn(this.localState.contact.number, this.$store.state.resortMeta.country).getNumber('international').replace(/ /g,'-') : ''
@@ -485,7 +496,7 @@ export default {
         })
       }
       this.$store.dispatch('duplicateContact', { groupId: this.groupId, contactId: this.contactId })
-        .then(id => this.$emit('openSibling', {id, scrollTo: true}))
+        .then(({ id, tags }) => this.$emit('openSibling', {id, tags, scrollTo: true}))
     },
     onImageUpload ({ url, fileName }) {
       this.$store.commit('SET_UPLOAD_BUFFER_URL', url)

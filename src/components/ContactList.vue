@@ -21,7 +21,7 @@
 
       <div class="contact-header"
            :class="{'box': !contactIsOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
-           @click.stop="onContactHeaderClick(contact.id)">
+           @click.stop="onContactHeaderClick(contact)">
         <span class="name">
           <span class="grippy" v-if="sortable" />
           {{ contact.name }}
@@ -30,7 +30,7 @@
         <span class="tags-and-chevron">
           <span class="tag-group">
             <span class="tag winter"
-              :class="{'is-active': contact.tags.winter}"
+              :class="{'is-active': deriveTagState(contact, 'winter')}"
               @click.stop="toggleTag(contact, 'winter')"
               v-show="$store.state.resortId !== 'russell_lands'"
             >
@@ -40,7 +40,7 @@
               Winter
             </span>
             <span class="tag summer"
-              :class="{'is-active': contact.tags.summer}"
+              :class="{'is-active': deriveTagState(contact, 'summer')}"
               @click.stop="toggleTag(contact, 'summer')"
               v-show="$store.state.resortId !== 'russell_lands'"
             >
@@ -49,7 +49,7 @@
               </span>
               Summer
             </span>
-            <span class="tag dining" :class="{'is-active': contact.tags.dining}" @click.stop="toggleTag(contact, 'dining')">
+            <span class="tag dining" :class="{'is-active': deriveTagState(contact, 'dining')}" @click.stop="toggleTag(contact, 'dining')">
               <img src="../assets/knife-and-fork.svg" class="">
               Dining
             </span>
@@ -103,7 +103,10 @@ export default {
     return {
       editingContactId: '',
       highlightedContactId: '',
-      contactOffsetAtOpen: 0
+      contactOffsetAtOpen: 0,
+      openContactTagBuffer: {
+
+      }
     }
   },
   computed: {
@@ -140,9 +143,10 @@ export default {
     contactHighlighted (id) {
       return id === this.highlightedContactId
     },
-    openContact ({ id, scrollTo }) {
+    openContact ({ id, tags, scrollTo }) {
       // NB: dirty state should already be checked for; openContact does opening only
       this.editingContactId = id
+      this.openContactTagBuffer = tags
       this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
 
       if (scrollTo) {
@@ -177,6 +181,7 @@ export default {
 
         this.$store.commit('SET_CONTACT_DIRTY_STATE', false)
         this.editingContactId = ''
+        this.openContactTagBuffer = {}
         onConfirmDirtyClose && onConfirmDirtyClose()
         this.$store.commit('CLOSE_MODAL')
         this.$nextTick(() => rollUpContact(contactId))
@@ -196,10 +201,10 @@ export default {
       }
 
     },
-    onContactHeaderClick (id) {
+    onContactHeaderClick ({ id, tags }) {
 
       if (this.editingContactId === '') { // none are open
-        this.openContact({ id })
+        this.openContact({ id, tags })
       } else {
         const closeOptions = {
           contactId: id,
@@ -213,23 +218,47 @@ export default {
     },
     toggleTag (contact, tag) {
 
-      if (this.$store.state.openContactIsDirty) {
-        return this.$store.dispatch('showModal', {
+      if (this.editingContactId === contact.id) {
+        //
+        // this contact is open. dispatch action to mutate local state in EditContact
+
+        this.openContactTagBuffer[tag] = !this.openContactTagBuffer[tag]
+        this.$store.dispatch('toggleOpenContactTag', {...this.openContactTagBuffer})
+
+      } else if (this.$store.state.openContactIsDirty) {
+        //
+        // another contact is open + dirty. don't do it!
+
+        this.$store.dispatch('showModal', {
           heading: 'Operation cannot be completed: Open contact has unsaved changes',
           message: 'Please save or cancel contact edits',
           confirmButtonLabel: 'OK',
           hideCancel: true,
         })
+
+      } else {
+        //
+        // go ahead and save change to tags
+
+        const tags = {...contact.tags}
+        tags[tag] = !tags[tag]
+
+        const payload = {
+          groupId: this.groupId,
+          updatedContact: {...contact, tags}
+        }
+
+        this.$store.dispatch('saveContact', payload)
+
       }
 
-      const tags = {...contact.tags}
-      tags[tag] = !tags[tag]
 
-      this.$store.dispatch('saveContact', {
-        groupId: this.groupId,
-        updatedContact: {...contact, tags}
-      })
-
+    },
+    deriveTagState (contact, tag) {
+      const tags = (contact.id === this.editingContactId)
+        ? this.openContactTagBuffer
+        : contact.tags
+      return tags[tag]
     },
     sortByName (list) {
       return list.slice().sort((a, b) => {
