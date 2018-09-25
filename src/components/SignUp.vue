@@ -117,7 +117,6 @@ export default {
         password: this.password,
         resortId: this.resortId,
       })
-      // debugger
       if (userCreate) this.$router.replace('/')
     }
   }

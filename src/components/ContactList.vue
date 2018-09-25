@@ -103,7 +103,6 @@ export default {
     return {
       editingContactId: '',
       highlightedContactId: '',
-      contactOffsetAtOpen: 0,
       openContactTagBuffer: {
 
       }
@@ -147,35 +146,16 @@ export default {
       // NB: dirty state should already be checked for; openContact does opening only
       this.editingContactId = id
       this.openContactTagBuffer = tags
-      this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
 
       if (scrollTo) {
         this.$nextTick(() => {
-          const newContactEl = document.querySelector(`[data-contact-id='${id}']`)
-          newContactEl && window.scrollTo({
-            'behavior': 'smooth',
-            'left': 0,
-            'top': newContactEl.offsetTop -45
-          })
-          this.contactOffsetAtOpen = window.pageYOffset || document.documentElement.scrollTop
-          this.highlightedContactId = id
-          setTimeout(() => {
-            this.highlightedContactId = ''
-          }, 2600)
+          this.scrollToElement({ id, highlight: true})
         })
       }
     },
-    closeContact ({ resetDirtyState, onConfirmDirtyClose, contactId }) {
+    closeContact ({ resetDirtyState, onConfirmDirtyClose, contactId, highlight, scrollIntoView }) {
 
       const onConfirm = () => {
-
-        const rollUpContact = (contactId) => {
-          document.documentElement.scrollTop = document.body.scrollTop = this.contactOffsetAtOpen
-          this.highlightedContactId = contactId
-          setTimeout(() => {
-            this.highlightedContactId = ''
-          }, 2600)
-        }
 
         if (this.$store.state.uploadBufferUrl) this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)
 
@@ -184,7 +164,7 @@ export default {
         this.openContactTagBuffer = {}
         onConfirmDirtyClose && onConfirmDirtyClose()
         this.$store.commit('CLOSE_MODAL')
-        this.$nextTick(() => rollUpContact(contactId))
+        if (scrollIntoView) this.$nextTick(() => { this.scrollToElement({ id: contactId, highlight }) })
 
       }
 
@@ -204,14 +184,14 @@ export default {
     onContactHeaderClick ({ id, tags }) {
 
       if (this.editingContactId === '') { // none are open
-        this.openContact({ id, tags })
+        this.openContact({ id, tags, scrollTo: true })
       } else {
         const closeOptions = {
           contactId: id,
           resetDirtyState: false,
-          onConfirmDirtyClose: !this.contactIsOpen(id)
-            ? () => { this.editingContactId = id }
-            : () => null
+          onConfirmDirtyClose: this.contactIsOpen(id)               // header of open (+ dirty) contact was clicked
+            ? () => null
+            : () => this.openContact({ id, tags, scrollTo: true })  // header of another contact was clicked
         }
         this.closeContact(closeOptions)
       }
@@ -271,6 +251,22 @@ export default {
           return 0
         }
       })
+    },
+    scrollToElement ({ id, highlight }) {
+      const contactEl = document.querySelector(`[data-contact-id='${id}']`)
+      console.log(contactEl)
+      contactEl && window.scrollTo({
+        'behavior': 'smooth',
+        'left': 0,
+        'top': contactEl.offsetTop -45
+      })
+      if (highlight) {
+        this.highlightedContactId = id
+        setTimeout(() => {
+          this.highlightedContactId = ''
+        }, 2600)
+      }
+
     },
     getContactElById (id) {
       return this.$refs[`contact_${id.substring(0, 8)}`][0]

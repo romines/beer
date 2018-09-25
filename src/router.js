@@ -126,7 +126,7 @@ router.beforeEach(async (to, from, next) => {
   */
 
   if (!auth.currentUser) {
-  console.log('redirect to the the login page . . .')
+    // no Firebase auth user.
     // redirect to login page.
     return next({
       path: '/login'
@@ -135,7 +135,7 @@ router.beforeEach(async (to, from, next) => {
 
 
   if (!store.state.user.authorizedIds) {
-    // if no user in state, await user data
+    // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
     const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))

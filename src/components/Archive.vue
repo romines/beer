@@ -135,9 +135,6 @@ export default {
       return this.starredOnly ? remaining.filter(archive => archive.starred) : remaining
     },
   },
-  created () {
-    // if (!this.$store.state.archives.archiveList.length) debugger
-  },
   methods: {
     getDateString (time) {
       return moment(time).format('lll')

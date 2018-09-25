@@ -267,7 +267,7 @@
           </a>
         </p>
         <p class="control no-expando">
-          <a class="button is-light" @click="initializeContact(); $emit('closeContact', { resetDirtyState: false, contactId: contactId })">
+          <a class="button is-light" @click="cancelEdits">
             Cancel
           </a>
         </p>
@@ -460,7 +460,20 @@ export default {
         updatedContact: contact
       }).then(() => {
         if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
-        this.$emit('closeContact', { resetDirtyState: true, contactId: this.contactId })
+        this.$emit('closeContact', {
+          resetDirtyState: true,
+          contactId: this.contactId ,
+          highlight: true,
+          scrollIntoView: true
+        })
+      })
+    },
+    cancelEdits () {
+      this.initializeContact()
+      this.$emit('closeContact', {
+        resetDirtyState: false,
+        contactId: this.contactId,
+        scrollIntoView: true
       })
     },
     deleteContact () {
