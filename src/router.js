@@ -113,7 +113,6 @@ const router = new VueRouter({ routes })
 router.beforeEach(async (to, from, next) => {
 
   if (!to.matched.some(record => record.meta.requiresAuth)) {
-    console.log('auth not necessary for: ' + to.path)
 
     // route is open to unauthenticated users
     store.commit('SET_LOADING_STATE', false)
@@ -122,7 +121,7 @@ router.beforeEach(async (to, from, next) => {
 
   /**
   *
-  * routes requiring auth
+  * routes below require auth
   *
   */
 
@@ -153,10 +152,12 @@ router.beforeEach(async (to, from, next) => {
   *
   */
 
-  if (!to.matched.some(record => record.meta.requiresSuperAdmin) || store.state.user.superAdmin) {
-    // route does NOT require superAdmin or this IS a superAdmin. send user on their way
+  if (store.state.user.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
+    // this is a superAdmin route or does NOT require superAdmin.
+    // send user on their way
     next()
   } else {
+    // non superAdmin trying to access route requiring superAdmin
     // redirect home
     next('/')
   }
