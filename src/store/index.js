@@ -119,9 +119,10 @@ const store = {
       }, err => console.log(err)
       )
     },
+
     getResorts ({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
-        console.log('inside getResorts .then');
+        console.log('inside getResorts .then')
         let resorts = []
         snapshot.forEach(doc => {
           resorts.push(doc.data())
@@ -130,7 +131,8 @@ const store = {
         return Promise.resolve()
       })
     },
-    saveNewResort ({ commit, dispatch }, resortData) {
+
+    saveNewResort ({ dispatch }, resortData) {
 
       resortData.contactGroups = resortData.contactGroups
         .map(addNoSort)
@@ -144,6 +146,7 @@ const store = {
         dispatch('archiveFromPasted', resortData)
       ])
     },
+
     listenToContacts ({ rootState, commit }) {
 
       console.log('listen[ing]ToContacts . . .')
@@ -194,6 +197,7 @@ const store = {
           dispatch('showErrorModal', error.message)
         })
     },
+
     logOut ({ commit }) {
       auth.signOut()
       .then(() => {
@@ -202,6 +206,7 @@ const store = {
         commit('SET_CONTACT_GROUPS', {})
       })
     },
+
     async createUser ({ commit, dispatch }, { email, password, resortId }) {
 
       const [createError, firebaseUser] = await promiseTo(auth.createUserWithEmailAndPassword(email, password))
@@ -232,50 +237,22 @@ const store = {
 
       commit('SET_USER', userForStore)
 
-      return 'User created successfully'
-
-        // .then( user => {
-        //   firebaseUser = user
-        //   firebaseUser.authorizedResortIds = [resortId]
-        //   return firestore.collection('users').doc(firebaseUser.uid).set({
-        //     authorizedResortIds: [resortId],
-        //     email
-        //   })
-        // }
-        // ).then(() => {
-        //   commit('SET_USER', firebaseUser)
-        //   onSuccess()
-        // }, error => {
-        //   commit('SET_LOADING_STATE', false)
-
-        //   dispatch('showErrorModal', error.message)
-        // })
+      return { successfulUserCreation: true }
 
     },
-    seed ({ rootState }) {
-      // legacy action that allows population of resort data imported from json file. Assumes existence of
-      // SEED_DATA global (contents of json)
 
-      const resortId = rootState.resortId
+    async triggerPasswordResetEmail ({ commit, dispatch }, { email }) {
 
-      if (!SEED_DATA[resortId].contactGroups || !Object.keys(SEED_DATA[resortId].contactGroups).length) {
-        return console.log(`No resort data found for ${resortId}!`)
-      } else {
-        console.log(`updating contact for ${resortId} . . .`)
-        const tempSeedData = SEED_DATA[resortId]
-        tempSeedData.contactGroups = tempSeedData.contactGroups
-          .map(addNoSort)
-          .map(addGroupId)
-          .map(addMissingContactDefaults)
+      const [triggerError] = await promiseTo(auth.sendPasswordResetEmail(email))
 
-        return RESORTS_REF.doc(resortId).set(tempSeedData)
+      if (triggerError) {
+        commit('SET_LOADING_STATE', false)
+        return dispatch('showErrorModal', triggerError.message)
       }
 
-    },
-    seedMeta ({ rootState }) {
-      database.ref(rootState.resortId).set(SEED_DATA[rootState.resortId])
-    },
+      return { successfulEmailTrigger: true }
 
+    },
 
     saveNewEmptyGroup ({ rootState }, groupName) {
       let groups = rootState.contactGroups.slice()
@@ -300,6 +277,7 @@ const store = {
       })
 
     },
+
     saveContactGroupName ({ rootState }, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
@@ -307,6 +285,7 @@ const store = {
         contactGroups: groups
       })
     },
+
     saveEmergencyContactGroup ({ rootState }, updatedEmergencyGroup) {
       // const groupIndex = rootState.contactGroups.findIndex(group => group.id === updatedEmergencyGroup.id)
 
@@ -317,6 +296,7 @@ const store = {
         emergencyGroup: updatedEmergencyGroup
       })
     },
+
     deleteContactGroup ({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups.splice(groupIndex, 1)
@@ -324,12 +304,14 @@ const store = {
         contactGroups: groups
       })
     },
+
     saveContactGroupList ({ rootState }, { updatedList }) {
       // currently unused, but could DRY out contact mutation methods below
       return RESORTS_REF.doc(rootState.resortId).update({
         contactGroups: updatedList
       })
     },
+
     toggleSortable ({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].noSort = !rootState.contactGroups[groupIndex].noSort
@@ -355,6 +337,7 @@ const store = {
         contactGroups: groups
       }).then(() => { commit('SET_UPLOAD_BUFFER_URL', '')})
     },
+
     deleteContact ({ rootState, dispatch }, { groupIndex, contactId }) {
 
       const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(contact => contact.id === contactId)
@@ -422,6 +405,7 @@ const store = {
         contactGroups: groups
       })
     },
+
     destroyImageFile ({ rootState, commit }, url) {
       const additionalReferencesExist = rootState.contactGroups.some((group) => {
         return group.list.some((contact) => contact.imageUrl === url)
@@ -438,6 +422,7 @@ const store = {
         console.log(error.message)
       })
     },
+
     listenForScaledImage ({ rootState, commit }, { fileName, url }) {
       console.log('Listening for scaled image . . .')
       RESORTS_REF.doc(rootState.resortId).collection('scaledImages').doc(fileName.split('.')[0]).onSnapshot(() => {
@@ -464,6 +449,7 @@ const store = {
         }
       })
     },
+
     showModal ({ commit, rootState }, contents) {
       // feel free to commit 'SHOW_MODAL' directly, however this action provides a default onConfirm
       const mergedContents = {
@@ -475,6 +461,7 @@ const store = {
       }
       commit('SHOW_MODAL', mergedContents)
     },
+
     showErrorModal ({ commit }, message) {
       commit('SHOW_MODAL', {
         heading: 'An error has occurred!',
@@ -483,6 +470,7 @@ const store = {
         classList: ['error']
       })
     },
+
     showSuccessModal ({ commit }, heading ) {
 
       const closeModal = () => { commit('CLOSE_MODAL') }

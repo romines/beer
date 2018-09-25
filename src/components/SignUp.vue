@@ -18,7 +18,7 @@
         </header>
         <div class="card-content">
           <div class="field">
-            <p class="control has-icons-left">
+            <p class="control has-icons-left has-icons-right">
               <input class="input email"
                      v-model="email"
                      type="email"
@@ -27,6 +27,9 @@
                      @focus="emailHasBeenTouched = false">
               <span class="icon is-small is-left">
                 <i class="fas fa-envelope" />
+              </span>
+              <span class="icon is-small is-right" :class="email && validEmail ? 'has-text-success': 'has-text-grey-lighter'">
+                <i class="fas fa-check" />
               </span>
             </p>
             <p class="help is-danger" v-show="email && emailHasBeenTouched && !validEmail">Email format is invalid</p>
@@ -72,10 +75,10 @@
 </template>
 
 <script>
+import mixins from './mixins'
 
 export default {
-  components: {
-  },
+  mixins: [mixins],
   props: {
     encodedResortId: {
       type: String
@@ -97,8 +100,7 @@ export default {
       return this.validEmail && !!this.password && (this.password === this.confirmPassword)
     },
     validEmail () {
-      var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return regex.test(this.email)
+      return this.emailIsValid(this.email)
     },
     passwordMismatch () {
       return this.confirmPassword.split('').every((char, index) => {
@@ -112,12 +114,12 @@ export default {
   methods: {
     async signUp () {
       this.$store.commit('SET_LOADING_STATE', true)
-      const userCreate = await this.$store.dispatch('createUser', {
+      const { successfulUserCreation } = await this.$store.dispatch('createUser', {
         email: this.email,
         password: this.password,
         resortId: this.resortId,
       })
-      if (userCreate) this.$router.replace('/')
+      if (successfulUserCreation) this.$router.replace('/')
     }
   }
 }

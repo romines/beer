@@ -10,6 +10,7 @@ import SignUp from './components/SignUp'
 import Resorts from './components/Resorts'
 import Resort from './components/Resort'
 import ExportJson from './components/ExportJson'
+import ForgotPassword from './components/ForgotPassword'
 
 const routes = [
   {
@@ -97,8 +98,13 @@ const routes = [
     component: Login
   },
   {
+    path: '/reset',
+    name: 'Reset Password',
+    component: ForgotPassword
+  },
+  {
     path: '/sign-up/:encodedResortId',
-    name: 'Sign-up',
+    name: 'Sign Up',
     component: SignUp,
     props: true
   },

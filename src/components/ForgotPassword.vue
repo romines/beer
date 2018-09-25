@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="forgot-password">
 
     <!-- TODO: move this somewhere common -->
     <h1 class="title">
@@ -14,30 +14,25 @@
       <div class="card">
         <div class="card-header">
           <p class="card-header-title">
-            Login
+            Reset Password
           </p>
         </div>
         <div class="card-content">
           <div class="field">
-            <p class="control has-icons-left">
+            <p class="control has-icons-left has-icons-right">
               <input class="input" v-model="email" type="email" placeholder="Email">
               <span class="icon is-small is-left">
                 <i class="fas fa-envelope" />
               </span>
-            </p>
-          </div>
-          <div class="field">
-            <p class="control has-icons-left">
-              <input class="input" v-model="password" type="password" placeholder="Password" @keyup.enter="logIn">
-              <span class="icon is-small is-left">
-                <i class="fas fa-lock" />
+              <span class="icon is-small is-right" :class="email && emailIsValid(email) ? 'has-text-success': 'has-text-grey-lighter'">
+                <i class="fas fa-check" />
               </span>
             </p>
           </div>
           <div class="field">
             <p class="control">
-              <button class="button is-success" @click="logIn" :disabled="!emailIsValid(email) || !password.length">
-                Login
+              <button class="button is-success" @click="triggerReset" :disabled="!email || !emailIsValid(email)">
+                Submit
               </button>
             </p>
           </div>
@@ -45,7 +40,7 @@
         <footer class="card-footer">
           <p class="card-footer-item">
             <span>
-              <router-link to="/reset">Forgot password?</router-link>
+              <router-link to="/login">Login</router-link> instead
             </span>
           </p>
         </footer>
@@ -58,8 +53,9 @@
 
 <script>
 import mixins from './mixins'
-
 export default {
+  components: {
+  },
   mixins: [mixins],
   data () {
     return {
@@ -69,18 +65,25 @@ export default {
   },
   computed: {
 
-
   },
   created () {
   },
   methods: {
-    logIn () {
+    async triggerReset () {
       this.$store.commit('SET_LOADING_STATE', true)
-      this.$store.dispatch('logIn', {
-        email: this.email,
-        password: this.password,
-        onSuccess: () => { this.$router.replace('/') }
+      const { successfulEmailTrigger } = await this.$store.dispatch('triggerPasswordResetEmail', {
+        email: this.email
       })
+      if (successfulEmailTrigger) {
+        this.$store.commit('SET_LOADING_STATE', false)
+        this.$router.replace('/login')
+        this.$store.dispatch('showModal', {
+          heading: 'Password reset requested successfully',
+          message: 'Check your email for instructions on completing reset',
+          confirmButtonLabel: 'OK',
+          hideCancel: true
+        })
+      }
     }
   }
 }

@@ -4,8 +4,6 @@
     <!-- TODO: nav to separate component -->
     <div class="top-nav-container">
       <span class="top-nav">
-        <!-- <router-link to="/">home</router-link> -->
-        <!-- <span @click="$store.dispatch('seedMeta')">seedMeta</span> -->
         <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>&nbsp;
         <span
           v-if="$store.state.user && $store.state.user.uid"

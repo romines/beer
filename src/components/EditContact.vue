@@ -366,7 +366,6 @@ export default {
       return this.phoneIsValid(this.localState.contact.number)
       && this.phoneIsValid(this.localState.contact.sms)
       && this.emailIsValid(this.localState.contact.mailto)
-      && this.emailIsValid(this.localState.contact.mailto)
       && ['url', 'menu', 'z_reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
     },
     saveButtonActive () {
