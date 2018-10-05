@@ -8,8 +8,8 @@
 
       <div class="field-body">
         <p class="control">
-          <label class="switch control" @click.stop>
-            <input type="checkbox" v-model="localState.emergencyGroup.seasonal" @click.stop.prevent.self="toggleSeasonal">
+          <label for="seasonal" class="switch control" @click.stop>
+            <input id="seasonal" type="checkbox" v-model="localState.emergencyGroup.seasonal" @click.stop.prevent.self="toggleSeasonal">
             <span class="slider round" />
           </label>
         </p>
@@ -102,6 +102,23 @@
               placeholder="Email">
             <span class="icon is-small is-left">
               <i class="fas fa-address-book" />
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Message</label>
+        </div>
+        <div class="field-body ">
+          <p class="control has-icons-left">
+            <input
+              v-model.trim="contact.message"
+              class="input is-expanded"
+              placeholder="Message">
+            <span class="icon is-small is-left">
+              <i class="fas fa-comment-alt" />
             </span>
           </p>
         </div>

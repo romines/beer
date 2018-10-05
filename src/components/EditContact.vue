@@ -94,8 +94,8 @@
           <label class="label">Summer</label>
         </div>
         <div class="toggle-container control is-expanded">
-          <label class="switch">
-            <input type="checkbox" v-model="localState.contact.tags.summer">
+          <label for="summer" class="switch">
+            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer">
             <span class="slider round" />
           </label>
         </div>
@@ -106,8 +106,8 @@
           <label class="label">Winter</label>
         </div>
         <div class="toggle-container control is-expanded">
-          <label class="switch">
-            <input type="checkbox" v-model="localState.contact.tags.winter">
+          <label for="winter" class="switch">
+            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter">
             <span class="slider round" />
           </label>
         </div>
@@ -119,8 +119,8 @@
         <label class="label">Dining</label>
       </div>
       <div class="toggle-container control is-expanded">
-        <label class="switch">
-          <input type="checkbox" v-model="localState.contact.tags.dining">
+        <label for="dining" class="switch">
+          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining">
           <span class="slider round" />
         </label>
       </div>

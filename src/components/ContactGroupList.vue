@@ -45,8 +45,8 @@
           <div class="group-sort" v-show="detailGroup === group.id">
             <span>Custom Sort Order</span>
             <div class="toggle-container ">
-              <label class="switch" @click.stop>
-                <input type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort" @click.stop.prevent.self="toggleSortable(groupIndex)">
+              <label for="no-sort" class="switch" @click.stop>
+                <input id="no-sort" type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort" @click.stop.prevent.self="toggleSortable(groupIndex)">
                 <span class="slider round" />
               </label>
             </div>
