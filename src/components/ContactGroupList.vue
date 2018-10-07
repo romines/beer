@@ -42,11 +42,11 @@
             </p>
           </div>
 
-          <div class="group-sort" v-show="detailGroup === group.id">
+          <div class="group-sort" v-show="detailGroup === group.id" @click.stop>
             <span>Custom Sort Order</span>
-            <div class="toggle-container ">
-              <label for="no-sort" class="switch" @click.stop>
-                <input id="no-sort" type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort" @click.stop.prevent.self="toggleSortable(groupIndex)">
+            <div class="toggle-container">
+              <label for="no-sort" class="switch" @click.stop.prevent="toggleSortable(groupIndex)">
+                <input id="no-sort" type="checkbox" v-model="$store.state.contactGroups[groupIndex].noSort">
                 <span class="slider round" />
               </label>
             </div>
