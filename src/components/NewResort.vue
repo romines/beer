@@ -234,7 +234,7 @@ export default {
       return this.newResort.name.length
         && this.newResort.resortId.length
         && this.newResort.mapFiles.length
-        && this.emergencyGroupValidState
+        // && this.emergencyGroupValidState
         && this.newResortNameIsValid
         && this.newResortIdIsValid
         && !this.jsonError
@@ -284,12 +284,15 @@ export default {
 
       resortData.contactGroups = (this.pastedData && this.pastedData.contactGroups) ? this.pastedData.contactGroups : []
 
-      if (this.selectedEmergencyGroup === -2) {
+      if (this.pastedData && this.pastedData.emergencyGroup) {                    // eGroup parsed from pasted JSON
+        resortData.emergencyGroup = this.pastedData.emergencyGroup
+
+      } else if (this.selectedEmergencyGroup === -2) {                            // eGroup entered manually
         resortData.emergencyGroup = {
           ...this.newEmergencyGroupData,
           list: this.newEmergencyGroupData.list.map(contact => this.formatContactNumbersForSave(contact, this.newResort.country))
         }
-      } else {
+      } else {                                                                    // eGroup selected from regular contacts
         resortData.emergencyGroup = this.clone(resortData.contactGroups[this.selectedEmergencyGroup])
         resortData.contactGroups = resortData.contactGroups.filter((group, index) => index !== this.selectedEmergencyGroup)
       }

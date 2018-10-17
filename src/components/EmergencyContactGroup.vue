@@ -7,9 +7,9 @@
       </div>
 
       <div class="field-body">
-        <p class="control">
-          <label for="seasonal" class="switch control" @click.stop>
-            <input id="seasonal" type="checkbox" v-model="localState.emergencyGroup.seasonal" @click.stop.prevent.self="toggleSeasonal">
+        <p class="control" @click.stop>
+          <label for="seasonal" class="switch control" @click.prevent="toggleSeasonal">
+            <input id="seasonal" type="checkbox" v-model="localState.emergencyGroup.seasonal">
             <span class="slider round" />
           </label>
         </p>
@@ -112,15 +112,10 @@
           <label class="label">Message</label>
         </div>
         <div class="field-body ">
-          <p class="control has-icons-left">
-            <input
-              v-model.trim="contact.message"
-              class="input is-expanded"
-              placeholder="Message">
-            <span class="icon is-small is-left">
-              <i class="fas fa-comment-alt" />
-            </span>
-          </p>
+          <textarea
+            v-model="contact.message"
+            class="textarea is-expanded"
+            placeholder="Message" />
         </div>
       </div>
 

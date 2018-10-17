@@ -254,7 +254,6 @@ export default {
     },
     scrollToElement ({ id, highlight }) {
       const contactEl = document.querySelector(`[data-contact-id='${id}']`)
-      console.log(contactEl)
       contactEl && window.scrollTo({
         'behavior': 'smooth',
         'left': 0,
