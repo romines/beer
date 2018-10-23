@@ -4,7 +4,7 @@
     <div class="add-new-bar box" @click="addResort" v-show="!addingResort">
       <span class="text">Add New</span>
       <span class="icon is-small">
-        <i class="fas fa-plus"/>
+        <i class="fas fa-plus" />
       </span>
     </div>
 
@@ -193,8 +193,7 @@ export default {
             }
           }
         ],
-        section: 'Emergency',
-        seasonal: false
+        section: 'Emergency'
       },
       newEmergencyGroupData: {}
     }

@@ -5,8 +5,7 @@ const emergencyGroup = {
     number: '+1-307-555-1212',
     tags: { summer: true, winter: true },
   }],
-  section: 'Emergency',
-  seasonal: false
+  section: 'Emergency'
 }
 const seedData = {
   emergencyGroup: { ...emergencyGroup },

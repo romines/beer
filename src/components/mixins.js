@@ -31,10 +31,6 @@ export default {
       const contactIsValid = (contact) => {
         const validPhone = contact.number === '000' ? true : (contact.number && this.getPn(contact.number, countryRegionCode) && this.getPn(contact.number, countryRegionCode).a.valid)
         const validSMS = contact.sms === '' ? true : (this.getPn(contact.sms, countryRegionCode) && this.getPn(contact.sms, countryRegionCode).a.valid)
-        console.log('this.emailIsValid(contact.mailto): ' + this.emailIsValid(contact.mailto))
-        console.log('contact.name.length: ' + contact.name.length)
-        console.log('validPhone: ' + validPhone)
-        console.log('validSMS: ' + validSMS)
         return contact.name.length && validPhone && validSMS && this.emailIsValid(contact.mailto)
       }
       const seasonalStateValid = () => {

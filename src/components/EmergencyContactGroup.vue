@@ -1,34 +1,7 @@
 <template>
-  <div class="emergency-contact-group">
-
-    <div class="emergency-seasonal field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Seasonal</label>
-      </div>
-
-      <div class="field-body">
-        <p class="control" @click.stop>
-          <label for="seasonal" class="switch control" @click.prevent="toggleSeasonal">
-            <input id="seasonal" type="checkbox" v-model="localState.emergencyGroup.seasonal">
-            <span class="slider round" />
-          </label>
-        </p>
-      </div>
-    </div>
+  <div class="emergency-contact-group" :class="localState.emergencyGroup.list.length > 1 ? 'two-contacts' : ''">
 
     <div class="contact" v-for="contact in localState.emergencyGroup.list" :key="contact.id">
-
-      <div class="field is-horizontal" v-show="localState.emergencyGroup.seasonal">
-        <div class="field-label is-normal">
-          <label class="label">Season</label>
-        </div>
-        <div class="field-body has-icons-left">
-          <p class="control">
-            <span class="button season" :class="{'active': contact.tags.winter}" @click="toggleContactSeason(contact.tags.winter)">Winter</span>
-            <span class="button season" :class="{'active': contact.tags.summer}" @click="toggleContactSeason(contact.tags.summer)">Summer</span>
-          </p>
-        </div>
-      </div>
 
       <div class="field is-horizontal">
         <div class="field-label is-normal">
@@ -119,7 +92,52 @@
         </div>
       </div>
 
+      <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'" @click.stop>
+        <div class="title is-6">Contact Active</div>
+        <div class="field is-horizontal toggle">
+          <div class="field-label is-normal">
+            <label class="label">Summer</label>
+          </div>
+          <div class="toggle-container control is-expanded">
+            <label :for="'summer_' + contact.id" class="switch">
+              <input :id="'summer_' + contact.id" type="checkbox" v-model="contact.tags.summer">
+              <span class="slider round" />
+            </label>
+          </div>
+        </div>
+
+        <div class="field is-horizontal toggle">
+          <div class="field-label is-normal">
+            <label class="label">Winter</label>
+          </div>
+          <div class="toggle-container control is-expanded">
+            <label :for="'winter_' + contact.id" class="switch">
+              <input :id="'winter_' + contact.id" type="checkbox" v-model="contact.tags.winter">
+              <span class="slider round" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- end Contact -->
+
+    <div class="add-remove-contact">
+      <span
+        class="link"
+        v-if="localState.emergencyGroup.list.length === 1"
+        @click="addRemoveSecondContact">
+        Add (Seasonal) Contact
+      </span>
+      <span
+        class="link"
+        v-if="localState.emergencyGroup.list.length === 2"
+        @click="addRemoveSecondContact">
+        Remove Contact
+      </span>
     </div>
+
+    <div class="invalid-form-warning help is-danger" v-show="seasonConflict">Only one contact may be active per season.</div>
+
     <div class="field is-grouped is-grouped-right actions" v-if="!hideSave">
       <p class="control no-expando">
         <a class="button is-primary" @click="saveEmergencyGroup" :disabled="!saveButtonActive">
@@ -140,6 +158,7 @@
 <script>
 import mixins from './mixins'
 import Cleave from 'vue-cleave'
+import uuid from 'uuid/v4'
 import 'cleave.js/dist/addons/cleave-phone.i18n.js'
 
 export default {
@@ -171,14 +190,14 @@ export default {
     groupIsDirty () {
       return JSON.stringify(this.localState.emergencyGroup) !== JSON.stringify(this.groupAtInitialization)
     },
+    seasonConflict () {
+      return this.localState.emergencyGroup.list.filter(contact => contact.tags.winter).length > 1 || this.localState.emergencyGroup.list.filter(contact => contact.tags.summer).length > 1
+    },
     saveButtonActive () {
-      return this.emergencyGroupValid(this.localState.emergencyGroup, this.resortCountry) && this.groupIsDirty
+      return this.emergencyGroupValid(this.localState.emergencyGroup, this.resortCountry) && this.groupIsDirty && !this.seasonConflict
     }
   },
   watch: {
-    // emergencyGroup () {
-    //   this.initializeGroup()
-    // },
     localState: {
       handler () {
         this.$emit('groupChange', this.localState.emergencyGroup)
@@ -194,7 +213,7 @@ export default {
       this.localState.emergencyGroup = this.clone(this.emergencyGroup)
       this.groupAtInitialization = this.clone(this.emergencyGroup)
     },
-    toggleSeasonal () {
+    addRemoveSecondContact () {
 
       if (this.localState.emergencyGroup.list.length < 2) {
         this.localState.emergencyGroup.list[0].tags.winter = true
@@ -204,6 +223,7 @@ export default {
           number: '',
           mailto: '',
           sms: '',
+          id: uuid(),
           tags: {
             winter: false,
             summer: true
@@ -215,21 +235,10 @@ export default {
         this.localState.emergencyGroup.list[0].tags.summer = true
       }
 
-      this.localState.emergencyGroup.seasonal = !this.localState.emergencyGroup.seasonal
-
     },
     phoneIsValid (num) {
       if (num === '000') return true
       return this.getPn(num, this.resortCountry) && this.getPn(num, this.resortCountry).a.valid
-    },
-    toggleContactSeason (currentlyActive) {
-      if (!currentlyActive) {
-        this.localState.emergencyGroup.list.forEach(contact => {
-          contact.tags.winter = !contact.tags.winter
-          contact.tags.summer = !contact.tags.summer
-        })
-
-      }
     },
     saveEmergencyGroup () {
       const emergencyGroup = {
@@ -248,7 +257,12 @@ export default {
 
 <style lang="scss" scoped>
 .emergency-contact-group {
-
+  &.two-contacts {
+    .contact:first-child {
+      padding-bottom: 1.2em;
+      border-bottom: 1px solid black;
+    }
+  }
   .contact {
     margin-top: 1.6em;
     .button.season {
@@ -258,6 +272,15 @@ export default {
         opacity: 1;
         border: 4px solid #209cee;
       }
+    }
+  }
+
+  .add-remove-contact {
+    .link {
+      margin-left: .6em;
+      text-decoration: underline;
+      font-weight: bold;
+      cursor: pointer;
     }
   }
 

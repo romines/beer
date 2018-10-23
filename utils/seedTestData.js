@@ -26,7 +26,6 @@ const emergencyGroup = {
       z_reservations: ''
     }
   ],
-  seasonal: false,
   section: 'Emergency'
 };
 
