@@ -169,7 +169,7 @@ export default {
   },
   computed: {
     groupIsDirty () {
-      return JSON.stringify(this.localState.emergencyGroup) !== JSON.stringify(this.contactAtInitialization)
+      return JSON.stringify(this.localState.emergencyGroup) !== JSON.stringify(this.groupAtInitialization)
     },
     saveButtonActive () {
       return this.emergencyGroupValid(this.localState.emergencyGroup, this.resortCountry) && this.groupIsDirty
@@ -192,7 +192,7 @@ export default {
   methods: {
     initializeGroup () {
       this.localState.emergencyGroup = this.clone(this.emergencyGroup)
-      this.contactAtInitialization = this.clone(this.emergencyGroup)
+      this.groupAtInitialization = this.clone(this.emergencyGroup)
     },
     toggleSeasonal () {
 

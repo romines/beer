@@ -60,7 +60,7 @@ export function addMissingContactDefaults (group) {
     return contact
   }
 
-  console.log('addMissingContactDefaults . . . ');
+  console.log('addMissingContactDefaults . . . ')
 
   group.list = group.list
     ? group.list

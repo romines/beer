@@ -76,7 +76,7 @@
 
           <div class="control">
             <div class="map-thumbs">
-              <div class="image-container" v-for="(url, index) in newResort.mapFiles">
+              <div class="image-container" v-for="(url, index) in newResort.mapFiles" :key="url">
                 <span class="icon is-small remove" @click="removeImage(index)">
                   <i class="fas fa-times-circle" />
                 </span>
@@ -116,6 +116,7 @@
             <span class="button is-small group-name"
               :class="(selectedEmergencyGroup === index) ? 'is-active' : ''"
               v-for="(name, index) in groupNames"
+              :key="name"
               @click="selectedEmergencyGroup = index; addingEmergencyGroup = false">
               {{ name }}
             </span>
@@ -225,16 +226,15 @@ export default {
       if (!this.pastedData || !this.pastedData.contactGroups) return []
       return this.pastedData.contactGroups.map(group => group.section)
     },
-    emergencyGroupValidState () {
-      if (this.selectedEmergencyGroup === -2) return this.emergencyGroupValid(this.newEmergencyGroupData, this.newResort.country)
-      return (this.selectedEmergencyGroup > -1)
+    emergencyGroupIsValid () {
+      if (this.selectedEmergencyGroup !== -2) return true
+      return this.emergencyGroupValid(this.newEmergencyGroupData, this.newResort.country)
     },
     saveButtonActive () {
 
       return this.newResort.name.length
         && this.newResort.resortId.length
-        && this.newResort.mapFiles.length
-        // && this.emergencyGroupValidState
+        && this.emergencyGroupIsValid
         && this.newResortNameIsValid
         && this.newResortIdIsValid
         && !this.jsonError
@@ -272,11 +272,35 @@ export default {
       })
     },
     onMapFileUpload ({ url }) {
-      console.log(url)
       this.newResort.mapFiles.push(url)
     },
     removeImage (index) {
       this.newResort.mapFiles.splice(index, 1)
+    },
+    getEmergencyGroup () {
+      const getEmergencyGroupFromManualEntry = () => {
+        return {
+          ...this.newEmergencyGroupData,
+          list: this.newEmergencyGroupData.list.map(contact => this.formatContactNumbersForSave(contact, this.newResort.country))
+        }
+      }
+      const getEmergencyGroupFromSelected = () => {
+        return this.pastedData.contactGroups[this.selectedEmergencyGroup]
+
+      }
+      const getEmergencyGroupFromDefault = () => {
+        return this.clone(this.emergencyGroupDefaults)
+      }
+
+      if (this.pastedData && this.pastedData.emergencyGroup) {
+        return this.pastedData.emergencyGroup
+      } else if (this.selectedEmergencyGroup === -2) {
+        return getEmergencyGroupFromManualEntry()
+      } else if (this.selectedEmergencyGroup > -1) {
+        return getEmergencyGroupFromSelected()
+      } else {
+        return getEmergencyGroupFromDefault()
+      }
     },
     saveNewResort () {
 
@@ -284,18 +308,9 @@ export default {
 
       resortData.contactGroups = (this.pastedData && this.pastedData.contactGroups) ? this.pastedData.contactGroups : []
 
-      if (this.pastedData && this.pastedData.emergencyGroup) {                    // eGroup parsed from pasted JSON
-        resortData.emergencyGroup = this.pastedData.emergencyGroup
+      resortData.emergencyGroup = this.getEmergencyGroup()
 
-      } else if (this.selectedEmergencyGroup === -2) {                            // eGroup entered manually
-        resortData.emergencyGroup = {
-          ...this.newEmergencyGroupData,
-          list: this.newEmergencyGroupData.list.map(contact => this.formatContactNumbersForSave(contact, this.newResort.country))
-        }
-      } else {                                                                    // eGroup selected from regular contacts
-        resortData.emergencyGroup = this.clone(resortData.contactGroups[this.selectedEmergencyGroup])
-        resortData.contactGroups = resortData.contactGroups.filter((group, index) => index !== this.selectedEmergencyGroup)
-      }
+      if (this.selectedEmergencyGroup > -1) resortData.contactGroups = resortData.contactGroups.filter((group, index) => index !== this.selectedEmergencyGroup)
 
       this.addingResort = false
 
