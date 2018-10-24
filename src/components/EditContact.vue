@@ -169,6 +169,7 @@
     </div>
 
     <location-selector
+      v-if="this.$store.state.resortMeta.mapFiles.length"
       :coordinate-string="localState.contact.rect"
       :map-id="localState.contact.mapId"
       @coordinateClick="onCoordinateClick"
