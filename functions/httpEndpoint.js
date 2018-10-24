@@ -43,11 +43,12 @@ module.exports = functions.https.onRequest((request, response) => {
 
     if (group.id !== undefined) delete group.id;
     group.list = group.list
-      .map(rmUuid)
-      .map(fixCoordinates)
-      .map(stripEmptyFields);
+    .map(rmUuid)
+    .map(fixCoordinates)
+    .map(stripEmptyFields);
 
     if (group.emergency) {
+      if (group.seasonal !== undefined) delete group.seasonal;
       group.list = group.list.map(cleanEmergencyContact);
     }
 
@@ -64,7 +65,6 @@ module.exports = functions.https.onRequest((request, response) => {
     const contactGroups = resortData.archiveData[resortData.published].contactGroups ? resortData.archiveData[resortData.published].contactGroups
       .filter(group => group.list)
       .map(stripIdsAndEmptyFields) : [];
-    contactGroups.push(emergencyGroup);
 
     const responseObject = {
       name: resortData.name,
