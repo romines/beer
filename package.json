@@ -8,6 +8,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --open --hot --overlay",
+    "deploy": "firebase deploy -P tapped",
     "export": "cd utils && node ./export.js",
     "stage": "cross-env NODE_ENV=staging webpack --progress --hide-modules && firebase deploy -P staging",
     "test": "npm run test:seed && npm run cypress:run",

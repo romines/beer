@@ -271,6 +271,7 @@ export default {
       })
     },
     onMapFileUpload ({ url }) {
+      if (!this.newResort.mapFiles) this.newResort.mapFiles = []
       this.newResort.mapFiles.push(url)
     },
     removeImage (index) {

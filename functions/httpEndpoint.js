@@ -19,7 +19,7 @@ module.exports = functions.https.onRequest((request, response) => {
     };
 
     const fixCoordinates = (contact) => {
-      if (contact.rect === '{{0,0}{80,80}}') contact.rect = '{{0,0},{80,80}}';
+      if (contact.rect === '{{0,0},{80,80}}' || contact.rect === '{{0,0}{80,80}}') delete contact.rect;
       return contact;
     };
 
