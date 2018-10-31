@@ -1,15 +1,13 @@
 /* eslint-env node */
 const functions = require('firebase-functions');
 const admin = require('./initialize');
+const twitterFetch = require('./twitterFetch');
 // const db = admin.firestore();
 const db = admin.database();
 
 module.exports = functions.https.onRequest((request, response) => {
   const resortId = request.query.r;
   const STRIP_EMPTY = !!(request.query.strip && request.query.strip === '1');
-  console.log(`STRIP_EMPTY: ${STRIP_EMPTY}`);
-  // const docRef = db.doc('resorts/' + resortId);
-  // const resortRoot = db.ref(resortId);
 
   function stripIdsAndEmptyFields(group) {
 
@@ -57,30 +55,39 @@ module.exports = functions.https.onRequest((request, response) => {
   }
 
 
+  db.ref(resortId).once('value')
 
-  db.ref(resortId).once('value', snapshot => {
+    .then(snapshot => {
 
-    const resortData = snapshot.val();
-    const emergencyGroup = stripIdsAndEmptyFields(resortData.archiveData[resortData.published].emergencyGroup);
-    const contactGroups = resortData.archiveData[resortData.published].contactGroups ? resortData.archiveData[resortData.published].contactGroups
-      .filter(group => group.list)
-      .map(stripIdsAndEmptyFields) : [];
+      const { archiveData, published, lastTweet } = snapshot.val();
 
-    const responseObject = {
-      name: resortData.name,
-      mapFiles: resortData.mapFiles,
-      resortId: resortData.resortId,
-      keys: resortData.keys,
-      contactGroups,
-      emergencyGroup
-    };
+      const emergencyGroup = stripIdsAndEmptyFields(archiveData[published].emergencyGroup);
 
-    const responseString = JSON.stringify(responseObject);
+      const contactGroups = archiveData[published].contactGroups
+        ? archiveData[published].contactGroups
+          .filter(group => group.list)
+          .map(stripIdsAndEmptyFields)
+        : [];
 
-    response.send(responseString);
+      return {
+        contactGroups,
+        emergencyGroup,
+        lastTweet
+      };
 
-  }).catch(function(error) {
-    response.send(error);
-  });
+    })
+    .then(({ contactGroups, emergencyGroup, cachedTweet }) => {
+      return Promise.all([
+        contactGroups,
+        emergencyGroup,
+        twitterFetch(cachedTweet)
+       ]);
+    })
+    .then(([ contactGroups, emergencyGroup, lastTweet ]) => {
+      response.send(JSON.stringify({ contactGroups, emergencyGroup, lastTweet }));
+    })
+    .catch(function(error) {
+      response.send(error);
+    });
 
 });
