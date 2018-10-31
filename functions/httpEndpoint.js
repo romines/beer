@@ -1,7 +1,6 @@
 /* eslint-env node */
 const functions = require('firebase-functions');
 const admin = require('./initialize');
-const twitterFetch = require('./twitterFetch');
 // const db = admin.firestore();
 const db = admin.database();
 
@@ -59,7 +58,7 @@ module.exports = functions.https.onRequest((request, response) => {
 
     .then(snapshot => {
 
-      const { archiveData, published, lastTweet } = snapshot.val();
+      const { archiveData, published } = snapshot.val();
 
       const emergencyGroup = stripIdsAndEmptyFields(archiveData[published].emergencyGroup);
 
@@ -69,22 +68,8 @@ module.exports = functions.https.onRequest((request, response) => {
           .map(stripIdsAndEmptyFields)
         : [];
 
-      return {
-        contactGroups,
-        emergencyGroup,
-        lastTweet
-      };
+      response.send(JSON.stringify({ contactGroups, emergencyGroup }));
 
-    })
-    .then(({ contactGroups, emergencyGroup, cachedTweet }) => {
-      return Promise.all([
-        contactGroups,
-        emergencyGroup,
-        twitterFetch(cachedTweet)
-       ]);
-    })
-    .then(([ contactGroups, emergencyGroup, lastTweet ]) => {
-      response.send(JSON.stringify({ contactGroups, emergencyGroup, lastTweet }));
     })
     .catch(function(error) {
       response.send(error);
