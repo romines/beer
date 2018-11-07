@@ -438,6 +438,7 @@ export default {
 
       this.localState.contact = {...defaults, ...this.contact}
       if (this.contactId === 'NEW') this.localState.contact.id = uuid()
+      if (this.contact.z_detail !== '') this.localState.contact.z_detail = this.cleanDescription(this.contact.z_detail)
       this.contactAtInitialization = this.clone(this.localState.contact)
     },
     listenForTagChange () {
@@ -520,6 +521,9 @@ export default {
     removeImage () {
       this.pendingFileDeletion = this.localState.contact.imageUrl
       this.localState.contact.imageUrl = ''
+    },
+    cleanDescription (description) {
+      return description.replace(/<div>/g, '').replace(/<\/div>/g, '').replace(/(\r\n|\n|\r)/gm,' ')
     },
     onCoordinateClick ({ x, y, mapIndex }) {
       const radius = this.localState.contact.rect.split('}')[1] ? this.localState.contact.rect.split('}')[1] : ',{80,80'
