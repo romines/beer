@@ -153,7 +153,7 @@ export default {
       if (Object.keys(state.publishedContacts).length === 0) return false
 
       const working = standardizeArchive({
-        contactGroups: rootState.contactGroups,
+        contactGroups: rootState.contactGroups.map(rmDescriptionEditor),
         emergencyGroup: rootState.emergencyGroup
       })
 
@@ -170,4 +170,9 @@ export default {
 
     }
   }
+}
+
+function rmDescriptionEditor(contact) {
+  if (contact.descriptionEditor !== undefined) delete contact.descriptionEditor
+  return contact
 }

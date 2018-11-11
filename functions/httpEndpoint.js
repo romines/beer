@@ -15,6 +15,11 @@ module.exports = functions.https.onRequest((request, response) => {
       return contact;
     };
 
+    const rmDescriptionEditor = (contact) => {
+      if (contact.descriptionEditor !== undefined) delete contact.descriptionEditor;
+      return contact;
+    };
+
     const fixCoordinates = (contact) => {
       if (contact.rect === '{{0,0},{80,80}}' || contact.rect === '{{0,0}{80,80}}') delete contact.rect;
       return contact;
@@ -40,9 +45,10 @@ module.exports = functions.https.onRequest((request, response) => {
 
     if (group.id !== undefined) delete group.id;
     group.list = group.list
-    .map(rmUuid)
-    .map(fixCoordinates)
-    .map(stripEmptyFields);
+      .map(rmUuid)
+      .map(rmDescriptionEditor)
+      .map(fixCoordinates)
+      .map(stripEmptyFields);
 
     if (group.emergency) {
       if (group.seasonal !== undefined) delete group.seasonal;

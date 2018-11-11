@@ -184,7 +184,7 @@
           <div class="heading">This contact shares coordinates with the following contact(s)</div>
         </div>
         <ul class="location-group">
-          <li class="location" v-for="location in matchingLocations">
+          <li class="location" v-for="location in matchingLocations" :key="`${location.name}_${location.x}_${location.y}`">
             <span class="name">{{ location.name }}</span>
             <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
           </li>
@@ -222,9 +222,45 @@
       <div class="field-label is-normal">
         <label class="label">Description</label>
       </div>
-      <!-- eslint-disable-next-line vue/attribute-hyphenation -->
-      <vue-editor v-model="localState.contact.z_detail" :editorToolbar="toolbarButtons" class="quill-editor" />
-      <!-- <vue-editor v-model="localState.contact.z_detail" /> -->
+      <div class="editors-container">
+        <!-- <div class="editor-selector-buttons tabs is-boxed">
+          <ul>
+            <li class="tab is-active">
+              <span>rich text</span>
+            </li>
+            <li class="tab">
+              <span>raw html</span>
+            </li>
+          </ul>
+        </div> -->
+        <div class="tabs is-boxed">
+          <ul>
+            <li :class="localState.contact.descriptionEditor === 'RICH' ? 'is-active' : ''" @click="localState.contact.descriptionEditor = 'RICH'">
+              <a>
+                <span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true" /></span>
+                <span>Rich Text</span>
+              </a>
+            </li>
+            <li :class="localState.contact.descriptionEditor === 'RAW' ? 'is-active' : ''" @click="localState.contact.descriptionEditor = 'RAW'">
+              <a>
+                <span class="icon is-small"><i class="fas fa-code" aria-hidden="true" /></span>
+                <span>Raw HTML</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- eslint-disable vue/attribute-hyphenation -->
+        <vue-editor
+          v-if="localState.contact.descriptionEditor === 'RICH'"
+          v-model="localState.contact.z_detail"
+          :editorToolbar="toolbarButtons" class="quill-editor" />
+        <!-- eslint-enable vue/attribute-hyphenation -->
+        <textarea
+          v-if="localState.contact.descriptionEditor === 'RAW'"
+          v-model="localState.contact.z_detail"
+          rows="13" />
+
+      </div>
     </div>
 
     <div class="field is-horizontal">
@@ -290,6 +326,7 @@
 import Cleave from 'vue-cleave'
 import { VueEditor } from 'vue2-editor'
 import uuid from 'uuid/v4'
+import equal from 'deep-equal'
 import 'cleave.js/dist/addons/cleave-phone.i18n.js'
 import mixins from './mixins'
 import LocationSelector from './LocationSelector.vue'
@@ -312,7 +349,8 @@ const contactDefaults = {
   sms: '',
   z_reservations: '',
   z_detail: '',
-  imageUrl: ''
+  imageUrl: '',
+  descriptionEditor: 'RICH'
 }
 
 export default {
@@ -357,7 +395,9 @@ export default {
   },
   computed: {
     contactIsDirty () {
-      return JSON.stringify(this.localState.contact) !== JSON.stringify(this.contactAtInitialization)
+      const contact = { ...this.localState.contact, descriptionEditor: null }
+      const contactAtInitialization = { ...this.contactAtInitialization, descriptionEditor: null }
+      return !equal(contact, contactAtInitialization)
     },
     allRequiredFieldsPopulated () {
       return this.localState.contact.name
@@ -600,6 +640,13 @@ export default {
      flex-basis: 172px;
     }
     .field.toggle { margin-bottom: .2em; }
+  }
+
+  .editors-container {
+    textarea {
+      width: 480px;
+      padding: .3em;
+    }
   }
 
   .quill-editor {
