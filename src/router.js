@@ -4,13 +4,16 @@ import { auth } from './firebaseInit.js'
 import { promiseTo } from './store/utils.js'
 
 import Home from './components/Home'
-import Archive from './components/Archive'
-import Login from './components/Login'
-import SignUp from './components/SignUp'
-import Resorts from './components/Resorts'
-import Resort from './components/Resort'
-import ExportJson from './components/ExportJson'
-import ForgotPassword from './components/ForgotPassword'
+import {
+  Archive,
+  ExportJson,
+  ForgotPassword,
+  Login,
+  MapManager,
+  Resorts,
+  Resort,
+  SignUp,
+} from './components'
 
 const routes = [
   {
@@ -25,13 +28,12 @@ const routes = [
 
       Promise.all([
         store.dispatch('listenToContacts'),
-        store.dispatch('listenToPublishedContacts')
+        store.dispatch('listenToPublishedContacts'),
       ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })
-
-    }
+    },
   },
   {
     path: '/history',
@@ -41,16 +43,22 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.state.user.superAdmin)
+        return next('/resorts')
       Promise.all([
         store.dispatch('listenToArchiveList'),
         store.dispatch('listenToContacts'),
-        store.dispatch('listenToPublishedContacts')
+        store.dispatch('listenToPublishedContacts'),
       ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })
-    }
+    },
+  },
+  {
+    path: '/maps',
+    name: 'Maps',
+    component: MapManager,
   },
   {
     path: '/resorts',
@@ -58,16 +66,15 @@ const routes = [
     component: Resorts,
     meta: {
       requiresAuth: true,
-      requiresSuperAdmin: true
+      requiresSuperAdmin: true,
     },
     beforeEnter: (to, from, next) => {
       store.commit('SET_RESORT_ID', '')
       store.dispatch('getResorts').then(() => {
-
         store.commit('SET_LOADING_STATE', false)
         next()
       })
-    }
+    },
   },
   {
     path: '/resorts/:resortId',
@@ -75,76 +82,76 @@ const routes = [
     component: Resort,
     meta: {
       requiresAuth: true,
-      requiresSuperAdmin: true
+      requiresSuperAdmin: true,
     },
     beforeEnter: (to, from, next) => {
-      store.dispatch('getResorts')
+      store
+        .dispatch('getResorts')
         .then(() => {
           store.commit('SET_RESORT_ID', to.params.resortId)
           return Promise.all([
             store.dispatch('listenToContacts'),
-            store.dispatch('listenToPublishedContacts')
+            store.dispatch('listenToPublishedContacts'),
           ])
         })
         .then(() => {
           store.commit('SET_LOADING_STATE', false)
           next()
         })
-    }
+    },
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
   },
   {
     path: '/reset',
     name: 'Reset Password',
-    component: ForgotPassword
+    component: ForgotPassword,
   },
   {
     path: '/sign-up/:encodedResortId',
     name: 'Sign Up',
     component: SignUp,
-    props: true
+    props: true,
   },
   {
     path: '/json',
-    component: ExportJson
+    component: ExportJson,
   },
 ]
 
 const router = new VueRouter({ routes })
 
 router.beforeEach(async (to, from, next) => {
-
   if (!to.matched.some(record => record.meta.requiresAuth)) {
-
     // route is open to unauthenticated users
     store.commit('SET_LOADING_STATE', false)
     return next()
   }
 
   /**
-  *
-  * routes below require auth
-  *
-  */
+   *
+   * routes below require auth
+   *
+   */
 
   if (!auth.currentUser) {
     // no Firebase auth user.
     // redirect to login page.
     return next({
-      path: '/login'
+      path: '/login',
     })
   }
-
 
   if (!store.state.user.authorizedIds) {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
-    const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))
+    const [err] = await promiseTo(
+      store.dispatch('getUserData', auth.currentUser)
+    )
     if (err) {
       store.commit('SET_LOADING_STATE', false)
       console.log(err.message)
@@ -153,12 +160,15 @@ router.beforeEach(async (to, from, next) => {
   }
 
   /**
-  *
-  * check user, route for superAdmin privileges
-  *
-  */
+   *
+   * check user, route for superAdmin privileges
+   *
+   */
 
-  if (store.state.user.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
+  if (
+    store.state.user.superAdmin ||
+    !to.matched.some(record => record.meta.requiresSuperAdmin)
+  ) {
     // this is a superAdmin route or does NOT require superAdmin.
     // send user on their way
     next()
@@ -167,8 +177,6 @@ router.beforeEach(async (to, from, next) => {
     // redirect home
     next('/')
   }
-
 })
-
 
 export default router

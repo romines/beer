@@ -4,18 +4,11 @@
     "ecmaVersion": 2017,
     "sourceType": "module"
   },
-  "extends": [
-    "plugin:vue/recommended"
-  ],
-  "plugins": [
-    "vue"
-  ],
+  "extends": ["plugin:vue/essential", "@vue/prettier"],
+  "plugins": ["vue", "prettier"],
   "rules": {
     "vue/require-v-for-key": "off",
-    "vue/html-indent": "off",
     "vue/require-default-prop": "off",
-    "vue/max-attributes-per-line": "off",
-    "vue/html-closing-bracket-newline": "off",
     "vue/attributes-order": "off",
     "no-console": "off",
     "for-direction": "off",

@@ -1,55 +1,55 @@
 <template>
   <div id="app">
-
     <!-- TODO: nav to separate component -->
     <div class="top-nav-container">
       <span class="top-nav">
-        <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>&nbsp;
+        <RouterLink v-if="$store.state.resortId" to="/history">
+          Revision History
+        </RouterLink>
+        &nbsp;
         <span
           v-if="$store.state.user && $store.state.user.uid"
           class="text-and-icon"
           @click="logOut"
-          >
+        >
           <span class="log-out">logout</span>
-          <span class="icon is-small">
-            <i class="fas fa-power-off" /></span>&nbsp;
-          </span>
+          <span class="icon is-small"><i class="fas fa-power-off"/></span>
+          &nbsp;
+        </span>
       </span>
     </div>
 
-    <modal />
+    <Modal />
 
-    <!-- main content area -->
-    <loading-spinner v-show="$store.state.loading" />
+    <!-- main content area.. -->
+    <LoadingSpinner v-show="$store.state.loading" />
     <router-view v-show="!$store.state.loading" class="main" />
     <!--  -->
-
   </div>
 </template>
 
 <script>
-import Modal from './components/Modal.vue'
-import LoadingSpinner from './components/LoadingSpinner.vue'
+import { LoadingSpinner, Modal } from './components'
 export default {
   name: 'App',
   components: {
     Modal,
-    LoadingSpinner
+    LoadingSpinner,
   },
   methods: {
-    logOut () {
+    logOut() {
       this.$store.dispatch('logOut')
       this.$router.replace('/login')
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-@import "~bulma/sass/utilities/initial-variables";
-@import "~bulma/sass/utilities/functions";
+@import '~bulma/sass/utilities/initial-variables';
+@import '~bulma/sass/utilities/functions';
 @import '~bulma/bulma';
-@import "~v-viewer/dist/viewer.css";
+@import '~v-viewer/dist/viewer.css';
 @import 'sharedStyles';
 
 // .contact-margin-setter:last-child .box {
@@ -87,11 +87,10 @@ export default {
 
     .icon {
       position: relative;
-      top: .2em;
-      left: .2em;
+      top: 0.2em;
+      left: 0.2em;
     }
   }
-
 }
 // end temp
 
@@ -114,15 +113,15 @@ export default {
   padding: 3px 4px;
   cursor: move;
   vertical-align: middle;
-  margin-top: -.7em;
-  margin-right: .3em;
+  margin-top: -0.7em;
+  margin-right: 0.3em;
   font-size: 12px;
   font-family: sans-serif;
   letter-spacing: 2px;
   color: #cccccc;
   text-shadow: 1px 0 1px black;
   padding-right: 1.6em;
-  margin-right: .6em;
+  margin-right: 0.6em;
 }
 .grippy::after {
   content: '.. .. .. ..';
@@ -135,11 +134,11 @@ export default {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  margin-top: .88rem;
+  margin-top: 0.88rem;
 }
 
-
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 
