@@ -3,18 +3,15 @@
     <!-- TODO: nav to separate component -->
     <div class="top-nav-container">
       <span class="top-nav">
-        <RouterLink v-if="$store.state.resortId" to="/history">
-          Revision History
-        </RouterLink>
-        &nbsp;
+        <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
+        <router-link v-if="$store.state.resortId" to="/maps">Maps</router-link>
         <span
           v-if="$store.state.user && $store.state.user.uid"
           class="text-and-icon"
           @click="logOut"
         >
-          <span class="log-out">logout</span>
-          <span class="icon is-small"><i class="fas fa-power-off"/></span>
-          &nbsp;
+          <span class="log-out">Logout</span>
+          <span class="icon is-small"><i class="fas fa-power-off"/></span> &nbsp;
         </span>
       </span>
     </div>
@@ -74,8 +71,11 @@ export default {
   a {
     color: blue !important;
   }
-  & > *:not(.text-and-icon) {
-    text-decoration: underline;
+  & > * {
+    margin-right: 0.3em;
+    &:not(.text-and-icon) {
+      text-decoration: underline;
+    }
   }
 
   .text-and-icon {

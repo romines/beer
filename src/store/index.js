@@ -102,8 +102,7 @@ const store = {
             user.authorizedResortIds = userData.authorizedResortIds
 
             // if not superAdmin set resortId here to first (only) resortId in authorized list
-            if (!userData.superAdmin)
-              commit('SET_RESORT_ID', userData.authorizedResortIds[0])
+            if (!userData.superAdmin) commit('SET_RESORT_ID', userData.authorizedResortIds[0])
 
             commit('SET_USER', {
               email: user.email,
@@ -136,9 +135,7 @@ const store = {
         .map(addGroupId)
         .map(addMissingContactDefaults)
 
-      resortData.emergencyGroup = addMissingContactDefaults(
-        resortData.emergencyGroup
-      )
+      resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
 
       return Promise.all([
         RESORTS_REF.doc(resortData.resortId).set(resortData),
@@ -191,12 +188,10 @@ const store = {
     },
 
     logIn({ commit, dispatch }, { email, password, onSuccess }) {
-      return auth
-        .signInWithEmailAndPassword(email, password)
-        .then(onSuccess, error => {
-          commit('SET_LOADING_STATE', false)
-          dispatch('showErrorModal', error.message)
-        })
+      return auth.signInWithEmailAndPassword(email, password).then(onSuccess, error => {
+        commit('SET_LOADING_STATE', false)
+        dispatch('showErrorModal', error.message)
+      })
     },
 
     logOut({ commit }) {
@@ -327,9 +322,7 @@ const store = {
     },
 
     saveContact({ rootState, commit }, { groupId, updatedContact }) {
-      const groupIndex = rootState.contactGroups.findIndex(
-        group => group.id === groupId
-      )
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(
         contact => contact.id === updatedContact.id
       )
@@ -376,16 +369,13 @@ const store = {
     },
 
     duplicateContact({ rootState }, { groupId, contactId }) {
-      const groupIndex = rootState.contactGroups.findIndex(
-        group => group.id === groupId
-      )
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const contactIndex = rootState.contactGroups[groupIndex].list.findIndex(
         contact => contact.id === contactId
       )
 
       const groups = rootState.contactGroups.slice()
-      const contactToCopy =
-        rootState.contactGroups[groupIndex].list[contactIndex]
+      const contactToCopy = rootState.contactGroups[groupIndex].list[contactIndex]
       const id = uuid()
 
       const newContact = {
@@ -418,9 +408,7 @@ const store = {
 
     saveContactList({ rootState }, { groupId, updatedList }) {
       // Used by <draggable /> in ContactList for contact re-ordering
-      const groupIndex = rootState.contactGroups.findIndex(
-        group => group.id === groupId
-      )
+      const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const groups = rootState.contactGroups.slice()
       groups[groupIndex].list = updatedList
       RESORTS_REF.doc(rootState.resortId).update({
@@ -434,9 +422,7 @@ const store = {
       })
 
       if (additionalReferencesExist) {
-        return console.log(
-          'File was not deleted because additional references to it were found'
-        )
+        return console.log('File was not deleted because additional references to it were found')
       }
 
       const refToDestroy = storage.refFromURL(url)
@@ -461,14 +447,9 @@ const store = {
         .doc(fileName.split('.')[0])
         .onSnapshot(() => {
           // if (!doc.data()) return
-          console.log(
-            `scaled image ready: scaled_${fileName.split('.')[0]}.png`
-          )
+          console.log(`scaled image ready: scaled_${fileName.split('.')[0]}.png`)
 
-          const scaledUrl = url.replace(
-            fileName,
-            `scaled_${fileName.split('.')[0]}.png`
-          )
+          const scaledUrl = url.replace(fileName, `scaled_${fileName.split('.')[0]}.png`)
 
           if (rootState.uploadBufferUrl && rootState.uploadBufferUrl === url) {
             // image has been uploaded, but contact has not been saved
@@ -481,8 +462,7 @@ const store = {
                 if (contact.imageUrl === url) {
                   console.log(
                     `setting ${rootState.contactGroups[groupIndex].section} > ${
-                      rootState.contactGroups[groupIndex].list[contactIndex]
-                        .name
+                      rootState.contactGroups[groupIndex].list[contactIndex].name
                     } imageUrl to that of newly scaled image . . .`
                   )
                   commit('UPDATE_IMAGE_URL', {

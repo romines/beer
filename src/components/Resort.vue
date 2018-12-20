@@ -17,23 +17,24 @@ export default {
     SavePublish,
     Contacts,
   },
-  data () {
+  data() {
     return {}
   },
   computed: {
-    name () {
+    name() {
       if (!this.$store.state.resortId) return
-      return this.$store.state.resorts.filter(resort => resort.resortId === this.$store.state.resortId)[0].name
-    }
+      return this.$store.state.resorts.filter(
+        resort => resort.resortId === this.$store.state.resortId
+      )[0].name
+    },
   },
-  created () {
-  },
+  created() {},
   methods: {
-    goBack () {
+    goBack() {
       this.$store.commit('SET_LOADING_STATE', true)
       this.$router.push('/resorts')
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -44,7 +45,7 @@ export default {
     margin-bottom: 0;
   }
   .icon.back {
-    font-size: .8em;
+    font-size: 0.8em;
     // margin-right: .6em;
   }
 }

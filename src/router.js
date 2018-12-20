@@ -43,8 +43,8 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin)
-        return next('/resorts')
+      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+
       Promise.all([
         store.dispatch('listenToArchiveList'),
         store.dispatch('listenToContacts'),
@@ -59,6 +59,14 @@ const routes = [
     path: '/maps',
     name: 'Maps',
     component: MapManager,
+    meta: {
+      requiresAuth: true,
+      requiresSuperAdmin: true,
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.state.resortId) return next('/')
+      next()
+    },
   },
   {
     path: '/resorts',
@@ -149,9 +157,7 @@ router.beforeEach(async (to, from, next) => {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
-    const [err] = await promiseTo(
-      store.dispatch('getUserData', auth.currentUser)
-    )
+    const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))
     if (err) {
       store.commit('SET_LOADING_STATE', false)
       console.log(err.message)
@@ -165,11 +171,8 @@ router.beforeEach(async (to, from, next) => {
    *
    */
 
-  if (
-    store.state.user.superAdmin ||
-    !to.matched.some(record => record.meta.requiresSuperAdmin)
-  ) {
-    // this is a superAdmin route or does NOT require superAdmin.
+  if (store.state.user.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
+    // this is a superAdmin or route does NOT require superAdmin.
     // send user on their way
     next()
   } else {

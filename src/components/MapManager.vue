@@ -1,13 +1,17 @@
 <template>
-  <div>Map Manager component</div>
+  <div class="map-manager">
+    <site-header title="Manage Maps" />
+    <div>Map Manager component</div>
+  </div>
 </template>
 
 <script>
-export default {}
+import SiteHeader from './SiteHeader.vue'
+export default {
+  components: {
+    SiteHeader,
+  },
+}
 </script>
 
-<style scoped lang="scss">
-* {
-  color: red;
-}
-</style>
+<style scoped lang="scss"></style>

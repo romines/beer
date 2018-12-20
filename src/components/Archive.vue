@@ -5,40 +5,55 @@
 
     <div class="archive-filters">
       <span class="filter-label">Filter Archives</span>
-      <span class="button starred is-small" :class="{'active': starredOnly}" @click="starredOnly = !starredOnly">Starred</span>
+      <span
+        class="button starred is-small"
+        :class="{ active: starredOnly }"
+        @click="starredOnly = !starredOnly"
+        >Starred</span
+      >
       <span class="button reverse is-small" @click="newFirst = !newFirst">
         <span class="text">Sort</span>
-        <span class="icon">
-          <i class="fas fa-long-arrow-alt-down" />
-        </span>
-        <span class="icon up">
-          <i class="fas fa-long-arrow-alt-up" />
-        </span>
+        <span class="icon"> <i class="fas fa-long-arrow-alt-down" /> </span>
+        <span class="icon up"> <i class="fas fa-long-arrow-alt-up" /> </span>
       </span>
     </div>
 
     <ul class="archive-list">
-
       <li class="archive published-archive box" v-if="publishedArchive">
-
-        <div class="col col-one icon star" @click="$store.dispatch('toggleArchiveStar', publishedArchive)" :class="{'starred': publishedArchive.starred}">
-          <i class="far fa-star off" />
-          <i class="fas fa-star on" />
+        <div
+          class="col col-one icon star"
+          @click="$store.dispatch('toggleArchiveStar', publishedArchive)"
+          :class="{ starred: publishedArchive.starred }"
+        >
+          <i class="far fa-star off" /> <i class="fas fa-star on" />
         </div>
 
         <div class="col col-two">
           <!--  -->
           <div class="row-one" v-show="editingNameOfArchiveAtIndex !== -2">
-              <span class="name">{{ publishedArchive.name }}</span>
-              <span class="icon edit is-small" @click.stop="editArchiveName(publishedArchive, -2)">
-                <i class="fas fa-edit" />
-              </span>
+            <span class="name">{{ publishedArchive.name }}</span>
+            <span class="icon edit is-small" @click.stop="editArchiveName(publishedArchive, -2)">
+              <i class="fas fa-edit" />
+            </span>
           </div>
           <!-- Or -->
-          <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === -2">
-            <input class="input is-small" v-model="archiveNameDraft" :ref="'publishedArchiveNameInput'" placeholder="Archive Name">
+          <div
+            class="row-one name-editor field is-grouped"
+            v-show="editingNameOfArchiveAtIndex === -2"
+          >
+            <input
+              class="input is-small"
+              v-model="archiveNameDraft"
+              :ref="'publishedArchiveNameInput'"
+              placeholder="Archive Name"
+            />
             <span class="actions" @click.stop>
-              <button class="button is-primary is-small" @click.stop.prevent="saveArchiveName(publishedArchive)">Save</button>
+              <button
+                class="button is-primary is-small"
+                @click.stop.prevent="saveArchiveName(publishedArchive)"
+              >
+                Save
+              </button>
               <button class="button is-small" @click.stop="cancelArchiveNameEdit">Cancel</button>
             </span>
           </div>
@@ -47,19 +62,19 @@
           <div class="row-two date" v-show="editingNameOfArchiveAtIndex !== -2">
             {{ getDateString(publishedArchive.date) }}
           </div>
-
         </div>
 
-        <div class="col col-three actions">
-          <span class="tag is-light">Published</span>
-        </div>
+        <div class="col col-three actions"><span class="tag is-light">Published</span></div>
       </li>
 
       <li class="archive box" v-for="(archive, index) in remainder" :key="archive.date">
         <div class="col-one">
-          <span class="icon star" @click="$store.dispatch('toggleArchiveStar', archive)" :class="{'starred': archive.starred}">
-            <i class="far fa-star off" />
-            <i class="fas fa-star on" />
+          <span
+            class="icon star"
+            @click="$store.dispatch('toggleArchiveStar', archive)"
+            :class="{ starred: archive.starred }"
+          >
+            <i class="far fa-star off" /> <i class="fas fa-star on" />
           </span>
         </div>
         <div class="col-two">
@@ -71,20 +86,38 @@
             </span>
           </div>
           <!-- Or -->
-          <div class="row-one name-editor field is-grouped" v-show="editingNameOfArchiveAtIndex === index">
-            <input class="input is-small archive-name" v-model="archiveNameDraft" :ref="'archiveNameInputs'" placeholder="Archive Name">
+          <div
+            class="row-one name-editor field is-grouped"
+            v-show="editingNameOfArchiveAtIndex === index"
+          >
+            <input
+              class="input is-small archive-name"
+              v-model="archiveNameDraft"
+              :ref="'archiveNameInputs'"
+              placeholder="Archive Name"
+            />
             <span class="actions" @click.stop>
-              <button class="button is-primary is-small" @click.stop.prevent="saveArchiveName(archive)">Save</button>
+              <button
+                class="button is-primary is-small"
+                @click.stop.prevent="saveArchiveName(archive)"
+              >
+                Save
+              </button>
               <button class="button is-small" @click.stop="cancelArchiveNameEdit">Cancel</button>
             </span>
           </div>
           <!--  -->
-          <div class="row-two date" v-show="editingNameOfArchiveAtIndex !== index">{{ getDateString(archive.date) }}</div>
-
+          <div class="row-two date" v-show="editingNameOfArchiveAtIndex !== index">
+            {{ getDateString(archive.date) }}
+          </div>
         </div>
         <div class="col col-three actions">
-          <span class="button is-small is-info restore" @click="restoreAndPublish(archive)">Restore + Publish</span>
-          <span class="button is-small is-success restore-publish" @click="restoreArchive(archive)">Restore</span>
+          <span class="button is-small is-info restore" @click="restoreAndPublish(archive)"
+            >Restore + Publish</span
+          >
+          <span class="button is-small is-success restore-publish" @click="restoreArchive(archive)"
+            >Restore</span
+          >
           <span class="button delete-archive is-small" @click="deleteArchive(archive)">
             <i class="fas fa-trash-alt" />
           </span>
@@ -102,45 +135,50 @@ import moment from 'moment'
 export default {
   components: {
     SavePublish,
-    SiteHeader
+    SiteHeader,
   },
-  data () {
+  data() {
     return {
       newFirst: true,
       starredOnly: false,
       newArchive: {
         name: '',
-        description: ''
+        description: '',
       },
       archiveNameDraft: '',
-      editingNameOfArchiveAtIndex: -1
+      editingNameOfArchiveAtIndex: -1,
     }
   },
   computed: {
-    archives () {
+    archives() {
       if (!this.$store.state.archives.archiveList) return []
-      const sorted = Object.keys(this.$store.state.archives.archiveList).map(key => {
-        return {
-          ...this.$store.state.archives.archiveList[key],
-          key
-        }
-      }).sort((a, b) => a.date - b.date)
+      const sorted = Object.keys(this.$store.state.archives.archiveList)
+        .map(key => {
+          return {
+            ...this.$store.state.archives.archiveList[key],
+            key,
+          }
+        })
+        .sort((a, b) => a.date - b.date)
       return this.newFirst ? sorted.reverse() : sorted
     },
-    publishedArchive () {
-      return this.archives.filter(({key}) =>  key === this.$store.state.archives.publishedContactsKey )[0]
+    publishedArchive() {
+      return this.archives.filter(
+        ({ key }) => key === this.$store.state.archives.publishedContactsKey
+      )[0]
     },
-    remainder () {
-      const remaining = this.archives.filter(({ key }) =>  key !== this.$store.state.archives.publishedContactsKey )
+    remainder() {
+      const remaining = this.archives.filter(
+        ({ key }) => key !== this.$store.state.archives.publishedContactsKey
+      )
       return this.starredOnly ? remaining.filter(archive => archive.starred) : remaining
     },
   },
   methods: {
-    getDateString (time) {
+    getDateString(time) {
       return moment(time).format('lll')
     },
-    deleteArchive (archive) {
-
+    deleteArchive(archive) {
       const onConfirm = () => {
         this.$store.dispatch('deleteArchive', archive.key).then(() => {
           this.$store.dispatch('showSuccessModal', 'Archive deleted successfully')
@@ -150,29 +188,30 @@ export default {
       this.$store.commit('SHOW_MODAL', {
         heading: `Are you sure you want to delete ${archive.name}?`,
         message: 'This cannot be undone.',
-        onConfirm
+        onConfirm,
       })
-
     },
 
-    editArchiveName (archive, index) {
+    editArchiveName(archive, index) {
       this.archiveNameDraft = archive.name
       this.editingNameOfArchiveAtIndex = index
-      const inputRef = index > -2 ? this.$refs.archiveNameInputs[index] : this.$refs.publishedArchiveNameInput
+      const inputRef =
+        index > -2 ? this.$refs.archiveNameInputs[index] : this.$refs.publishedArchiveNameInput
       this.$nextTick(() => inputRef.focus())
     },
 
-    cancelArchiveNameEdit () {
+    cancelArchiveNameEdit() {
       this.editingNameOfArchiveAtIndex = -1
       this.archiveNameDraft = ''
     },
 
-    saveArchiveName ({ key }) {
-      this.$store.dispatch('saveArchiveName', { key, name: this.archiveNameDraft }).then(() => this.cancelArchiveNameEdit())
+    saveArchiveName({ key }) {
+      this.$store
+        .dispatch('saveArchiveName', { key, name: this.archiveNameDraft })
+        .then(() => this.cancelArchiveNameEdit())
     },
 
-    restoreArchive (archive) {
-
+    restoreArchive(archive) {
       const doRestore = () => {
         this.$store.commit('SET_LOADING_STATE', true)
         this.$store.dispatch('restoreArchive', archive).then(() => {
@@ -193,14 +232,14 @@ export default {
         this.$store.commit('SHOW_MODAL', {
           heading: 'Discard unpublished changes?',
           message: 'Restoring this version will overwrite your changes.',
-          onConfirm: doRestore
+          onConfirm: doRestore,
         })
       } else {
         doRestore()
       }
     },
 
-    restoreAndPublish (archive) {
+    restoreAndPublish(archive) {
       const doRestorePublish = () => {
         this.$store.commit('SET_LOADING_STATE', true)
         this.$store.dispatch('restoreAndPublish', archive).then(() => {
@@ -215,145 +254,144 @@ export default {
         this.$store.commit('SHOW_MODAL', {
           heading: 'Discard unpublished changes?',
           message: 'Restoring this version will overwrite your changes.',
-          onConfirm: doRestorePublish
+          onConfirm: doRestorePublish,
         })
       } else {
         doRestorePublish()
       }
-    }
-  }
-
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-  @import '../sharedStyles.scss';
-  $starYellow: #ffd400;
-  .archive-list {
-    .archive {
-      display: flex;
-      align-items: center;
-      padding-right: 0;
-
-      .col-one {
-        flex-grow: 0;
-      }
-
-      .col-two {
-        flex-grow: 1;
-      }
-
-      .col-three {
-        flex: 0 0 9em;
-        // border-left: 1px solid grey;
-        justify-content: center;
-        display: inline-flex;
-        .button {
-          margin: 0 .4em;
-        }
-      }
-
-
-
-      // .icon {
-      //   margin-top: -.22em;
-      // }
-      // .col-two
-        .star {
-          margin-right: .6em;
-          font-size: 1.3em;
-
-          &:not(.starred) {
-            opacity: .65;
-            .on { display: none; }
-          }
-          &.starred {
-            color: $starYellow;
-            .off { display: none; }
-          }
-        }
-        .edit {
-          opacity: .7;
-          margin-left: 1em;
-          font-size: .7em;
-        }
-
-      .col-two .row-one {
-        margin-top: -.6em;
-        margin-bottom: -.3em;
-        display: flex;
-        align-items: center;
-      }
-
-      .name {
-        font-size: 1.25em;
-      }
-      .name-editor {
-        display: flex;
-        padding-top: .3em;
-        // input {
-        //   width: 74%;
-        // }
-        .actions {
-          flex: 0 0 0;
-          display: flex;
-          flex-wrap: nowrap;
-          padding: 0 .6em;
-          .button {
-            margin: .4em;
-          }
-        }
-      }
-
-      .date {
-        font-size: .7em;
-        margin-top: .3em;
-        margin-bottom: -.9em
-      }
-
-      &.published-archive {
-        border: 2px solid $mildNavy;
-        margin-bottom: calc(1.5rem - 2px);
-        margin-top: 1em;
-        .tag {
-          border: 1px solid $boneGrey;
-        }
-
-      }
-
-    }
-  }
-  .archive-filters {
-    border-top: 1px solid $boneGrey;
-    border-bottom: 1px solid $boneGrey;
-    padding: .2em 0;
-    margin-bottom: .6em;
+@import '../sharedStyles.scss';
+$starYellow: #ffd400;
+.archive-list {
+  .archive {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    padding-left: 10%;
-    .filter-label {
-      font-size: .8em;
-      opacity: .8;
-      margin-right: .8em;
+    padding-right: 0;
+
+    .col-one {
+      flex-grow: 0;
     }
-    .button {
-      margin-right: .3em;
+
+    .col-two {
+      flex-grow: 1;
+    }
+
+    .col-three {
+      flex: 0 0 9em;
+      // border-left: 1px solid grey;
+      justify-content: center;
+      display: inline-flex;
+      .button {
+        margin: 0 0.4em;
+      }
+    }
+
+    // .icon {
+    //   margin-top: -.22em;
+    // }
+    // .col-two
+    .star {
+      margin-right: 0.6em;
+      font-size: 1.3em;
+
+      &:not(.starred) {
+        opacity: 0.65;
+        .on {
+          display: none;
+        }
+      }
       &.starred {
-        border: 4px solid $starYellow;
-        &:not(.active) {
-          opacity: .5;
+        color: $starYellow;
+        .off {
+          display: none;
         }
       }
     }
-    .reverse {
-      .icon {
-        opacity: .8;
-        font-size: .8em;
-        &.up {
-          margin-left: -.75em;
+    .edit {
+      opacity: 0.7;
+      margin-left: 1em;
+      font-size: 0.7em;
+    }
+
+    .col-two .row-one {
+      margin-top: -0.6em;
+      margin-bottom: -0.3em;
+      display: flex;
+      align-items: center;
+    }
+
+    .name {
+      font-size: 1.25em;
+    }
+    .name-editor {
+      display: flex;
+      padding-top: 0.3em;
+      // input {
+      //   width: 74%;
+      // }
+      .actions {
+        flex: 0 0 0;
+        display: flex;
+        flex-wrap: nowrap;
+        padding: 0 0.6em;
+        .button {
+          margin: 0.4em;
         }
+      }
+    }
+
+    .date {
+      font-size: 0.7em;
+      margin-top: 0.3em;
+      margin-bottom: -0.9em;
+    }
+
+    &.published-archive {
+      border: 2px solid $mildNavy;
+      margin-bottom: calc(1.5rem - 2px);
+      margin-top: 1em;
+      .tag {
+        border: 1px solid $boneGrey;
       }
     }
   }
+}
+.archive-filters {
+  border-top: 1px solid $boneGrey;
+  border-bottom: 1px solid $boneGrey;
+  padding: 0.2em 0;
+  margin-bottom: 0.6em;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 10%;
+  .filter-label {
+    font-size: 0.8em;
+    opacity: 0.8;
+    margin-right: 0.8em;
+  }
+  .button {
+    margin-right: 0.3em;
+    &.starred {
+      border: 4px solid $starYellow;
+      &:not(.active) {
+        opacity: 0.5;
+      }
+    }
+  }
+  .reverse {
+    .icon {
+      opacity: 0.8;
+      font-size: 0.8em;
+      &.up {
+        margin-left: -0.75em;
+      }
+    }
+  }
+}
 </style>
