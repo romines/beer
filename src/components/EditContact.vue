@@ -307,9 +307,7 @@ import { VueEditor } from 'vue2-editor'
 import uuid from 'uuid/v4'
 import equal from 'deep-equal'
 import 'cleave.js/dist/addons/cleave-phone.i18n.js'
-import mixins from './mixins'
-import LocationSelector from './LocationSelector.vue'
-import ImageUpload from './ImageUpload.vue'
+import { ImageUpload, LocationSelector, mixins } from './'
 
 // fields that might be missing should be initialized with default values to ensure reactivity
 const contactDefaults = {

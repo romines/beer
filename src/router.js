@@ -9,9 +9,9 @@ import {
   ExportJson,
   ForgotPassword,
   Login,
-  MapManager,
+  Maps,
   Resorts,
-  Resort,
+  EditResort,
   SignUp,
 } from './components'
 
@@ -58,7 +58,7 @@ const routes = [
   {
     path: '/maps',
     name: 'Maps',
-    component: MapManager,
+    component: Maps,
     meta: {
       requiresAuth: true,
       requiresSuperAdmin: true,
@@ -88,7 +88,7 @@ const routes = [
   {
     path: '/resorts/:resortId',
     name: 'Resort Home',
-    component: Resort,
+    component: EditResort,
     meta: {
       requiresAuth: true,
       requiresSuperAdmin: true,

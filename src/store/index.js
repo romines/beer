@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { auth, firestore, storage, database } from '../firebaseInit.js'
+import { auth, firestore, storage } from '../firebaseInit.js'
 
 import uuid from 'uuid/v4'
 import 'babel-polyfill'
@@ -14,8 +14,6 @@ import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
-const SEED_DATA = {} // this is going away
-// const USER_DATA = userData.users
 const defaultModalContents = {
   heading: '',
   message: '',

@@ -83,7 +83,7 @@
 
 <script>
 import draggable from 'vuedraggable'
-import EditContact from './EditContact'
+import { EditContact } from './'
 
 export default {
   components: {
