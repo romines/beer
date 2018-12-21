@@ -2,56 +2,58 @@
   <draggable
     class="contact-list"
     v-model="draggableList"
-    :options="{handle:'.grippy'}"
-    @start="drag=true; editingContactId = '';"
-    @end="drag=false">
-
+    :options="{ handle: '.grippy' }"
+    @start="
+      drag = true
+      editingContactId = ''
+    "
+    @end="drag = false"
+  >
     <div
       class="contact contact-margin-setter"
       v-for="contact in draggableList"
       :key="contact.id"
       :ref="'contact_' + contact.id.substring(0, 8)"
-      :class="{'box': contactIsOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
-      :data-contact-id="contact.id">
+      :class="{ box: contactIsOpen(contact.id), highlighted: contactHighlighted(contact.id) }"
+      :data-contact-id="contact.id"
+    >
       <!--
         To increase clickable surface area,
         contact header is .box if contact is closed
          . . . otherwise whole contact is .box
                                                 -->
 
-      <div class="contact-header"
-           :class="{'box': !contactIsOpen(contact.id), 'highlighted': contactHighlighted(contact.id)}"
-           @click.stop="onContactHeaderClick(contact)">
-        <span class="name">
-          <span class="grippy" v-if="sortable" />
-          {{ contact.name }}
-        </span>
+      <div
+        class="contact-header"
+        :class="{ box: !contactIsOpen(contact.id), highlighted: contactHighlighted(contact.id) }"
+        @click.stop="onContactHeaderClick(contact)"
+      >
+        <span class="name"> <span class="grippy" v-if="sortable" /> {{ contact.name }} </span>
 
         <span class="tags-and-chevron">
           <span class="tag-group">
-            <span class="tag winter"
-              :class="{'is-active': deriveTagState(contact, 'winter')}"
+            <span
+              class="tag winter"
+              :class="{ 'is-active': deriveTagState(contact, 'winter') }"
               @click.stop="toggleTag(contact, 'winter')"
               v-show="$store.state.resortId !== 'russell_lands'"
             >
-              <span class="icon is-small">
-                <i class="fas fa-snowflake" />
-              </span>
-              Winter
+              <span class="icon is-small"> <i class="fas fa-snowflake" /> </span> Winter
             </span>
-            <span class="tag summer"
-              :class="{'is-active': deriveTagState(contact, 'summer')}"
+            <span
+              class="tag summer"
+              :class="{ 'is-active': deriveTagState(contact, 'summer') }"
               @click.stop="toggleTag(contact, 'summer')"
               v-show="$store.state.resortId !== 'russell_lands'"
             >
-              <span class="icon is-small">
-                <i class="fas fa-umbrella-beach" />
-              </span>
-              Summer
+              <span class="icon is-small"> <i class="fas fa-umbrella-beach" /> </span> Summer
             </span>
-            <span class="tag dining" :class="{'is-active': deriveTagState(contact, 'dining')}" @click.stop="toggleTag(contact, 'dining')">
-              <img src="../assets/knife-and-fork.svg" class="">
-              Dining
+            <span
+              class="tag dining"
+              :class="{ 'is-active': deriveTagState(contact, 'dining') }"
+              @click.stop="toggleTag(contact, 'dining')"
+            >
+              <img src="../assets/knife-and-fork.svg" class="" /> Dining
             </span>
           </span>
           <span class="icon is-small" v-show="!contactIsOpen(contact.id)">
@@ -61,7 +63,7 @@
             <i class="fas fa-chevron-up" />
           </span>
         </span>
-      <!-- end .contact-header -->
+        <!-- end .contact-header -->
       </div>
 
       <edit-contact
@@ -71,11 +73,11 @@
         :contact-id="contact.id"
         :contact="contact"
         @closeContact="closeContact"
-        @openSibling="openContact" />
+        @openSibling="openContact"
+      />
 
-    <!-- end .contact -->
+      <!-- end .contact -->
     </div>
-
   </draggable>
 </template>
 
@@ -86,26 +88,24 @@ import EditContact from './EditContact'
 export default {
   components: {
     draggable,
-    EditContact
+    EditContact,
   },
   props: {
     groupIndex: {
-      type: Number
+      type: Number,
     },
     groupId: {
-      type: String
+      type: String,
     },
     groupIsOpen: {
-      type: Boolean
+      type: Boolean,
     },
   },
-  data () {
+  data() {
     return {
       editingContactId: '',
       highlightedContactId: '',
-      openContactTagBuffer: {
-
-      }
+      openContactTagBuffer: {},
     }
   },
   computed: {
@@ -120,91 +120,85 @@ export default {
       },
       set(updatedList) {
         this.$store.dispatch('saveContactList', { updatedList, groupId: this.groupId })
-      }
+      },
     },
-    sortable () {
-        return this.$store.state.contactGroups[this.groupIndex].noSort
-    }
-
+    sortable() {
+      return this.$store.state.contactGroups[this.groupIndex].noSort
+    },
   },
   watch: {
     groupIsOpen(open) {
       // when group closes, close open contact
       if (!open) this.editingContactId = ''
-    }
+    },
   },
-  created () {
-  },
+  created() {},
   methods: {
-    contactIsOpen (id) {
+    contactIsOpen(id) {
       return id === this.editingContactId
     },
-    contactHighlighted (id) {
+    contactHighlighted(id) {
       return id === this.highlightedContactId
     },
-    openContact ({ id, tags, scrollTo }) {
+    openContact({ id, tags, scrollTo }) {
       // NB: dirty state should already be checked for; openContact does opening only
       this.editingContactId = id
       this.openContactTagBuffer = tags
 
       if (scrollTo) {
         this.$nextTick(() => {
-          this.scrollToElement({ id, highlight: true})
+          this.scrollToElement({ id, highlight: true })
         })
       }
     },
-    closeContact ({ resetDirtyState, onConfirmDirtyClose, contactId, highlight, scrollIntoView }) {
-
+    closeContact({ resetDirtyState, onConfirmDirtyClose, contactId, highlight, scrollIntoView }) {
       const onConfirm = () => {
-
-        if (this.$store.state.uploadBufferUrl) this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)
+        if (this.$store.state.uploadBufferUrl)
+          this.$store.dispatch('destroyImageFile', this.$store.state.uploadBufferUrl)
 
         this.$store.commit('SET_CONTACT_DIRTY_STATE', false)
         this.editingContactId = ''
         this.openContactTagBuffer = {}
         onConfirmDirtyClose && onConfirmDirtyClose()
         this.$store.commit('CLOSE_MODAL')
-        if (scrollIntoView) this.$nextTick(() => { this.scrollToElement({ id: contactId, highlight }) })
-
+        if (scrollIntoView)
+          this.$nextTick(() => {
+            this.scrollToElement({ id: contactId, highlight })
+          })
       }
 
       if (this.$store.state.openContactIsDirty && !resetDirtyState) {
-
         this.$store.commit('SHOW_MODAL', {
           heading: 'You have unsaved changes',
           confirmButtonLabel: 'Discard Changes',
-          onConfirm
+          onConfirm,
         })
-
       } else {
         return onConfirm()
       }
-
     },
-    onContactHeaderClick ({ id, tags }) {
-
-      if (this.editingContactId === '') { // none are open
+    onContactHeaderClick({ id, tags }) {
+      if (this.editingContactId === '') {
+        // none are open
         this.openContact({ id, tags, scrollTo: true })
       } else {
         const closeOptions = {
           contactId: id,
           resetDirtyState: false,
-          onConfirmDirtyClose: this.contactIsOpen(id)               // header of open (+ dirty) contact was clicked
+          onConfirmDirtyClose: this.contactIsOpen(id) // header of open (+ dirty) contact was clicked
             ? () => null
-            : () => this.openContact({ id, tags, scrollTo: true })  // header of another contact was clicked
+            : () => this.openContact({ id, tags, scrollTo: true }), // header of another contact was clicked
         }
         this.closeContact(closeOptions)
       }
     },
-    toggleTag (contact, tag) {
-
+    toggleTag(contact, tag) {
       if (this.editingContactId === contact.id) {
         //
         // this contact is open. dispatch action to mutate local state in EditContact
 
         this.openContactTagBuffer[tag] = !this.openContactTagBuffer[tag]
-        this.$store.dispatch('toggleOpenContactTag', {...this.openContactTagBuffer})
-
+        this.$store.dispatch('toggleOpenContactTag', { ...this.openContactTagBuffer })
       } else if (this.$store.state.openContactIsDirty) {
         //
         // another contact is open + dirty. don't do it!
@@ -215,32 +209,26 @@ export default {
           confirmButtonLabel: 'OK',
           hideCancel: true,
         })
-
       } else {
         //
         // go ahead and save change to tags
 
-        const tags = {...contact.tags}
+        const tags = { ...contact.tags }
         tags[tag] = !tags[tag]
 
         const payload = {
           groupId: this.groupId,
-          updatedContact: {...contact, tags}
+          updatedContact: { ...contact, tags },
         }
 
         this.$store.dispatch('saveContact', payload)
-
       }
-
-
     },
-    deriveTagState (contact, tag) {
-      const tags = (contact.id === this.editingContactId)
-        ? this.openContactTagBuffer
-        : contact.tags
+    deriveTagState(contact, tag) {
+      const tags = contact.id === this.editingContactId ? this.openContactTagBuffer : contact.tags
       return tags[tag]
     },
-    sortByName (list) {
+    sortByName(list) {
       return list.slice().sort((a, b) => {
         if (a.name.toUpperCase() < b.name.toUpperCase()) {
           return -1
@@ -252,75 +240,78 @@ export default {
         }
       })
     },
-    scrollToElement ({ id, highlight }) {
+    scrollToElement({ id, highlight }) {
       const contactEl = document.querySelector(`[data-contact-id='${id}']`)
-      contactEl && window.scrollTo({
-        'behavior': 'smooth',
-        'left': 0,
-        'top': contactEl.offsetTop -45
-      })
+      contactEl &&
+        window.scrollTo({
+          behavior: 'smooth',
+          left: 0,
+          top: contactEl.offsetTop - 45,
+        })
       if (highlight) {
         this.highlightedContactId = id
         setTimeout(() => {
           this.highlightedContactId = ''
         }, 2600)
       }
-
     },
-    getContactElById (id) {
+    getContactElById(id) {
       return this.$refs[`contact_${id.substring(0, 8)}`][0]
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-  .contact-list {
-    margin-top: .6em;
-  }
-  .contact {
-    // regretable DOM organization leads to weird styles
-    &.highlighted {
-      .box {
-        border: solid 5px rgba(66, 79, 173, 0.43);
-      }
-    }
-    &.highlighted.box {
+.contact-list {
+  margin-top: 0.6em;
+}
+.contact {
+  // regretable DOM organization leads to weird styles
+  &.highlighted {
+    .box {
       border: solid 5px rgba(66, 79, 173, 0.43);
     }
   }
-  .contact-header {
+  &.highlighted.box {
+    border: solid 5px rgba(66, 79, 173, 0.43);
+  }
+}
+.contact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  // transition: border-width 0.6s linear;
+  .tags-and-chevron {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    cursor: pointer;
-    // transition: border-width 0.6s linear;
-    .tags-and-chevron {
+    .tag-group {
       display: flex;
       align-items: center;
-      .tag-group {
-        display: flex;
-        align-items: center;
-        .tag {
-          margin-right: .3em;
-          &:hover { filter: invert(4%); }
-          &:not(.is-active) {
-            opacity: .3;
-            &:hover {
-              opacity: .7;
-              filter: invert(14%);
-            }
+      .tag {
+        margin-right: 0.3em;
+        &:hover {
+          filter: invert(4%);
+        }
+        &:not(.is-active) {
+          opacity: 0.3;
+          &:hover {
+            opacity: 0.7;
+            filter: invert(14%);
           }
-          &:not(.dining) .icon { margin-right: .4em; }
-          &.dining img {
-            width: 12px;
-            height: 12px;
-            margin-right: .3em;
-            opacity: .7;
-          }
-
+        }
+        &:not(.dining) .icon {
+          margin-right: 0.4em;
+        }
+        &.dining img {
+          width: 12px;
+          height: 12px;
+          margin-right: 0.3em;
+          opacity: 0.7;
         }
       }
     }
   }
+}
 </style>

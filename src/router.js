@@ -27,7 +27,7 @@ const routes = [
       if (store.state.user.superAdmin) return next('/resorts')
 
       Promise.all([
-        store.dispatch('listenToContacts'),
+        store.dispatch('listenToResortRoot'),
         store.dispatch('listenToPublishedContacts'),
       ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
@@ -47,7 +47,7 @@ const routes = [
 
       Promise.all([
         store.dispatch('listenToArchiveList'),
-        store.dispatch('listenToContacts'),
+        store.dispatch('listenToResortRoot'),
         store.dispatch('listenToPublishedContacts'),
       ]).then(() => {
         store.commit('SET_LOADING_STATE', false)
@@ -63,8 +63,9 @@ const routes = [
       requiresAuth: true,
       requiresSuperAdmin: true,
     },
-    beforeEnter: (to, from, next) => {
+    beforeEnter: async (to, from, next) => {
       if (!store.state.resortId) return next('/')
+      await store.dispatch('listenToResortRoot')
       next()
     },
   },
@@ -98,7 +99,7 @@ const routes = [
         .then(() => {
           store.commit('SET_RESORT_ID', to.params.resortId)
           return Promise.all([
-            store.dispatch('listenToContacts'),
+            store.dispatch('listenToResortRoot'),
             store.dispatch('listenToPublishedContacts'),
           ])
         })
@@ -127,6 +128,10 @@ const routes = [
   {
     path: '/json',
     component: ExportJson,
+    beforeEnter: (to, from, next) => {
+      if (!store.state.resortId) return next('/')
+      next()
+    },
   },
 ]
 

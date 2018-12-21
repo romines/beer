@@ -1,68 +1,51 @@
 <template>
   <div class="edit-contact">
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Name</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Name</label></div>
       <div class="control has-icons-left">
-        <input
-          v-model.trim="localState.contact.name"
-          class="input"
-          placeholder="Name">
-        <span class="icon is-small is-left">
-          <i class="fas fa-address-book" />
-        </span>
+        <input v-model.trim="localState.contact.name" class="input" placeholder="Name" />
+        <span class="icon is-small is-left"> <i class="fas fa-address-book" /> </span>
       </div>
     </div>
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Phone Number</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Phone Number</label></div>
       <div class="control has-icons-left">
-
         <cleave
           v-model="localState.contact.number"
           class="input"
-          :class="{ 'is-danger': !phoneIsValid(localState.contact.number)}"
+          :class="{ 'is-danger': !phoneIsValid(localState.contact.number) }"
           :options="{ phone: true, phoneRegionCode: $store.state.resortMeta.country }"
-          placeholder="Phone" />
+          placeholder="Phone"
+        />
 
-        <span class="icon is-small is-left">
-          <i class="fas fa-phone" />
-        </span>
+        <span class="icon is-small is-left"> <i class="fas fa-phone" /> </span>
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">SMS</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">SMS</label></div>
       <div class="control has-icons-left">
         <cleave
           v-model="localState.contact.sms"
           class="input"
           :options="{ phone: true, phoneRegionCode: $store.state.resortMeta.country }"
           :class="{ 'is-danger': !phoneIsValid(localState.contact.sms) }"
-          placeholder="SMS" />
-        <span class="icon is-small is-left">
-          <i class="fas fa-mobile-alt" />
-        </span>
+          placeholder="SMS"
+        />
+        <span class="icon is-small is-left"> <i class="fas fa-mobile-alt" /> </span>
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Website</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Website</label></div>
       <div class="control has-icons-left has-icons-right">
         <input
           v-model.trim="localState.contact.url"
           :class="{ 'is-danger': !urlIsValid(localState.contact.url) }"
           class="input"
-          placeholder="Website">
-        <span class="icon is-small is-left">
-          <i class="fas fa-globe" />
-        </span>
+          placeholder="Website"
+        />
+        <span class="icon is-small is-left"> <i class="fas fa-globe" /> </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.url">
           <a :href="localState.contact.url" target="_blank" tabindex="-1">
             <i class="fas fa-external-link-alt" />
@@ -72,42 +55,35 @@
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Email Address</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Email Address</label></div>
       <div class="control has-icons-left">
         <input
           v-model.trim="localState.contact.mailto"
           class="input"
           :class="{ 'is-danger': !emailIsValid(localState.contact.mailto) }"
-          placeholder="Email Address">
-        <span class="icon is-small is-left">
-          <i class="fas fa-envelope" />
-        </span>
+          placeholder="Email Address"
+        />
+        <span class="icon is-small is-left"> <i class="fas fa-envelope" /> </span>
       </div>
     </div>
 
     <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'">
       <div class="title is-6">Contact Active</div>
       <div class="field is-horizontal toggle">
-        <div class="field-label is-normal">
-          <label class="label">Summer</label>
-        </div>
+        <div class="field-label is-normal"><label class="label">Summer</label></div>
         <div class="toggle-container control is-expanded">
           <label for="summer" class="switch">
-            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer">
+            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer" />
             <span class="slider round" />
           </label>
         </div>
       </div>
 
       <div class="field is-horizontal toggle">
-        <div class="field-label is-normal">
-          <label class="label">Winter</label>
-        </div>
+        <div class="field-label is-normal"><label class="label">Winter</label></div>
         <div class="toggle-container control is-expanded">
           <label for="winter" class="switch">
-            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter">
+            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter" />
             <span class="slider round" />
           </label>
         </div>
@@ -115,30 +91,25 @@
     </div>
 
     <div class="field is-horizontal toggle">
-      <div class="field-label is-normal">
-        <label class="label">Dining</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Dining</label></div>
       <div class="toggle-container control is-expanded">
         <label for="dining" class="switch">
-          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining">
+          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining" />
           <span class="slider round" />
         </label>
       </div>
     </div>
 
     <div class="field is-horizontal" v-show="localState.contact.tags.dining">
-      <div class="field-label is-normal">
-        <label class="label">Menu URL</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Menu URL</label></div>
       <div class="control has-icons-left has-icons-right">
         <input
           v-model.trim="localState.contact.menu"
           :class="{ 'is-danger': !urlIsValid(localState.contact.menu) }"
           class="input"
-          placeholder="Menu URL">
-        <span class="icon is-small is-left">
-          <i class="fas fa-globe" />
-        </span>
+          placeholder="Menu URL"
+        />
+        <span class="icon is-small is-left"> <i class="fas fa-globe" /> </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.menu">
           <a :href="localState.contact.menu" target="_blank" tabindex="-1">
             <i class="fas fa-external-link-alt" />
@@ -148,18 +119,15 @@
     </div>
 
     <div class="field is-horizontal" v-show="localState.contact.tags.dining">
-      <div class="field-label is-normal">
-        <label class="label">Reservations URL</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Reservations URL</label></div>
       <div class="control has-icons-left has-icons-right">
         <input
           v-model.trim="localState.contact.z_reservations"
           :class="{ 'is-danger': !urlIsValid(localState.contact.z_reservations) }"
           class="input"
-          placeholder="Reservations URL">
-        <span class="icon is-small is-left">
-          <i class="fas fa-globe" />
-        </span>
+          placeholder="Reservations URL"
+        />
+        <span class="icon is-small is-left"> <i class="fas fa-globe" /> </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.z_reservations">
           <a :href="localState.contact.z_reservations" tabindex="-1" target="_blank">
             <i class="fas fa-external-link-alt" />
@@ -173,18 +141,17 @@
       :coordinate-string="localState.contact.rect"
       :map-id="localState.contact.mapId"
       @coordinateClick="onCoordinateClick"
-      @resetMapCoordinates="resetMapCoordinates" />
+      @resetMapCoordinates="resetMapCoordinates"
+    />
 
     <div class="field is-horizontal" v-if="matchingLocations && matchingLocations.length">
-      <div class="field-label is-normal">
-        <label class="label">&nbsp;</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">&nbsp;</label></div>
       <div class="matching-pins">
         <div class="proximity-warning">
           <div class="heading">This contact shares coordinates with the following contact(s)</div>
         </div>
         <ul class="location-group">
-          <li class="location" v-for="location in matchingLocations" :key="`${location.name}_${location.x}_${location.y}`">
+          <li class="location" v-for="location in matchingLocations" :key="location.id">
             <span class="name">{{ location.name }}</span>
             <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
           </li>
@@ -192,36 +159,41 @@
       </div>
     </div>
 
-    <div class="field is-horizontal" v-if="groupedNearbyLocations && Object.keys(groupedNearbyLocations).length">
-      <div class="field-label is-normal">
-        <label class="label">&nbsp;</label>
-      </div>
+    <div
+      class="field is-horizontal"
+      v-if="groupedNearbyLocations && Object.keys(groupedNearbyLocations).length"
+    >
+      <div class="field-label is-normal"><label class="label">&nbsp;</label></div>
       <div class="proximate-pins">
         <div class="proximity-warning">
           <div class="heading">
-            <span class="warning-title">
-              <strong>NOTICE: Nearby locations exist.</strong>
-            </span>
-            <span class="coordinates" v-if="localState.contact.rect">Selected coordinates: ({{ getCoordinates(localState.contact.rect).x }}, {{ getCoordinates(localState.contact.rect).y }})</span>
+            <span class="warning-title"> <strong>NOTICE: Nearby locations exist.</strong> </span>
+            <span class="coordinates" v-if="localState.contact.rect"
+              >Selected coordinates: ({{ getCoordinates(localState.contact.rect).x }},
+              {{ getCoordinates(localState.contact.rect).y }})</span
+            >
           </div>
-
         </div>
-        <ul class="location-group" v-for="(group, key) in groupedNearbyLocations" @click="locationGroupClick(group)" :key="key">
+        <ul
+          class="location-group"
+          v-for="(group, key) in groupedNearbyLocations"
+          @click="locationGroupClick(group)"
+          :key="key"
+        >
           <li class="location" v-for="location in group" :key="location.name">
             <span class="name">{{ location.name }}</span>
             <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
           </li>
         </ul>
         <small>
-          Click location(s) above to apply existing coordinates. This ensures contacts which share a location appear together on the map
+          Click location(s) above to apply existing coordinates. This ensures contacts which share a
+          location appear together on the map
         </small>
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Description</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Description</label></div>
       <div class="editors-container">
         <!-- <div class="editor-selector-buttons tabs is-boxed">
           <ul>
@@ -235,15 +207,21 @@
         </div> -->
         <div class="tabs is-boxed">
           <ul>
-            <li :class="localState.contact.descriptionEditor === 'RICH' ? 'is-active' : ''" @click="localState.contact.descriptionEditor = 'RICH'">
+            <li
+              :class="localState.contact.descriptionEditor === 'RICH' ? 'is-active' : ''"
+              @click="localState.contact.descriptionEditor = 'RICH'"
+            >
               <a>
-                <span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true" /></span>
+                <span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true"/></span>
                 <span>Rich Text</span>
               </a>
             </li>
-            <li :class="localState.contact.descriptionEditor === 'RAW' ? 'is-active' : ''" @click="localState.contact.descriptionEditor = 'RAW'">
+            <li
+              :class="localState.contact.descriptionEditor === 'RAW' ? 'is-active' : ''"
+              @click="localState.contact.descriptionEditor = 'RAW'"
+            >
               <a>
-                <span class="icon is-small"><i class="fas fa-code" aria-hidden="true" /></span>
+                <span class="icon is-small"><i class="fas fa-code" aria-hidden="true"/></span>
                 <span>Raw HTML</span>
               </a>
             </li>
@@ -253,72 +231,73 @@
         <vue-editor
           v-if="localState.contact.descriptionEditor === 'RICH'"
           v-model="localState.contact.z_detail"
-          :editorToolbar="toolbarButtons" class="quill-editor" />
+          :editorToolbar="toolbarButtons"
+          class="quill-editor"
+        />
         <!-- eslint-enable vue/attribute-hyphenation -->
         <textarea
           v-if="localState.contact.descriptionEditor === 'RAW'"
           v-model="localState.contact.z_detail"
-          rows="13" />
-
+          rows="13"
+        />
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal">
-        <label class="label">Image</label>
-      </div>
+      <div class="field-label is-normal"><label class="label">Image</label></div>
 
       <div class="manage-image control">
         <div class="image-container" v-show="!!localState.contact.imageUrl">
           <span class="icon is-small remove" @click="removeImage">
             <i class="fas fa-times-circle" />
           </span>
-          <img :src="localState.contact.imageUrl">
+          <img :src="localState.contact.imageUrl" />
           <div class="remove-image" @click="removeImage">remove image</div>
         </div>
 
-        <image-upload @uploadComplete="onImageUpload" :path-prefix="$store.state.resortId + '/images/'" v-show="!localState.contact.imageUrl" />
-
+        <image-upload
+          @uploadComplete="onImageUpload"
+          :path-prefix="$store.state.resortId + '/images/'"
+          v-show="!localState.contact.imageUrl"
+        />
       </div>
     </div>
 
-    <div class="invalid-form-warning help is-danger" v-show="!localState.contact.name">You must provide a contact name.</div>
-    <div class="invalid-form-warning help is-danger" v-show="!localState.contact.number && !localState.contact.sms">You must provide a phone or SMS number.</div>
-    <div class="invalid-form-warning help is-danger" v-show="!allDataVaild">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
+    <div class="invalid-form-warning help is-danger" v-show="!localState.contact.name">
+      You must provide a contact name.
+    </div>
+    <div
+      class="invalid-form-warning help is-danger"
+      v-show="!localState.contact.number && !localState.contact.sms"
+    >
+      You must provide a phone or SMS number.
+    </div>
+    <div class="invalid-form-warning help is-danger" v-show="!allDataVaild">
+      Form contains invalid data. Please fix errors (outlined in red) and try again
+    </div>
 
     <div class="bottom-buttons">
       <div class="duplicate field is-left">
         <p class="control no-expando">
           <a class="button is-light" @click="duplicateContact">
-            <span>Make a Copy</span>
-            <span class="icon is-small">
-              <i class="far fa-copy" />
-            </span>
+            <span>Make a Copy</span> <span class="icon is-small"> <i class="far fa-copy" /> </span>
           </a>
         </p>
       </div>
       <div class="field is-grouped is-grouped-right">
         <p class="control no-expando">
-          <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive">
-            Save
-          </a>
+          <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive"> Save </a>
         </p>
         <p class="control no-expando">
-          <a class="button is-light" @click="cancelEdits">
-            Cancel
-          </a>
+          <a class="button is-light" @click="cancelEdits"> Cancel </a>
         </p>
         <p class="control no-expando" v-show="contactId !== 'NEW'">
           <a class="button is-danger is-outlined" @click="deleteContact">
-            <span>Delete</span>
-            <span class="icon is-small">
-              <i class="fas fa-trash-alt" />
-            </span>
+            <span>Delete</span> <span class="icon is-small"> <i class="fas fa-trash-alt" /> </span>
           </a>
         </p>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -337,20 +316,20 @@ const contactDefaults = {
   name: '',
   mailto: '',
   number: '',
-  rect :  '{{0,0},{80,80}}',
+  rect: '{{0,0},{80,80}}',
   url: '',
-  mapId : -1,
-  tags :  {
+  mapId: -1,
+  tags: {
     summer: true,
     winter: true,
-    dining: false
+    dining: false,
   },
   menu: '',
   sms: '',
   z_reservations: '',
   z_detail: '',
   imageUrl: '',
-  descriptionEditor: 'RICH'
+  descriptionEditor: 'RICH',
 }
 
 export default {
@@ -358,26 +337,26 @@ export default {
     Cleave,
     LocationSelector,
     ImageUpload,
-    VueEditor
+    VueEditor,
   },
 
-  mixins: [ mixins ],
+  mixins: [mixins],
 
   props: {
     contact: {
-      type: Object
+      type: Object,
     },
     groupId: {
-      type: String
+      type: String,
     },
     groupIndex: {
-      type: Number
+      type: Number,
     },
     contactId: {
-      type: String
+      type: String,
     },
   },
-  data () {
+  data() {
     return {
       localState: {
         contact: {},
@@ -385,162 +364,184 @@ export default {
       contactAtInitialization: {},
       pendingFileDeletion: '',
       toolbarButtons: [
-        [{ 'header': [1, 2, 3, 4, false] }],
+        [{ header: [1, 2, 3, 4, false] }],
         ['bold', 'italic', 'strike', 'link'],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['clean']
-      ]
+        [{ indent: '-1' }, { indent: '+1' }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['clean'],
+      ],
     }
   },
   computed: {
-    contactIsDirty () {
+    contactIsDirty() {
       const contact = { ...this.localState.contact, descriptionEditor: null }
       const contactAtInitialization = { ...this.contactAtInitialization, descriptionEditor: null }
       return !equal(contact, contactAtInitialization)
     },
-    allRequiredFieldsPopulated () {
-      return this.localState.contact.name
-        && this.localState.contact.number || this.localState.contact.sms
+    allRequiredFieldsPopulated() {
+      return (
+        (this.localState.contact.name && this.localState.contact.number) ||
+        this.localState.contact.sms
+      )
     },
-    allDataVaild () {
-      return this.phoneIsValid(this.localState.contact.number)
-      && this.phoneIsValid(this.localState.contact.sms)
-      && this.emailIsValid(this.localState.contact.mailto)
-      && ['url', 'menu', 'z_reservations'].every(fieldName =>  this.urlIsValid(this.localState.contact[fieldName]))
+    allDataVaild() {
+      return (
+        this.phoneIsValid(this.localState.contact.number) &&
+        this.phoneIsValid(this.localState.contact.sms) &&
+        this.emailIsValid(this.localState.contact.mailto) &&
+        ['url', 'menu', 'z_reservations'].every(fieldName =>
+          this.urlIsValid(this.localState.contact[fieldName])
+        )
+      )
     },
-    saveButtonActive () {
+    saveButtonActive() {
       return this.contactIsDirty && this.allRequiredFieldsPopulated && this.allDataVaild
     },
-    flattenedContacts () {
+    flattenedContacts() {
       return this.$store.state.contactGroups.reduce((accumulated, group) => {
         return [...accumulated, ...group.list]
       }, [])
     },
-    myCoordinates () {
+    myCoordinates() {
       return this.getCoordinates(this.localState.contact.rect)
     },
-    matchingLocations () {
+    matchingLocations() {
       if (!this.myCoordinates) return
       if (!(this.myCoordinates.x && this.myCoordinates.y)) return []
-      return this.flattenedContacts.filter(contact => {
-        if (!contact.rect || !this.myCoordinates) return false
-        if (contact.id === this.localState.contact.id) return false
-        const testCoords = this.getCoordinates(contact.rect)
-        return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
-      }).map(this.contactToLocation)
+      return this.flattenedContacts
+        .filter(contact => {
+          if (!contact.rect || !this.myCoordinates) return false
+          if (contact.id === this.localState.contact.id) return false
+          const testCoords = this.getCoordinates(contact.rect)
+          return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
+        })
+        .map(this.contactToLocation)
     },
-    nearbyLocations () {
-      const isMatch = (contact) => {
+    nearbyLocations() {
+      const isMatch = contact => {
         if (!contact.rect || !this.myCoordinates) return false
         const testCoords = this.getCoordinates(contact.rect)
-        return (contact.id !== this.localState.contact.id)                                        // not same contact
-          && (contact.mapId === this.localState.contact.mapId)                                    // using same map
-          && ((testCoords.x !== this.myCoordinates.x) || (testCoords.y !== this.myCoordinates.y)) // not exact match
-          && (Math.abs(testCoords.x - this.myCoordinates.x) < 81)                                 // within tolerance
-          && (Math.abs(testCoords.y - this.myCoordinates.y) < 81)
+        return (
+          contact.id !== this.localState.contact.id && // not same contact
+          contact.mapId === this.localState.contact.mapId && // using same map
+          (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
+          Math.abs(testCoords.x - this.myCoordinates.x) < 81 && // within tolerance
+          Math.abs(testCoords.y - this.myCoordinates.y) < 81
+        )
       }
       return this.flattenedContacts.filter(isMatch).map(this.contactToLocation)
     },
 
-    groupedNearbyLocations () {
-
+    groupedNearbyLocations() {
       return this.nearbyLocations.reduce((acc, coordinateObject) => {
         const coordString = coordinateObject.x.toString() + coordinateObject.y.toString()
         if (!acc[coordString]) acc[coordString] = []
         acc[coordString].push(coordinateObject)
         return acc
       }, {})
-
-    }
+    },
   },
 
   watch: {
     // re-initialize localState when 'contact' prop changes
-    contact () {
+    contact() {
       this.initializeContact()
     },
-    contactIsDirty (val) {
+    contactIsDirty(val) {
       this.$store.commit('SET_CONTACT_DIRTY_STATE', val)
-    }
+    },
   },
-  created () {
+  created() {
     this.initializeContact()
     this.listenForTagChange()
   },
-  destroyed () {
+  destroyed() {
     if (this.unsubscribeTagChangeListener) this.unsubscribeTagChangeListener()
   },
   methods: {
-
-    initializeContact () {
+    initializeContact() {
       const defaults = this.clone(contactDefaults)
 
-      this.localState.contact = {...defaults, ...this.contact}
+      this.localState.contact = { ...defaults, ...this.contact }
       if (this.contactId === 'NEW') this.localState.contact.id = uuid()
-      if (this.contact.z_detail !== '') this.localState.contact.z_detail = this.cleanDescription(this.contact.z_detail)
+      if (this.contact.z_detail !== '')
+        this.localState.contact.z_detail = this.cleanDescription(this.contact.z_detail)
       this.contactAtInitialization = this.clone(this.localState.contact)
     },
-    listenForTagChange () {
+    listenForTagChange() {
       console.log('listening for tag change')
       this.unsubscribeTagChangeListener = this.$store.subscribeAction((action, state) => {
         if (action.type !== 'toggleOpenContactTag') return
         this.localState.contact.tags = action.payload
       })
     },
-    saveContact () {
-      const number = this.localState.contact.number ? this.getPn(this.localState.contact.number, this.$store.state.resortMeta.country).getNumber('international').replace(/ /g,'-') : ''
-      const sms = this.localState.contact.sms ? this.getPn(this.localState.contact.sms, this.$store.state.resortMeta.country).getNumber('international') : ''
+    saveContact() {
+      const number = this.localState.contact.number
+        ? this.getPn(this.localState.contact.number, this.$store.state.resortMeta.country)
+            .getNumber('international')
+            .replace(/ /g, '-')
+        : ''
+      const sms = this.localState.contact.sms
+        ? this.getPn(this.localState.contact.sms, this.$store.state.resortMeta.country).getNumber(
+            'international'
+          )
+        : ''
       const contact = {
         ...this.localState.contact,
         number,
-        sms
+        sms,
       }
-      this.$store.dispatch('saveContact', {
-        groupId: this.groupId,
-        updatedContact: contact
-      }).then(() => {
-        if (this.pendingFileDeletion) this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
-        this.$emit('closeContact', {
-          resetDirtyState: true,
-          contactId: this.contactId ,
-          highlight: true,
-          scrollIntoView: true
+      this.$store
+        .dispatch('saveContact', {
+          groupId: this.groupId,
+          updatedContact: contact,
         })
-      })
+        .then(() => {
+          if (this.pendingFileDeletion)
+            this.$store.dispatch('destroyImageFile', this.pendingFileDeletion)
+          this.$emit('closeContact', {
+            resetDirtyState: true,
+            contactId: this.contactId,
+            highlight: true,
+            scrollIntoView: true,
+          })
+        })
     },
-    cancelEdits () {
+    cancelEdits() {
       this.initializeContact()
       this.$emit('closeContact', {
         resetDirtyState: false,
         contactId: this.contactId,
-        scrollIntoView: true
+        scrollIntoView: true,
       })
     },
-    deleteContact () {
-
+    deleteContact() {
       const onConfirm = () => {
         this.$emit('closeContact', { resetDirtyState: true }) // why won't this work in the .then cb below??
-        this.$store.commit('SHOW_MODAL', { loading: true, heading: 'Are you sure you want to delete this contact?' })
-        this.$store.dispatch('deleteContact', {
-          groupIndex: this.groupIndex,
-          contactId: this.contactId
-        }).then(() => {
-          // this.$emit('cancelEdits')      // ...nerp..doesn't do shit here
-          this.$store.dispatch('showSuccessModal', 'Contact deleted successfully')
-          setTimeout(() => {
-            this.$store.commit('CLOSE_MODAL')
-          }, 1500)
+        this.$store.commit('SHOW_MODAL', {
+          loading: true,
+          heading: 'Are you sure you want to delete this contact?',
         })
+        this.$store
+          .dispatch('deleteContact', {
+            groupIndex: this.groupIndex,
+            contactId: this.contactId,
+          })
+          .then(() => {
+            // this.$emit('cancelEdits')      // ...nerp..doesn't do shit here
+            this.$store.dispatch('showSuccessModal', 'Contact deleted successfully')
+            setTimeout(() => {
+              this.$store.commit('CLOSE_MODAL')
+            }, 1500)
+          })
       }
 
       this.$store.commit('SHOW_MODAL', {
         heading: 'Are you sure you want to delete this contact?',
-        onConfirm
+        onConfirm,
       })
-
     },
-    duplicateContact () {
+    duplicateContact() {
       if (this.contactIsDirty) {
         return this.$store.dispatch('showModal', {
           heading: 'Contact has unsaved changes',
@@ -549,172 +550,192 @@ export default {
           hideCancel: true,
         })
       }
-      this.$store.dispatch('duplicateContact', { groupId: this.groupId, contactId: this.contactId })
-        .then(({ id, tags }) => this.$emit('openSibling', {id, tags, scrollTo: true}))
+      this.$store
+        .dispatch('duplicateContact', { groupId: this.groupId, contactId: this.contactId })
+        .then(({ id, tags }) => this.$emit('openSibling', { id, tags, scrollTo: true }))
     },
-    onImageUpload ({ url, fileName }) {
+    onImageUpload({ url, fileName }) {
       this.$store.commit('SET_UPLOAD_BUFFER_URL', url)
-      if (this.localState.contact.imageUrl) this.$store.dispatch('destroyImageFile', this.localState.contact.imageUrl)
+      if (this.localState.contact.imageUrl)
+        this.$store.dispatch('destroyImageFile', this.localState.contact.imageUrl)
       this.$store.dispatch('listenForScaledImage', { url, fileName })
       this.localState.contact.imageUrl = url
     },
-    removeImage () {
+    removeImage() {
       this.pendingFileDeletion = this.localState.contact.imageUrl
       this.localState.contact.imageUrl = ''
     },
-    cleanDescription (description) {
-      return description.replace(/<div>/g, '').replace(/<\/div>/g, '').replace(/(\r\n|\n|\r)/gm,' ')
+    cleanDescription(description) {
+      return description
+        .replace(/<div>/g, '')
+        .replace(/<\/div>/g, '')
+        .replace(/(\r\n|\n|\r)/gm, ' ')
     },
-    onCoordinateClick ({ x, y, mapIndex }) {
-      const radius = this.localState.contact.rect.split('}')[1] ? this.localState.contact.rect.split('}')[1] : ',{80,80'
+    onCoordinateClick({ x, y, mapIndex }) {
+      const radius = this.localState.contact.rect.split('}')[1]
+        ? this.localState.contact.rect.split('}')[1]
+        : ',{80,80'
       this.localState.contact.rect = `{{${x},${y}}${radius}}}`
       this.localState.contact.mapId = mapIndex
     },
-    resetMapCoordinates () {
-      this.localState.contact.rect =  '{{0,0},{80,80}}'
-      this.localState.contact.mapId =  -1
+    resetMapCoordinates() {
+      this.localState.contact.rect = '{{0,0},{80,80}}'
+      this.localState.contact.mapId = -1
     },
-    getCoordinates (coordinateString) {
+    getCoordinates(coordinateString) {
       if (!coordinateString) return
       const str = coordinateString.split('}')[0]
       return {
         x: parseInt(str.substring(2, str.indexOf(','))),
-        y: parseInt(str.substring(str.indexOf(',') + 1, str.length))
+        y: parseInt(str.substring(str.indexOf(',') + 1, str.length)),
       }
     },
-    locationGroupClick (group) {
+    locationGroupClick(group) {
       this.onCoordinateClick({
         x: group[0].x,
         y: group[0].y,
-        mapIndex: this.localState.contact.mapId
+        mapIndex: this.localState.contact.mapId,
       })
       this.$store.dispatch('showSuccessModal', 'Coordinates applied successfully')
     },
-    contactToLocation ({ name, rect }) {
+    contactToLocation({ name, rect }) {
       return {
         name,
+        id: uuid(),
         x: this.getCoordinates(rect).x,
-        y: this.getCoordinates(rect).y
+        y: this.getCoordinates(rect).y,
       }
     },
-    phoneIsValid (number) {
+    phoneIsValid(number) {
       const regionCode = this.$store.state.resortMeta.country
       if (!number) return true
       if (number === '000') return true
       return this.getPn(number, regionCode).a.valid
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-  .edit-contact {
-    padding-top: .6em;
-  }
-  .field .control:not(.no-expando) {
-    flex-grow: 1;
-  }
-  .toggle-container, .manage-image, .proximate-pins, .matching-pins, div.control, .editr {
-    width: 100%;
-    max-width: 480px;
-  }
-  .test-link {
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    a {
-      color: black;
-      opacity: .5;
-      &:hover { opacity: 1; }
+.edit-contact {
+  padding-top: 0.6em;
+}
+.field .control:not(.no-expando) {
+  flex-grow: 1;
+}
+.toggle-container,
+.manage-image,
+.proximate-pins,
+.matching-pins,
+div.control,
+.editr {
+  width: 100%;
+  max-width: 480px;
+}
+.test-link {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  a {
+    color: black;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
     }
   }
-  .field.toggle { margin-bottom: .26em; }
-  .active-toggles {
-    padding-bottom: 0;
-    margin-bottom: .65em !important;
-    .title {
-      margin-bottom: .3em;
-      padding-bottom: .3em;
-      border-bottom: 1px solid #c3c3c3;
-    }
-    .field-label {
-     flex-basis: 172px;
-    }
-    .field.toggle { margin-bottom: .2em; }
+}
+.field.toggle {
+  margin-bottom: 0.26em;
+}
+.active-toggles {
+  padding-bottom: 0;
+  margin-bottom: 0.65em !important;
+  .title {
+    margin-bottom: 0.3em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #c3c3c3;
   }
+  .field-label {
+    flex-basis: 172px;
+  }
+  .field.toggle {
+    margin-bottom: 0.2em;
+  }
+}
 
-  .editors-container {
-    textarea {
-      width: 480px;
-      padding: .3em;
-    }
-  }
-
-  .quill-editor {
+.editors-container {
+  textarea {
     width: 480px;
-    .ql-container {
-      height: auto;
-    }
+    padding: 0.3em;
   }
+}
 
-  .manage-image {
-    .image-container {
-      position: relative;
-      .icon.remove {
-        position: absolute;
-        z-index: 10;
-        top: -6px;
-        left: -6px;
-        &:hover {
-          color: red;
-        }
-      }
-      .remove-image {
-        padding-top: .2em;
-        font-size: .9em;
-      }
-    }
-    .remove-image {
-      cursor: pointer;
-      text-decoration: underline;
+.quill-editor {
+  width: 480px;
+  .ql-container {
+    height: auto;
+  }
+}
+
+.manage-image {
+  .image-container {
+    position: relative;
+    .icon.remove {
+      position: absolute;
+      z-index: 10;
+      top: -6px;
+      left: -6px;
       &:hover {
         color: red;
       }
     }
-  }
-
-  .location-selector {
-    margin-bottom: .75rem;
-  }
-  // Nearby and matching locations
-  .location-group {
-    border: 1px solid grey;
-    margin-bottom: .1em;
-    padding: .2em .4em;
-    border-radius: 6px;
-    .location {
-      display: flex;
-      justify-content: space-between;
+    .remove-image {
+      padding-top: 0.2em;
+      font-size: 0.9em;
     }
   }
-
-  .proximate-pins {
-    .location-group {
-      cursor: pointer;
-      &:hover { background-color: #d0d0d0; }
+  .remove-image {
+    cursor: pointer;
+    text-decoration: underline;
+    &:hover {
+      color: red;
     }
   }
+}
 
-  .invalid-form-warning {
-    margin: .6em 0;
-    text-align: right;
-  }
-  .bottom-buttons {
+.location-selector {
+  margin-bottom: 0.75rem;
+}
+// Nearby and matching locations
+.location-group {
+  border: 1px solid grey;
+  margin-bottom: 0.1em;
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  .location {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    .duplicate {
-      margin-bottom: 0 !important;
+  }
+}
+
+.proximate-pins {
+  .location-group {
+    cursor: pointer;
+    &:hover {
+      background-color: #d0d0d0;
     }
   }
+}
 
+.invalid-form-warning {
+  margin: 0.6em 0;
+  text-align: right;
+}
+.bottom-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .duplicate {
+    margin-bottom: 0 !important;
+  }
+}
 </style>

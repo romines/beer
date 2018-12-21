@@ -143,8 +143,8 @@ const store = {
       ])
     },
 
-    listenToContacts({ rootState, commit }) {
-      console.log('listen[ing]ToContacts . . .')
+    listenToResortRoot({ rootState, commit }) {
+      console.log('listen[ing]ToResortRoot . . .')
 
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).onSnapshot(
@@ -519,7 +519,7 @@ const store = {
   },
   modules: {
     archives,
-    maps,
+    // maps,
   },
 }
 
