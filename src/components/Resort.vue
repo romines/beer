@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-resort">
+  <div class="resorts">
     <site-header title="Contacts" />
     <save-publish />
     <contacts />
@@ -7,7 +7,9 @@
 </template>
 
 <script>
-import { SiteHeader, SavePublish, Contacts } from './'
+import SiteHeader from './SiteHeader.vue'
+import SavePublish from './SavePublish.vue'
+import Contacts from './Contacts.vue'
 
 export default {
   components: {

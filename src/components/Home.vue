@@ -1,27 +1,38 @@
 <template>
   <div class="home">
+
     <site-header title="Contact Management" />
     <save-publish />
     <contacts />
+
   </div>
 </template>
 
 <script>
-import { Contacts, SiteHeader, SavePublish } from './'
+import Contacts from './Contacts'
+import SiteHeader from './SiteHeader'
+import SavePublish from './SavePublish'
 
 export default {
   components: {
     Contacts,
     SiteHeader,
-    SavePublish,
+    SavePublish
   },
-  data() {
-    return {}
+  data () {
+    return {
+    }
   },
-  computed: {},
-  created() {},
-  methods: {},
+  computed: {
+
+  },
+  created () {
+  },
+  methods: {
+
+  }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

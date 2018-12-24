@@ -132,7 +132,9 @@
 
 <script>
 import draggable from 'vuedraggable'
-import { ContactList, EditContact, EmergencyContactGroup } from './'
+import ContactList from './ContactList'
+import EditContact from './EditContact'
+import EmergencyContactGroup from './EmergencyContactGroup.vue'
 
 export default {
   components: {
