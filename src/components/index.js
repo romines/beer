@@ -1,24 +1,49 @@
 // @create-index
 
-export { default as Archive } from './Archive.vue'
-export { default as ContactGroupList } from './ContactGroupList.vue'
-export { default as ContactList } from './ContactList.vue'
-export { default as Contacts } from './Contacts.vue'
-export { default as EditContact } from './EditContact.vue'
-export { default as EmergencyContactGroup } from './EmergencyContactGroup.vue'
-export { default as ExportJson } from './ExportJson.vue'
-export { default as ForgotPassword } from './ForgotPassword.vue'
-export { default as Home } from './Home.vue'
-export { default as ImageUpload } from './ImageUpload.vue'
-export { default as LoadingSpinner } from './LoadingSpinner.vue'
-export { default as LocationSelector } from './LocationSelector.vue'
-export { default as Login } from './Login.vue'
-export { default as MapManager } from './MapManager.vue'
-export { default as Modal } from './Modal.vue'
-export { default as NewResort } from './NewResort.vue'
-export { default as Resort } from './Resort.vue'
-export { default as Resorts } from './Resorts.vue'
-export { default as SavePublish } from './SavePublish.vue'
-export { default as SignUp } from './SignUp.vue'
-export { default as SiteHeader } from './SiteHeader.vue'
-export { default as mixins } from './mixins.js'
+import Archive from './Archive.vue'
+import ContactGroupList from './ContactGroupList.vue'
+import ContactList from './ContactList.vue'
+import Contacts from './Contacts.vue'
+import EditContact from './EditContact.vue'
+import EmergencyContactGroup from './EmergencyContactGroup.vue'
+import ExportJson from './ExportJson.vue'
+import ForgotPassword from './ForgotPassword.vue'
+import Home from './Home.vue'
+import ImageUpload from './ImageUpload.vue'
+import LoadingSpinner from './LoadingSpinner.vue'
+import LocationSelector from './LocationSelector.vue'
+import Login from './Login.vue'
+import MapManager from './MapManager.vue'
+import Modal from './Modal.vue'
+import NewResort from './NewResort.vue'
+import Resort from './Resort.vue'
+import Resorts from './Resorts.vue'
+import SavePublish from './SavePublish.vue'
+import SignUp from './SignUp.vue'
+import SiteHeader from './SiteHeader.vue'
+import mixins from './mixins.js'
+
+export {
+  Archive,
+  ContactGroupList,
+  ContactList,
+  Contacts,
+  EditContact,
+  EmergencyContactGroup,
+  ExportJson,
+  ForgotPassword,
+  Home,
+  ImageUpload,
+  LoadingSpinner,
+  LocationSelector,
+  Login,
+  MapManager,
+  Modal,
+  NewResort,
+  Resort,
+  Resorts,
+  SavePublish,
+  SignUp,
+  SiteHeader,
+  mixins,
+}
