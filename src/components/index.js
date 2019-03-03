@@ -13,7 +13,7 @@ import ImageUpload from './ImageUpload.vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 import LocationSelector from './LocationSelector.vue'
 import Login from './Login.vue'
-import MapManager from './MapManager.vue'
+import Maps from './Maps.vue'
 import Modal from './Modal.vue'
 import NewResort from './NewResort.vue'
 import Resort from './Resort.vue'
@@ -37,7 +37,7 @@ export {
   LoadingSpinner,
   LocationSelector,
   Login,
-  MapManager,
+  Maps,
   Modal,
   NewResort,
   Resort,

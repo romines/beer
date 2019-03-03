@@ -11,6 +11,17 @@
   "dependencies": {
     "@google-cloud/storage": "^2.0.3",
     "firebase-admin": "^6.0.0",
-    "moment": "^2.22.2"
+    "moment": "^2.24.0",
+    "yargs": "^12.0.5"
+  },
+  "devDependencies": {
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.16.4"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true
   }
 }

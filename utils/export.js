@@ -3,17 +3,24 @@ const moment = require('moment');
 const fs = require('fs');
 
 const collectionName = process.argv[2] ? process.argv[2] : 'resorts';
-const fileName = process.argv[3] ? process.argv[3] : `./backups/${moment().format('MMDD')}.json`;
+const fileName = process.argv[3]
+  ? process.argv[3]
+  : `./backups/${moment().format('MMDD')}.json`;
 
 const db = admin.firestore();
-db.settings({timestampsInSnapshots: true});
+db.settings({ timestampsInSnapshots: true });
 
 const data = {};
 data[collectionName] = {};
 
-console.log(`NOTE: exporting from ${process.env.NODE_ENV ? process.env.NODE_ENV : 'production'} . . .`);
+console.log(
+  `NOTE: exporting from ${
+    process.env.NODE_ENV ? process.env.NODE_ENV : 'production'
+  } . . .`
+);
 
-var results = db.collection(collectionName)
+var results = db
+  .collection(collectionName)
   .get()
   .then(snapshot => {
     snapshot.forEach(doc => {
@@ -31,6 +38,6 @@ results.then(data => {
     if (err) {
       return console.log(err);
     }
-    console.log("The file was saved!");
+    console.log('The file was saved!');
   });
 });

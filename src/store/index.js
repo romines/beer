@@ -6,7 +6,7 @@ import uuid from 'uuid/v4'
 import 'babel-polyfill'
 
 import archives from './archives'
-import maps from './maps'
+// import maps from './maps'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 // import mayExport from '../../utils/firestore-export.json'
@@ -14,8 +14,6 @@ import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 const RESORTS_REF = firestore.collection('resorts') // is there a better way to call attention to module scoped var
 
-const SEED_DATA = {} // this is going away
-// const USER_DATA = userData.users
 const defaultModalContents = {
   heading: '',
   message: '',
@@ -185,6 +183,14 @@ const store = {
           err => reject(`Error listening to contacts: ${err}`)
         )
       })
+    },
+
+    resetResortState({ commit, dispatch }) {
+      commit('SET_RESORT_ID', '')
+      commit('SET_USER', {})
+      commit('SET_CONTACT_GROUPS', {})
+      commit('SET_RESORT_META', {})
+      dispatch('resetArchiveState')
     },
 
     logIn({ commit, dispatch }, { email, password, onSuccess }) {

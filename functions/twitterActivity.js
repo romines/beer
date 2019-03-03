@@ -9,6 +9,10 @@ const twitter = new Twitter({
     app_only_auth: true
   });
 
+  /* 
+   NOTE: twitter endpoint + data only available in Production due to [ ?? twitter api authorizaiton ?? ]
+  */
+
 module.exports = functions.https.onRequest((request, response) => {
 
   const resortId = request.query.r;

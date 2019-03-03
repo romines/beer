@@ -9,7 +9,7 @@ import {
   ExportJson,
   ForgotPassword,
   Login,
-  MapManager,
+  Maps,
   Resorts,
   Resort,
   SignUp,
@@ -58,7 +58,7 @@ const routes = [
   {
     path: '/maps',
     name: 'Maps',
-    component: MapManager,
+    component: Maps,
     meta: {
       requiresAuth: true,
       requiresSuperAdmin: true,
@@ -78,7 +78,8 @@ const routes = [
       requiresSuperAdmin: true,
     },
     beforeEnter: (to, from, next) => {
-      store.commit('SET_RESORT_ID', '')
+      store.commit('SET_LOADING_STATE', true)
+      store.dispatch('resetResortState')
       store.dispatch('getResorts').then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()

@@ -24,6 +24,14 @@ export default {
     },
   },
   actions: {
+    resetArchiveState({ commit }) {
+      commit('SET_PUBLISHED_CONTACTS', {
+        key: '',
+        publishedContacts: {},
+      })
+      commit('SET_LAST_PUBLISHED', '')
+      commit('SET_ARCHIVE_LIST', {})
+    },
     listenToPublishedContacts({ rootState, commit }) {
       console.log('listen[ing]ToPublished . . .')
       const resortRef = database.ref(rootState.resortId)
@@ -77,10 +85,7 @@ export default {
 
       return resortRoot.update(updates)
     },
-    archiveFromPasted(
-      { rootState },
-      { resortId, contactGroups, emergencyGroup }
-    ) {
+    archiveFromPasted({ rootState }, { resortId, contactGroups, emergencyGroup }) {
       const resortRoot = database.ref(resortId)
       const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
@@ -104,15 +109,11 @@ export default {
       return resortRoot.update(updates)
     },
     toggleArchiveStar({ rootState }, { key, starred }) {
-      database
-        .ref(`${rootState.resortId}/archiveList/${key}/starred/`)
-        .set(!starred)
+      database.ref(`${rootState.resortId}/archiveList/${key}/starred/`).set(!starred)
     },
     saveArchiveName({ rootState }, { key, name }) {
       const updates = { name }
-      return database
-        .ref(`${rootState.resortId}/archiveList/${key}`)
-        .update(updates)
+      return database.ref(`${rootState.resortId}/archiveList/${key}`).update(updates)
     },
     restoreArchive({ rootState }, { key }) {
       const resortRef = database.ref(rootState.resortId)
@@ -138,10 +139,7 @@ export default {
       updates[`/archiveList/${key}/date`] = moment().valueOf()
       updates['published'] = key
 
-      return Promise.all([
-        dispatch('restoreArchive', { key }),
-        resortRoot.update(updates),
-      ])
+      return Promise.all([dispatch('restoreArchive', { key }), resortRoot.update(updates)])
     },
     discardChanges({ state, rootState }) {
       return firestore
@@ -154,8 +152,7 @@ export default {
   getters: {
     dirty: (state, getters, rootState) => {
       if (!rootState.resortId) return false
-      if (!(rootState.contactGroups && rootState.contactGroups.length))
-        return false
+      if (!(rootState.contactGroups && rootState.contactGroups.length)) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
 
       const working = standardizeArchive({

@@ -49,30 +49,11 @@
           </p>
         </div>
       </div>
-      <div class="field is-horizontal" v-show="newResort.resortId.length">
-        <div class="field-label is-normal"><label class="label">Map Files</label></div>
 
-        <div class="field-body manage-maps">
-          <div class="control">
-            <div class="map-thumbs">
-              <div class="image-container" v-for="(url, index) in newResort.mapFiles" :key="url">
-                <span class="icon is-small remove" @click="removeImage(index)">
-                  <i class="fas fa-times-circle" />
-                </span>
-                <img :src="url" />
-                <div class="remove-image" @click="removeImage(index)">remove map</div>
-              </div>
-            </div>
+      <!-- Map management -->
+      <map-manager v-if="newResort.resortId" :path-prefix="newResort.resortId" />
 
-            <image-upload
-              file-name-prefix="map_"
-              :path-prefix="`${newResort.resortId}/map_files/`"
-              button-label="Add a map..."
-              @uploadComplete="onMapFileUpload"
-            />
-          </div>
-        </div>
-      </div>
+      <!-- Map management -->
 
       <div class="field is-horizontal">
         <div class="field-label is-normal"><label class="label">JSON</label></div>
@@ -158,13 +139,13 @@
 </template>
 
 <script>
-import ImageUpload from './ImageUpload.vue'
+import MapManager from './MapManager.vue'
 import EmergencyContactGroup from './EmergencyContactGroup.vue'
 import mixins from './mixins'
 
 export default {
   components: {
-    ImageUpload,
+    MapManager,
     EmergencyContactGroup,
   },
   mixins: [mixins],
@@ -269,7 +250,7 @@ export default {
         this.$refs.resortName.focus()
       })
     },
-    onMapFileUpload({ url }) {
+    onMapFileAdded({ url }) {
       if (!this.newResort.mapFiles) this.newResort.mapFiles = []
       this.newResort.mapFiles.push(url)
     },
@@ -345,24 +326,6 @@ export default {
   padding: 0 10px;
   p.help {
     margin: -10px 0 4px 140px;
-  }
-  .manage-maps {
-    display: block;
-    .map-thumbs {
-      display: flex;
-      align-items: stretch;
-      .image-container {
-        position: relative;
-        &:not(:first-child) {
-          margin-left: 1em;
-        }
-        .remove {
-          position: absolute;
-          top: -7px;
-          left: -7px;
-        }
-      }
-    }
   }
   .emergency-group-select {
     .field-body {

@@ -7,9 +7,9 @@ const db = admin.database();
 module.exports = functions.https.onRequest((request, response) => {
   const resortId = request.query.r;
   const STRIP_EMPTY = !!(request.query.strip && request.query.strip === '1');
-
+  
   function stripIdsAndEmptyFields(group) {
-
+    
     const rmUuid = (contact) => {
       if (contact.id !== undefined) delete contact.id;
       return contact;
@@ -63,12 +63,14 @@ module.exports = functions.https.onRequest((request, response) => {
   db.ref(resortId).once('value')
 
     .then(snapshot => {
-
       const { archiveData, published } = snapshot.val();
+      const version = request.query.v && archiveData[request.query] ? request.query.v : null;
 
       const emergencyGroup = stripIdsAndEmptyFields(archiveData[published].emergencyGroup);
 
-      const contactGroups = archiveData[published].contactGroups
+      const archiveKey = version ? version : published;
+
+      const contactGroups = archiveData[archiveKey].contactGroups
         ? archiveData[published].contactGroups
           .filter(group => group.list)
           .map(stripIdsAndEmptyFields)
