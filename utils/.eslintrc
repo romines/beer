@@ -12,6 +12,6 @@
   },
   "root": true,
   "parserOptions": {
-    "ecmaVersion": 2017
+    "ecmaVersion": 9
   }
 }
