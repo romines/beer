@@ -2,10 +2,11 @@ const admin = require('./firebaseAdmin.js')('production');
 const moment = require('moment');
 const fs = require('fs');
 
+const environment = process.env.NODE_ENV ? process.env.NODE_ENV : 'production';
 const collectionName = process.argv[2] ? process.argv[2] : 'resorts';
 const fileName = process.argv[3]
   ? process.argv[3]
-  : `./backups/${moment().format('MMDD')}.json`;
+  : `./backups/${moment().format('MMDD')}_${environment}.json`;
 
 const db = admin.firestore();
 db.settings({ timestampsInSnapshots: true });
@@ -13,11 +14,7 @@ db.settings({ timestampsInSnapshots: true });
 const data = {};
 data[collectionName] = {};
 
-console.log(
-  `NOTE: exporting from ${
-    process.env.NODE_ENV ? process.env.NODE_ENV : 'production'
-  } . . .`
-);
+console.log(`NOTE: exporting from ${environment} . . .`);
 
 var results = db
   .collection(collectionName)
