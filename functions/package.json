@@ -19,5 +19,15 @@
   "private": true,
   "engines": {
     "node": "8"
+  },
+  "devDependencies": {
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.17.1"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true
   }
 }
