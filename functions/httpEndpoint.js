@@ -26,9 +26,9 @@ module.exports = functions.https.onRequest((request, response) => {
     };
 
     const stripEmptyFields = (contact) => {
-        if (STRIP_EMPTY) {
-          Object.keys(contact).forEach(key => {
-            if ((contact[key]) !== 0 && !contact[key]) {
+      if (STRIP_EMPTY) {
+        Object.keys(contact).forEach(key => {
+          if ((contact[key]) !== 0 && !contact[key]) {
             delete contact[key];
           }
         });
@@ -63,12 +63,14 @@ module.exports = functions.https.onRequest((request, response) => {
   db.ref(resortId).once('value')
 
     .then(snapshot => {
-
       const { archiveData, published } = snapshot.val();
+      const version = request.query.v && archiveData[request.query] ? request.query.v : null;
 
       const emergencyGroup = stripIdsAndEmptyFields(archiveData[published].emergencyGroup);
 
-      const contactGroups = archiveData[published].contactGroups
+      const archiveKey = version ? version : published;
+
+      const contactGroups = archiveData[archiveKey].contactGroups
         ? archiveData[published].contactGroups
           .filter(group => group.list)
           .map(stripIdsAndEmptyFields)
@@ -77,7 +79,7 @@ module.exports = functions.https.onRequest((request, response) => {
       response.send(JSON.stringify({ contactGroups, emergencyGroup }));
 
     })
-    .catch(function(error) {
+    .catch(function (error) {
       response.send(error);
     });
 
