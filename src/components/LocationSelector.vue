@@ -65,6 +65,7 @@ const foo = {
       1522146126814: '{{1035,480},{80,80}}',
     }
 }
+import 'viewerjs/dist/viewer.css'
 import Viewer from "v-viewer/src/component.vue"
 
 export default {
@@ -194,8 +195,8 @@ export default {
 
         // pin drop click
         document.body.addEventListener('click', (e) => {
-
           if (!e.target.matches('img.viewer-transition')) return
+          console.log('pin set click event')
           if (this.viewerDOM.bodyEl.classList.contains('viewer-drag')) return
           e.stopPropagation()
 

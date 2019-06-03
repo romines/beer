@@ -46,7 +46,6 @@ export default {
 @import '~bulma/sass/utilities/initial-variables';
 @import '~bulma/sass/utilities/functions';
 @import '~bulma/bulma';
-@import '~v-viewer/dist/viewer.css';
 @import 'sharedStyles';
 
 // .contact-margin-setter:last-child .box {

@@ -29,7 +29,7 @@
     "moment": "^2.22.2",
     "uuid": "^3.3.2",
     "v-click-outside": "^1.0.5",
-    "v-viewer": "file:../v-viewer",
+    "v-viewer": "^1.4.0",
     "vue": "^2.5.17",
     "vue-cleave": "^1.2.2",
     "vue-router": "^3.0.1",
