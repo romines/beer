@@ -107,8 +107,9 @@
             </span>
           </div>
           <!--  -->
-          <div class="row-two date" v-show="editingNameOfArchiveAtIndex !== index">
-            {{ getDateString(archive.date) }}
+          <div class="row-two" v-show="editingNameOfArchiveAtIndex !== index">
+            <span class="date">{{ getDateString(archive.date) }}</span>
+            <span class="version" v-show="$store.state.user.superAdmin">Version id: {{ archive.key }}</span>
           </div>
         </div>
         <div class="col col-three actions">
@@ -345,10 +346,11 @@ $starYellow: #ffd400;
       }
     }
 
-    .date {
+    .row-two {
       font-size: 0.7em;
       margin-top: 0.3em;
       margin-bottom: -0.9em;
+      & .date { margin-right: 1.6em; }
     }
 
     &.published-archive {
