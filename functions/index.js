@@ -1,5 +1,8 @@
 /* eslint-env node */
+const config = JSON.parse(process.env.FIREBASE_CONFIG);
 
-exports.generateThumbnail = require('./generateThumbnail');
 exports.httpEndpoint = require('./httpEndpoint');
-exports.twitterActivity = require('./twitterActivity');
+exports.generateThumbnail = require('./generateThumbnail');
+if (config.projectId === 'resorts-tapped-admin') {
+  exports.twitterActivity = require('./twitterActivity');
+}

@@ -1,13 +1,22 @@
 {
-  "extends": ["eslint:recommended", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "prettier"
+  ],
   "env": {
     "node": true,
     "es6": true
   },
-  "plugins": ["prettier"],
+  "plugins": [
+    "prettier"
+  ],
   "rules": {
-    "semi": [2, "always"],
-    "no-console": "off"
+    "semi": [
+      2,
+      "always"
+    ],
+    "no-console": "off",
+    "prettier/prettier": "warn"
   },
   "root": true,
   "parserOptions": {
