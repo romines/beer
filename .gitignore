@@ -4,13 +4,15 @@ node_modules/
 dist/
 npm-debug.log
 yarn-error.log
-.firebase
 
 # Editor directories and files
 .vscode
 
-# firebase credentials
+# firebase
 src/firebaseConfig.js
+.firebase
+**/firebase-debug.log
+**/.runtimeconfig.json
 
 utils/backups
 src/assets/*.json

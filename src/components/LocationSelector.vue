@@ -38,6 +38,7 @@
 
 <script>
 import Viewer from 'v-viewer/src/component.vue'
+import 'viewerjs/dist/viewer.css'
 
 export default {
   components: { Viewer },
@@ -71,8 +72,12 @@ export default {
       viewerDOM: {
         bodyEl: document.querySelector('body'),
         currentImage: document.createElement('img'),
-        saveCancelButtons: document.createDocumentFragment().childNodes,
+        saveCancelButtons: document.createDocumentFragment().childNodes
       },
+      mapMargins: {
+        marginLeft: 0,
+        marginTop: 0,
+      }
     }
   },
   computed: {
@@ -140,7 +145,13 @@ export default {
       )
     },
 
-    onMapViewed({ detail }) {
+    onMapViewed ({detail}) {
+      // TODO initialize all handlers here? compose with component methods?
+      document.querySelector('.viewer-canvas img').addEventListener('pointerdown', e => {
+        console.log('pointerdown');
+        this.mapMargins.marginLeft = e.target.style.marginLeft
+        this.mapMargins.marginTop = e.target.style.marginTop
+      })
       this.viewingMapIndex = detail.index
       this.viewerDOM.currentImage = document.querySelector(`[alt="${detail.image.alt}"]`)
       this.resetMapUI()
@@ -164,30 +175,28 @@ export default {
         this.viewerDOM.saveCancelButtons = document.querySelectorAll('.persistence')
       }
 
-      const insertPanNotice = () => {
-        const markupString = `<p class="pan-notice"><span class="inner">Hold 'Shift' and click to drag map.</span></p>`
-        const footer = document.querySelector('.viewer-footer')
-        footer.insertBefore(
-          document.createRange().createContextualFragment(markupString),
-          footer.firstElementChild
-        )
-      }
-
       const addMapEventHandlers = () => {
-        // pin drop click
-        document.body.addEventListener('click', e => {
-          if (!e.target.matches('img.viewer-transition')) return
-          if (this.viewerDOM.bodyEl.classList.contains('viewer-drag')) return
-          e.stopPropagation()
 
-          this.xCoordinate = Math.round(e.offsetX / this.zoomLevel)
-          this.yCoordinate = Math.round(e.offsetY / this.zoomLevel)
-          this.$emit('coordinateClick', {
-            x: this.xCoordinate,
-            y: this.yCoordinate,
-            mapIndex: this.viewingMapIndex,
-          })
-          this.toggleButtonState()
+        // pin placement
+        document.body.addEventListener('pointerup', (e) => {
+          if (!e.target.matches('.viewer-canvas img')) return
+
+          if (e.target.style.marginLeft === this.mapMargins.marginLeft && e.target.style.marginTop === this.mapMargins.marginTop) {
+
+            this.xCoordinate = Math.round(e.offsetX / this.zoomLevel)
+            this.yCoordinate = Math.round(e.offsetY / this.zoomLevel)
+            this.$emit('coordinateClick', {
+              x: this.xCoordinate,
+              y: this.yCoordinate,
+              mapIndex: this.viewingMapIndex
+            })
+            this.toggleButtonState()
+
+          } else {
+            // pointerup followed drag event
+            this.resetMapUI()
+          }
+
         })
 
         // save/cancel click
@@ -203,15 +212,6 @@ export default {
         this.viewerDOM.saveCancelButtons.forEach(el =>
           el.addEventListener('click', handleSaveCancel)
         )
-
-        // shift key is down
-        window.addEventListener('keydown', e => {
-          if (!e.shiftKey) return
-          this.viewerDOM.bodyEl.classList.add('viewer-drag')
-        })
-        window.addEventListener('keyup', e => {
-          this.viewerDOM.bodyEl.classList.remove('viewer-drag')
-        })
 
         // close map click(s)
         const hidePin = e => {
@@ -233,7 +233,6 @@ export default {
       }
 
       insertSaveCancelButtons()
-      insertPanNotice()
       addMapEventHandlers()
     },
 
