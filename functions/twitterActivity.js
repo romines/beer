@@ -12,11 +12,12 @@ const twitter = new Twitter({
 module.exports = functions.https.onRequest((request, response) => {
 
   const resortId = request.query.r;
+  const handle = request.query.h;
 
   database.ref(`${resortId}/twitter`).once('value')
 
     .then(snapshot => {
-      return parseTwitterData(snapshot.val(), resortId);
+      return parseTwitterData(snapshot.val(), resortId, handle);
     })
     .then(lastTweet => {
       response.send(JSON.stringify(lastTweet));
@@ -27,7 +28,7 @@ module.exports = functions.https.onRequest((request, response) => {
 
 });
 
-function parseTwitterData(twitterData, resortId) {
+function parseTwitterData(twitterData, resortId, handle) {
 
   if (process.env.GCLOUD_PROJECT !== 'resorts-tapped-admin') return Promise.resolve('Tweets not fetched in non-production environments . . .');
   if (!twitterData || !twitterData.screenName) return Promise.resolve(`Twitter cache not configured for resortId ${resortId}`);
@@ -35,7 +36,7 @@ function parseTwitterData(twitterData, resortId) {
 
   // screenName must be added to firebase rtdb manually (before first tweet can be retrieved)
 
-  const screen_name = twitterData.screenName;
+  const screen_name = handle ? handle : twitterData.screenName;
 
   return new Promise((resolve, reject) => {
 
