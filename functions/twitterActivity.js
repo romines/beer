@@ -16,11 +16,12 @@ const twitter = new Twitter({
 module.exports = functions.https.onRequest((request, response) => {
 
   const resortId = request.query.r;
+  const handle = request.query.h;
 
   database.ref(`${resortId}/twitter`).once('value')
 
     .then(snapshot => {
-      return parseTwitterData(snapshot.val(), resortId);
+      return parseTwitterData(snapshot.val(), resortId, handle);
     })
     .then(lastTweet => {
       response.send(JSON.stringify(lastTweet));
@@ -31,15 +32,15 @@ module.exports = functions.https.onRequest((request, response) => {
 
 });
 
-function parseTwitterData(twitterData, resortId) {
+function parseTwitterData(twitterData, resortId, handle) {
 
   if (process.env.GCLOUD_PROJECT !== 'resorts-tapped-admin') return Promise.resolve('Tweets not fetched in non-production environments . . .');
   if (!twitterData || !twitterData.screenName) return Promise.resolve(`Twitter cache not configured for resortId ${resortId}`);
-  if (isFresh(twitterData.lastTweet)) return Promise.resolve(twitterData.lastTweet);
+  if (isFresh(twitterData.lastTweet) && isSameHandle(twitterData.screenName, handle)) return Promise.resolve(twitterData.lastTweet);
 
-  // screenName must be added to firebase rtdb manually (before first tweet can be retrieved)
+  // if screenName can be provided as a query param, otherwise it is read from firebase rtdb
 
-  const screen_name = twitterData.screenName;
+  const screen_name = handle ? handle : twitterData.screenName;
 
   return new Promise((resolve, reject) => {
 
@@ -53,7 +54,7 @@ function parseTwitterData(twitterData, resortId) {
         lastTweet = response[0];
       }
 
-      updateCache(resortId, lastTweet).then(lastTweet => {
+      updateCache(resortId, lastTweet, screen_name).then(lastTweet => {
         return resolve(lastTweet);
       });
 
@@ -63,12 +64,15 @@ function parseTwitterData(twitterData, resortId) {
 }
 
 
-function updateCache(resortId, tweet) {
+function updateCache(resortId, tweet, handle) {
   const tweetData = {
-    ...tweet,
-    fetched: moment().format()
+    screenName: handle,
+    lastTweet: {
+      ...tweet,
+      fetched: moment().format()
+    }
   };
-  const ref = database.ref(`${resortId}/twitter/lastTweet`);
+  const ref = database.ref(`${resortId}/twitter`);
   return ref.set(tweetData).then(() => {
     return Promise.resolve(tweetData);
   });
@@ -79,4 +83,9 @@ function isFresh(tweet) {
   const fetched = moment(tweet.fetched);
   const now = moment();
   return now.diff(fetched, 'minutes') < 10;
+}
+
+function isSameHandle(lastHandle, handle) {
+  if (!lastHandle || !handle) return true;
+  return lastHandle.toLowerCase() === handle.toLowerCase();
 }

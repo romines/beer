@@ -164,12 +164,12 @@ const store = {
             // }
 
             // resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
-            resortData.availableMaps = resortData.mapFiles.map(mapUrl => ({
+            resortData.availableMaps = resortData.mapFile ? resortData.mapFiles.map(mapUrl => ({
               name: 'Friendly Name',
               mapUrl,
               active: true,
-            }))
-            // End TEMP
+            })) : [];
+      // End TEMP
 
             commit('SET_CONTACT_GROUPS', resortData)
             commit('SET_RESORT_META', {
