@@ -37,18 +37,10 @@ const contactDefinition = {
 }
 export default {
   state: {
-    availableMaps: {},
   },
   mutations: {
-    SET_AVAILABLE_MAPS(state, availableMaps) {
-      console.log('SET_AVAILABLE_MAPS . . .')
-      state.availableMaps = availableMaps
-    },
   },
   actions: {
-    listenToMaps({ rootState, commit }) {
-      console.log('listen[ing]ToMaps . . .')
-    },
     saveMap({ rootState }, map) {
       const { mapId } = map
       const availableMaps = { ...rootState.availableMaps }

@@ -195,16 +195,6 @@
     <div class="field is-horizontal">
       <div class="field-label is-normal"><label class="label">Description</label></div>
       <div class="editors-container">
-        <!-- <div class="editor-selector-buttons tabs is-boxed">
-          <ul>
-            <li class="tab is-active">
-              <span>rich text</span>
-            </li>
-            <li class="tab">
-              <span>raw html</span>
-            </li>
-          </ul>
-        </div> -->
         <div class="tabs is-boxed">
           <ul>
             <li

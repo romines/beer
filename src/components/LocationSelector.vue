@@ -4,26 +4,41 @@
       class="map-pin"
       v-show="showPin"
       :style="{ top: yPinLocation + 'px', left: xPinLocation + 'px' }"
-      ><i class="fas fa-map-marker-alt"
-    /></span>
+    >
+      <i class="fas fa-map-marker-alt"/>
+    </span>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Map Coordinates</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Map Coordinates</label>
+      </div>
 
       <div class="control">
         <viewer
           :options="viewerOptions"
-          :images="images"
+          :images="maps"
           @inited="initializeViewer"
           class="viewer"
           ref="viewer"
         >
-          <div v-for="(image, index) in images" class="thumb-container" :key="image">
+          <div class="tabs is-boxed">
+            <ul>
+              <li
+                v-for="(map, index) in maps"
+                :key="map.id"
+                class="tab"
+                :class="{'is-active': index === 0}"
+              >
+                <a class="map-name">{{ map.name }}</a>
+              </li>
+            </ul>
+          </div>
+          <div class="thumb-container" v-for="(map, index) in maps" :key="map.id">
             <div class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
               <span class="icon is-small remove" @click="$emit('resetMapCoordinates')">
-                <i class="fas fa-times-circle" />
+                <i class="fas fa-times-circle"/>
               </span>
-              <img :src="image" />
+              <img :src="map.url">
               <small v-if="mapId == index">
                 <span class="marker"> <i class="fas fa-map-marker-alt" /> </span>
                 {{ `(${xCoordinate}, ${yCoordinate})` }}
@@ -72,12 +87,12 @@ export default {
       viewerDOM: {
         bodyEl: document.querySelector('body'),
         currentImage: document.createElement('img'),
-        saveCancelButtons: document.createDocumentFragment().childNodes
+        saveCancelButtons: document.createDocumentFragment().childNodes,
       },
       mapMargins: {
         marginLeft: 0,
         marginTop: 0,
-      }
+      },
     }
   },
   computed: {
@@ -94,9 +109,9 @@ export default {
         !this.hidePin
       )
     },
-    images() {
+    maps() {
       // return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
-      return this.$store.state.resortMeta.mapFiles
+      return this.$store.state.resortMeta.maps.filter(map => map.active)
     },
   },
 
@@ -145,10 +160,9 @@ export default {
       )
     },
 
-    onMapViewed ({detail}) {
+    onMapViewed({ detail }) {
       // TODO initialize all handlers here? compose with component methods?
       document.querySelector('.viewer-canvas img').addEventListener('pointerdown', e => {
-        console.log('pointerdown');
         this.mapMargins.marginLeft = e.target.style.marginLeft
         this.mapMargins.marginTop = e.target.style.marginTop
       })
@@ -176,27 +190,26 @@ export default {
       }
 
       const addMapEventHandlers = () => {
-
         // pin placement
-        document.body.addEventListener('pointerup', (e) => {
+        document.body.addEventListener('pointerup', e => {
           if (!e.target.matches('.viewer-canvas img')) return
 
-          if (e.target.style.marginLeft === this.mapMargins.marginLeft && e.target.style.marginTop === this.mapMargins.marginTop) {
-
+          if (
+            e.target.style.marginLeft === this.mapMargins.marginLeft &&
+            e.target.style.marginTop === this.mapMargins.marginTop
+          ) {
             this.xCoordinate = Math.round(e.offsetX / this.zoomLevel)
             this.yCoordinate = Math.round(e.offsetY / this.zoomLevel)
             this.$emit('coordinateClick', {
               x: this.xCoordinate,
               y: this.yCoordinate,
-              mapIndex: this.viewingMapIndex
+              mapIndex: this.viewingMapIndex,
             })
             this.toggleButtonState()
-
           } else {
             // pointerup followed drag event
             this.resetMapUI()
           }
-
         })
 
         // save/cancel click
@@ -262,13 +275,18 @@ export default {
 </script>
 
 <style lang="scss">
+.map-name {
+  font-size: 1em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 16em;
+}
+
 div.control {
   max-width: 480px;
 }
 .viewer {
-  // overflow-x: auto;
-  // white-space: nowrap;
-  display: flex;
   padding-bottom: 1.1em;
 
   .thumb-container {

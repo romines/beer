@@ -149,33 +149,11 @@ const store = {
           doc => {
             const resortData = doc.data()
 
-            // In event of a structural change to the model, standardize/sanitize here
-            // TEMP
-
-            // resortData.contactGroups = resortData.contactGroups
-            //   .map(addNoSort)
-            //   .map(addGroupId)
-            //   .map(addMissingContactDefaults)
-
-            // if (!resortData.emergencyGroup) {
-            //   const index = resortData.contactGroups.findIndex(group => group.emergency)
-            //   if (index > -1) { resortData.emergencyGroup = resortData.contactGroups.splice(index, 1)[0] }
-            //   else            { console.log('WARNING: no emergency group found!!!!') }
-            // }
-
-            // resortData.emergencyGroup = addMissingContactDefaults(resortData.emergencyGroup)
-            resortData.availableMaps = resortData.mapFile ? resortData.mapFiles.map(mapUrl => ({
-              name: 'Friendly Name',
-              mapUrl,
-              active: true,
-            })) : [];
-      // End TEMP
-
             commit('SET_CONTACT_GROUPS', resortData)
             commit('SET_RESORT_META', {
               country: resortData.country,
               mapFiles: resortData.mapFiles,
-              availableMaps: resortData.availableMaps,
+              maps: resortData.maps,
               name: resortData.name,
             })
             resolve()
