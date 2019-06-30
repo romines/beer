@@ -138,59 +138,14 @@
 
     <location-selector
       v-if="this.$store.state.resortMeta.mapFiles && this.$store.state.resortMeta.mapFiles.length"
+      :coordinates="localState.contact.coordinates"
+      :flattened-contacts="flattenedContacts"
       :coordinate-string="localState.contact.rect"
+      :contact-id="localState.contact.id"
       :map-id="localState.contact.mapId"
       @coordinateClick="onCoordinateClick"
       @resetMapCoordinates="resetMapCoordinates"
     />
-
-    <div class="field is-horizontal" v-if="matchingLocations && matchingLocations.length">
-      <div class="field-label is-normal"><label class="label">&nbsp;</label></div>
-      <div class="matching-pins">
-        <div class="proximity-warning">
-          <div class="heading">This contact shares coordinates with the following contact(s)</div>
-        </div>
-        <ul class="location-group">
-          <li class="location" v-for="location in matchingLocations" :key="location.id">
-            <span class="name">{{ location.name }}</span>
-            <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div
-      class="field is-horizontal"
-      v-if="groupedNearbyLocations && Object.keys(groupedNearbyLocations).length"
-    >
-      <div class="field-label is-normal"><label class="label">&nbsp;</label></div>
-      <div class="proximate-pins">
-        <div class="proximity-warning">
-          <div class="heading">
-            <span class="warning-title"> <strong>NOTICE: Nearby locations exist.</strong> </span>
-            <span class="coordinates" v-if="localState.contact.rect"
-              >Selected coordinates: ({{ getCoordinates(localState.contact.rect).x }},
-              {{ getCoordinates(localState.contact.rect).y }})</span
-            >
-          </div>
-        </div>
-        <ul
-          class="location-group"
-          v-for="(group, key) in groupedNearbyLocations"
-          @click="locationGroupClick(group)"
-          :key="key"
-        >
-          <li class="location" v-for="location in group" :key="location.name">
-            <span class="name">{{ location.name }}</span>
-            <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
-          </li>
-        </ul>
-        <small>
-          Click location(s) above to apply existing coordinates. This ensures contacts which share a
-          location appear together on the map
-        </small>
-      </div>
-    </div>
 
     <div class="field is-horizontal">
       <div class="field-label is-normal"><label class="label">Description</label></div>
@@ -391,44 +346,6 @@ export default {
       return this.$store.state.contactGroups.reduce((accumulated, group) => {
         return [...accumulated, ...group.list]
       }, [])
-    },
-    myCoordinates() {
-      return this.getCoordinates(this.localState.contact.rect)
-    },
-    matchingLocations() {
-      if (!this.myCoordinates) return
-      if (!(this.myCoordinates.x && this.myCoordinates.y)) return []
-      return this.flattenedContacts
-        .filter(contact => {
-          if (!contact.rect || !this.myCoordinates) return false
-          if (contact.id === this.localState.contact.id) return false
-          const testCoords = this.getCoordinates(contact.rect)
-          return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
-        })
-        .map(this.contactToLocation)
-    },
-    nearbyLocations() {
-      const isMatch = contact => {
-        if (!contact.rect || !this.myCoordinates) return false
-        const testCoords = this.getCoordinates(contact.rect)
-        return (
-          contact.id !== this.localState.contact.id && // not same contact
-          contact.mapId === this.localState.contact.mapId && // using same map
-          (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
-          Math.abs(testCoords.x - this.myCoordinates.x) < 81 && // within tolerance
-          Math.abs(testCoords.y - this.myCoordinates.y) < 81
-        )
-      }
-      return this.flattenedContacts.filter(isMatch).map(this.contactToLocation)
-    },
-
-    groupedNearbyLocations() {
-      return this.nearbyLocations.reduce((acc, coordinateObject) => {
-        const coordString = coordinateObject.x.toString() + coordinateObject.y.toString()
-        if (!acc[coordString]) acc[coordString] = []
-        acc[coordString].push(coordinateObject)
-        return acc
-      }, {})
     },
   },
 

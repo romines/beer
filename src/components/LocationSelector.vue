@@ -21,27 +21,89 @@
           class="viewer"
           ref="viewer"
         >
-          <div class="tabs is-boxed">
+          <div class="tabs is-boxed map-selectors">
             <ul>
               <li
-                v-for="(map, index) in maps"
+                v-for="map in maps"
                 :key="map.id"
-                class="tab"
-                :class="{'is-active': index === 0}"
+                class="tab map-name-container"
+                :class="{'is-active': activeMapId === map.id}"
+                @click="selectMap(map.id)"
               >
-                <a class="map-name">{{ map.name }}</a>
+                <a class="map-name">{{ map.name }} {{ map.name.split('').reverse().join('') }}</a>
               </li>
             </ul>
           </div>
-          <div class="thumb-container" v-for="(map, index) in maps" :key="map.id">
+          <div
+            class="thumb-container"
+            v-for="(map, index) in maps"
+            :key="map.id"
+            v-show="activeMapId === map.id"
+          >
             <div class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
               <span class="icon is-small remove" @click="$emit('resetMapCoordinates')">
                 <i class="fas fa-times-circle"/>
               </span>
               <img :src="map.url">
-              <small v-if="mapId == index">
-                <span class="marker"> <i class="fas fa-map-marker-alt" /> </span>
-                {{ `(${xCoordinate}, ${yCoordinate})` }}
+            </div>
+            <small v-if="mapId == index">
+              <span class="marker">
+                <i class="fas fa-map-marker-alt"/>
+              </span>
+              {{ `(${xCoordinate}, ${yCoordinate})` }}
+            </small>
+          </div>
+
+          <div class="field is-horizontal" v-if="matchingLocations && matchingLocations.length">
+            <div class="field-label is-normal">
+              <label class="label">&nbsp;</label>
+            </div>
+            <div class="matching-pins">
+              <div class="proximity-warning">
+                <div class="heading">This contact shares coordinates with the following contact(s)</div>
+              </div>
+              <ul class="location-group">
+                <li class="location" v-for="location in matchingLocations" :key="location.id">
+                  <span class="name">{{ location.name }}</span>
+                  <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div
+            class="field is-horizontal"
+            v-if="groupedNearbyLocations && Object.keys(groupedNearbyLocations).length"
+          >
+            <div class="field-label is-normal">
+              <label class="label">&nbsp;</label>
+            </div>
+            <div class="proximate-pins">
+              <div class="proximity-warning">
+                <div class="heading">
+                  <span class="warning-title">
+                    <strong>NOTICE: Nearby locations exist.</strong>
+                  </span>
+                  <span class="coordinates" v-if="coordinateString">
+                    Selected coordinates: ({{ getCoordinates(coordinateString).x }},
+                    {{ getCoordinates(coordinateString).y }})
+                  </span>
+                </div>
+              </div>
+              <ul
+                class="location-group"
+                v-for="(group, key) in groupedNearbyLocations"
+                @click="locationGroupClick(group)"
+                :key="key"
+              >
+                <li class="location" v-for="location in group" :key="location.name">
+                  <span class="name">{{ location.name }}</span>
+                  <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
+                </li>
+              </ul>
+              <small>
+                Click location(s) above to apply existing coordinates. This ensures contacts which share a
+                location appear together on the map
               </small>
             </div>
           </div>
@@ -54,12 +116,22 @@
 <script>
 import Viewer from 'v-viewer/src/component.vue'
 import 'viewerjs/dist/viewer.css'
+import uuid from 'uuid/v4'
 
 export default {
   components: { Viewer },
   props: {
+    contactId: {
+      type: String,
+    },
     coordinateString: {
       type: String,
+    },
+    coordinates: {
+      type: Object,
+    },
+    flattenedContacts: {
+      type: Array,
     },
     mapId: {
       type: Number,
@@ -67,6 +139,7 @@ export default {
   },
   data() {
     return {
+      activeMapId: -1,
       hidePin: true,
       viewingMapIndex: -1,
       xMargin: 0,
@@ -113,6 +186,44 @@ export default {
       // return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
       return this.$store.state.resortMeta.maps.filter(map => map.active)
     },
+    myCoordinates() {
+      return this.getCoordinates(this.coordinateString)
+    },
+    nearbyLocations() {
+      const isMatch = contact => {
+        if (!contact.rect || !this.myCoordinates) return false
+        const testCoords = this.getCoordinates(contact.rect)
+        return (
+          contact.id !== this.contactId && // not same contact
+          contact.mapId === this.mapId && // using same map
+          (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
+          Math.abs(testCoords.x - this.myCoordinates.x) < 81 && // within tolerance
+          Math.abs(testCoords.y - this.myCoordinates.y) < 81
+        )
+      }
+      return this.flattenedContacts.filter(isMatch).map(this.contactToLocation)
+    },
+    matchingLocations() {
+      if (!this.myCoordinates) return
+      if (!(this.myCoordinates.x && this.myCoordinates.y)) return []
+      return this.flattenedContacts
+        .filter(contact => {
+          if (!contact.rect || !this.myCoordinates) return false
+          if (contact.id === this.contactId) return false
+          const testCoords = this.getCoordinates(contact.rect)
+          return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
+        })
+        .map(this.contactToLocation)
+    },
+    groupedNearbyLocations() {
+      return this.nearbyLocations.reduce((acc, coordinateObject) => {
+        if (!(coordinateObject.x && coordinateObject.y)) debugger
+        const coordString = coordinateObject.x.toString() + coordinateObject.y.toString()
+        if (!acc[coordString]) acc[coordString] = []
+        acc[coordString].push(coordinateObject)
+        return acc
+      }, {})
+    },
   },
 
   watch: {
@@ -148,7 +259,22 @@ export default {
       this.zoomLevel =
         this.viewerDOM.currentImage.scrollWidth / this.viewerDOM.currentImage.naturalWidth
     },
-
+    getCoordinates(coordinateString) {
+      if (!coordinateString) return
+      const str = coordinateString.split('}')[0]
+      return {
+        x: parseInt(str.substring(2, str.indexOf(','))),
+        y: parseInt(str.substring(str.indexOf(',') + 1, str.length)),
+      }
+    },
+    contactToLocation({ name, rect }) {
+      return {
+        name,
+        id: uuid(),
+        x: this.getCoordinates(rect).x,
+        y: this.getCoordinates(rect).y,
+      }
+    },
     getMarginOffset() {
       const justTheNumber = str => str.substring(str.lastIndexOf(' ') + 1, str.length - 2)
       const styles = this.viewerDOM.currentImage.getAttribute('style').split(';')
@@ -159,7 +285,9 @@ export default {
         styles.filter(str => str.indexOf('margin-top') > -1).map(justTheNumber)[0]
       )
     },
-
+    selectMap(mapId) {
+      this.activeMapId = mapId
+    },
     onMapViewed({ detail }) {
       // TODO initialize all handlers here? compose with component methods?
       document.querySelector('.viewer-canvas img').addEventListener('pointerdown', e => {
@@ -275,12 +403,18 @@ export default {
 </script>
 
 <style lang="scss">
-.map-name {
-  font-size: 1em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 16em;
+.tabs.map-selectors {
+  .map-name-container {
+    .map-name {
+      font-size: 0.9em;
+      display: inline-block;
+      max-width: 13em;
+      flex-grow: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
 }
 
 div.control {
