@@ -24,13 +24,13 @@
           <div class="tabs is-boxed map-selectors">
             <ul>
               <li
-                v-for="map in maps"
+                v-for="(map, index) in maps"
                 :key="map.id"
                 class="tab map-name-container"
-                :class="{'is-active': activeMapId === map.id}"
-                @click="selectMap(map.id)"
+                :class="{'is-active': viewingMapIndex === index}"
+                @click="selectMap(index)"
               >
-                <a class="map-name">{{ map.name }} {{ map.name.split('').reverse().join('') }}</a>
+                <a class="map-name">{{ map.name }}</a>
               </li>
             </ul>
           </div>
@@ -38,20 +38,26 @@
             class="thumb-container"
             v-for="(map, index) in maps"
             :key="map.id"
-            v-show="activeMapId === map.id"
+            v-show="viewingMapIndex === index"
           >
-            <div class="inner-container" :class="validMapCoordinatesExist(index) ? 'selected' : ''">
-              <span class="icon is-small remove" @click="$emit('resetMapCoordinates')">
+            <div
+              class="inner-container"
+              :class="validMapCoordinatesExist(map.id) ? 'selected' : ''"
+            >
+              <span
+                class="icon is-small remove"
+                @click="$emit('resetMapCoordinates', activeMap.id)"
+              >
                 <i class="fas fa-times-circle"/>
               </span>
               <img :src="map.url">
             </div>
-            <small v-if="mapId == index">
+            <!-- <small v-if="mapId == index">
               <span class="marker">
                 <i class="fas fa-map-marker-alt"/>
               </span>
               {{ `(${xCoordinate}, ${yCoordinate})` }}
-            </small>
+            </small>-->
           </div>
 
           <div class="field is-horizontal" v-if="matchingLocations && matchingLocations.length">
@@ -133,15 +139,11 @@ export default {
     flattenedContacts: {
       type: Array,
     },
-    mapId: {
-      type: Number,
-    },
   },
   data() {
     return {
-      activeMapId: -1,
       hidePin: true,
-      viewingMapIndex: -1,
+      viewingMapIndex: 0,
       xMargin: 0,
       yMargin: 0,
       xCoordinate: 0,
@@ -176,26 +178,31 @@ export default {
       return this.yMargin + this.yCoordinate * this.zoomLevel
     },
     showPin() {
-      return (
-        (this.xCoordinate || this.yCoordinate) &&
-        this.mapId === this.viewingMapIndex &&
-        !this.hidePin
-      )
+      return (this.xCoordinate || this.yCoordinate) && !this.hidePin
     },
     maps() {
-      // return this.$store.state.resortMeta.mapFiles.map(fileName => imageDefinitions[fileName])
       return this.$store.state.resortMeta.maps.filter(map => map.active)
     },
+    activeMap() {
+      if (
+        !this.$store.state.resortMeta.maps ||
+        !this.$store.state.resortMeta.maps[this.viewingMapIndex]
+      ) {
+        return {}
+      } else {
+        return this.$store.state.resortMeta.maps[this.viewingMapIndex]
+      }
+    },
     myCoordinates() {
-      return this.getCoordinates(this.coordinateString)
+      return this.getCoordinates(this.coordinates[this.activeMap.id])
     },
     nearbyLocations() {
       const isMatch = contact => {
-        if (!contact.rect || !this.myCoordinates) return false
-        const testCoords = this.getCoordinates(contact.rect)
+        if (!contact.coordinates || !contact.coordinates[this.activeMap.id] || !this.myCoordinates)
+          return false
+        const testCoords = this.getCoordinates(contact.coordinates[this.activeMap.id])
         return (
           contact.id !== this.contactId && // not same contact
-          contact.mapId === this.mapId && // using same map
           (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
           Math.abs(testCoords.x - this.myCoordinates.x) < 81 && // within tolerance
           Math.abs(testCoords.y - this.myCoordinates.y) < 81
@@ -206,18 +213,23 @@ export default {
     matchingLocations() {
       if (!this.myCoordinates) return
       if (!(this.myCoordinates.x && this.myCoordinates.y)) return []
+
       return this.flattenedContacts
         .filter(contact => {
-          if (!contact.rect || !this.myCoordinates) return false
+          if (
+            !contact.coordinates ||
+            !contact.coordinates[this.activeMap.id] ||
+            !this.myCoordinates
+          )
+            return false
           if (contact.id === this.contactId) return false
-          const testCoords = this.getCoordinates(contact.rect)
+          const testCoords = this.getCoordinates(contact.coordinates[this.activeMap.id])
           return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
         })
         .map(this.contactToLocation)
     },
     groupedNearbyLocations() {
       return this.nearbyLocations.reduce((acc, coordinateObject) => {
-        if (!(coordinateObject.x && coordinateObject.y)) debugger
         const coordString = coordinateObject.x.toString() + coordinateObject.y.toString()
         if (!acc[coordString]) acc[coordString] = []
         acc[coordString].push(coordinateObject)
@@ -226,41 +238,38 @@ export default {
     },
   },
 
-  watch: {
-    // re-initialize localState when new values come down from above
-    coordinateString: {
-      immediate: true,
-      handler() {
-        this.initializeCoordinates()
-        this.toggleButtonState()
-      },
-    },
-    mapId: {
-      immediate: true,
-      handler() {
-        this.initializeMapId()
-      },
-    },
-  },
+  // watch: {
+  //   // re-initialize localState when new values come down from above
+  //   // 06/30 This shouldn't be needed anymore.  coordinates are initialized when map is viewed.
+  //   coordinates: {
+  //     immediate: true,
+  //     deep: true,
+  //     handler() {
+  //       this.initializeCoordinates()
+  //       this.showHidePersistButtons()
+  //     },
+  //   },
+  // },
   methods: {
     initializeViewer(viewer) {
       this.$viewer = viewer
     },
     initializeCoordinates() {
-      const str = this.coordinateString.split('}')[0]
-      this.xCoordinate = parseInt(str.substring(2, str.indexOf(',')))
-      this.yCoordinate = parseInt(str.substring(str.indexOf(',') + 1, str.length))
+      this.xCoordinate = 0
+      this.yCoordinate = 0
+      if (!(this.activeMap && this.coordinates)) return
+      const { x, y } = this.getCoordinates(this.coordinates[this.activeMap.id])
+      this.xCoordinate = x
+      this.yCoordinate = y
     },
-    initializeMapId() {
-      this.viewingMapIndex = this.mapId
-    },
-
     getZoomLevel() {
       this.zoomLevel =
         this.viewerDOM.currentImage.scrollWidth / this.viewerDOM.currentImage.naturalWidth
     },
     getCoordinates(coordinateString) {
-      if (!coordinateString) return
+      if (!coordinateString) {
+        return { x: 0, y: 0 }
+      }
       const str = coordinateString.split('}')[0]
       return {
         x: parseInt(str.substring(2, str.indexOf(','))),
@@ -285,8 +294,8 @@ export default {
         styles.filter(str => str.indexOf('margin-top') > -1).map(justTheNumber)[0]
       )
     },
-    selectMap(mapId) {
-      this.activeMapId = mapId
+    selectMap(index) {
+      this.viewingMapIndex = index
     },
     onMapViewed({ detail }) {
       // TODO initialize all handlers here? compose with component methods?
@@ -296,6 +305,7 @@ export default {
       })
       this.viewingMapIndex = detail.index
       this.viewerDOM.currentImage = document.querySelector(`[alt="${detail.image.alt}"]`)
+      this.initializeCoordinates()
       this.resetMapUI()
     },
 
@@ -331,9 +341,9 @@ export default {
             this.$emit('coordinateClick', {
               x: this.xCoordinate,
               y: this.yCoordinate,
-              mapIndex: this.viewingMapIndex,
+              mapId: this.activeMap.id,
             })
-            this.toggleButtonState()
+            this.showHidePersistButtons()
           } else {
             // pointerup followed drag event
             this.resetMapUI()
@@ -347,7 +357,8 @@ export default {
             this.hidePin = true
             this.$viewer.hide()
           } else {
-            this.$emit('coordinateClick', { x: 0, y: 0, mapIndex: this.viewingMapIndex })
+            // remove coordinates click
+            this.$emit('coordinateClick', { x: 0, y: 0, mapId: this.activeMap.id })
           }
         }
         this.viewerDOM.saveCancelButtons.forEach(el =>
@@ -384,19 +395,29 @@ export default {
         this.getMarginOffset()
         this.hidePin = false
       }, 600)
-      this.toggleButtonState()
+      this.showHidePersistButtons()
     },
 
-    toggleButtonState() {
-      if ((this.xCoordinate || this.yCoordinate) && this.mapId === this.viewingMapIndex) {
+    showHidePersistButtons() {
+      if (this.xCoordinate || this.yCoordinate) {
         this.viewerDOM.saveCancelButtons.forEach(el => el.classList.remove('inactive'))
       } else {
         this.viewerDOM.saveCancelButtons.forEach(el => el.classList.add('inactive'))
       }
     },
 
-    validMapCoordinatesExist(index) {
-      return this.mapId === index && (this.xCoordinate || this.yCoordinate)
+    locationGroupClick(group) {
+      this.$emit('coordinateClick', {
+        x: group[0].x,
+        y: group[0].y,
+        mapId: this.activeMap.id,
+      })
+      this.$store.dispatch('showSuccessModal', 'Coordinates applied successfully')
+    },
+
+    validMapCoordinatesExist(mapId) {
+      const { x, y } = this.getCoordinates(this.coordinates[mapId])
+      return !!(x || y)
     },
   },
 }

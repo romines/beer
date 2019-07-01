@@ -3,6 +3,9 @@ const functions = require('firebase-functions');
 const admin = require('./initialize');
 const db = admin.database();
 
+const stringIsEmptyCoordinates = str =>
+  str === '{{0,0},{80,80}}' || str === '{{0,0}{80,80}}';
+
 module.exports = functions.https.onRequest((request, response) => {
   const resortId = request.query.r;
   const STRIP_EMPTY = !!(request.query.strip && request.query.strip === '1');
@@ -20,11 +23,13 @@ module.exports = functions.https.onRequest((request, response) => {
     };
 
     const fixCoordinates = contact => {
-      if (
-        contact.rect === '{{0,0},{80,80}}' ||
-        contact.rect === '{{0,0}{80,80}}'
-      )
-        delete contact.rect;
+      if (stringIsEmptyCoordinates(contact.rect)) delete contact.rect;
+      if (contact.coordinates) {
+        Object.keys(contact.coordinates).forEach(mapId => {
+          if (stringIsEmptyCoordinates(contact.coordinates[mapId]))
+            delete contact.coordinates[mapId];
+        });
+      }
       return contact;
     };
 
@@ -75,8 +80,8 @@ module.exports = functions.https.onRequest((request, response) => {
 
       const contactGroups = archiveData[version].contactGroups
         ? archiveData[version].contactGroups
-            .filter(group => group.list)
-            .map(stripIdsAndEmptyFields)
+          .filter(group => group.list)
+          .map(stripIdsAndEmptyFields)
         : [];
 
       const versionMeta = archiveList[version];
@@ -93,7 +98,7 @@ module.exports = functions.https.onRequest((request, response) => {
 
       response.send(JSON.stringify(payload));
     })
-    .catch(function(error) {
+    .catch(function (error) {
       response.send(error);
     });
 });

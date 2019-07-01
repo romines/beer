@@ -1,14 +1,20 @@
 <template>
   <div class="edit-contact">
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Name</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Name</label>
+      </div>
       <div class="control has-icons-left">
-        <input v-model.trim="localState.contact.name" class="input" placeholder="Name" />
-        <span class="icon is-small is-left"> <i class="fas fa-address-book" /> </span>
+        <input v-model.trim="localState.contact.name" class="input" placeholder="Name">
+        <span class="icon is-small is-left">
+          <i class="fas fa-address-book"/>
+        </span>
       </div>
     </div>
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Phone Number</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Phone Number</label>
+      </div>
       <div class="control has-icons-left">
         <cleave
           v-model="localState.contact.number"
@@ -18,12 +24,16 @@
           placeholder="Phone"
         />
 
-        <span class="icon is-small is-left"> <i class="fas fa-phone" /> </span>
+        <span class="icon is-small is-left">
+          <i class="fas fa-phone"/>
+        </span>
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">SMS</label></div>
+      <div class="field-label is-normal">
+        <label class="label">SMS</label>
+      </div>
       <div class="control has-icons-left">
         <cleave
           v-model="localState.contact.sms"
@@ -32,105 +42,129 @@
           :class="{ 'is-danger': !phoneIsValid(localState.contact.sms) }"
           placeholder="SMS"
         />
-        <span class="icon is-small is-left"> <i class="fas fa-mobile-alt" /> </span>
+        <span class="icon is-small is-left">
+          <i class="fas fa-mobile-alt"/>
+        </span>
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Website</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Website</label>
+      </div>
       <div class="control has-icons-left has-icons-right">
         <input
           v-model.trim="localState.contact.url"
           :class="{ 'is-danger': !urlIsValid(localState.contact.url) }"
           class="input"
           placeholder="Website"
-        />
-        <span class="icon is-small is-left"> <i class="fas fa-globe" /> </span>
+        >
+        <span class="icon is-small is-left">
+          <i class="fas fa-globe"/>
+        </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.url">
           <a :href="localState.contact.url" target="_blank" tabindex="-1">
-            <i class="fas fa-external-link-alt" />
+            <i class="fas fa-external-link-alt"/>
           </a>
         </span>
       </div>
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Email Address</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Email Address</label>
+      </div>
       <div class="control has-icons-left">
         <input
           v-model.trim="localState.contact.mailto"
           class="input"
           :class="{ 'is-danger': !emailIsValid(localState.contact.mailto) }"
           placeholder="Email Address"
-        />
-        <span class="icon is-small is-left"> <i class="fas fa-envelope" /> </span>
+        >
+        <span class="icon is-small is-left">
+          <i class="fas fa-envelope"/>
+        </span>
       </div>
     </div>
 
     <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'">
       <div class="title is-6">Contact Active</div>
       <div class="field is-horizontal toggle">
-        <div class="field-label is-normal"><label class="label">Summer</label></div>
+        <div class="field-label is-normal">
+          <label class="label">Summer</label>
+        </div>
         <div class="toggle-container control is-expanded">
           <label for="summer" class="switch">
-            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer" />
-            <span class="slider round" />
+            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer">
+            <span class="slider round"/>
           </label>
         </div>
       </div>
 
       <div class="field is-horizontal toggle">
-        <div class="field-label is-normal"><label class="label">Winter</label></div>
+        <div class="field-label is-normal">
+          <label class="label">Winter</label>
+        </div>
         <div class="toggle-container control is-expanded">
           <label for="winter" class="switch">
-            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter" />
-            <span class="slider round" />
+            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter">
+            <span class="slider round"/>
           </label>
         </div>
       </div>
     </div>
 
     <div class="field is-horizontal toggle">
-      <div class="field-label is-normal"><label class="label">Dining</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Dining</label>
+      </div>
       <div class="toggle-container control is-expanded">
         <label for="dining" class="switch">
-          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining" />
-          <span class="slider round" />
+          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining">
+          <span class="slider round"/>
         </label>
       </div>
     </div>
 
     <div class="field is-horizontal" v-show="localState.contact.tags.dining">
-      <div class="field-label is-normal"><label class="label">Menu URL</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Menu URL</label>
+      </div>
       <div class="control has-icons-left has-icons-right">
         <input
           v-model.trim="localState.contact.menu"
           :class="{ 'is-danger': !urlIsValid(localState.contact.menu) }"
           class="input"
           placeholder="Menu URL"
-        />
-        <span class="icon is-small is-left"> <i class="fas fa-globe" /> </span>
+        >
+        <span class="icon is-small is-left">
+          <i class="fas fa-globe"/>
+        </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.menu">
           <a :href="localState.contact.menu" target="_blank" tabindex="-1">
-            <i class="fas fa-external-link-alt" />
+            <i class="fas fa-external-link-alt"/>
           </a>
         </span>
       </div>
     </div>
 
     <div class="field is-horizontal" v-show="localState.contact.tags.dining">
-      <div class="field-label is-normal"><label class="label">Reservations URL</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Reservations URL</label>
+      </div>
       <div class="control has-icons-left has-icons-right">
         <input
           v-model.trim="localState.contact.z_reservations"
           :class="{ 'is-danger': !urlIsValid(localState.contact.z_reservations) }"
           class="input"
           placeholder="Reservations URL"
-        />
-        <span class="icon is-small is-left"> <i class="fas fa-globe" /> </span>
+        >
+        <span class="icon is-small is-left">
+          <i class="fas fa-globe"/>
+        </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.z_reservations">
           <a :href="localState.contact.z_reservations" tabindex="-1" target="_blank">
-            <i class="fas fa-external-link-alt" />
+            <i class="fas fa-external-link-alt"/>
           </a>
         </span>
       </div>
@@ -148,7 +182,9 @@
     />
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Description</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Description</label>
+      </div>
       <div class="editors-container">
         <div class="tabs is-boxed">
           <ul>
@@ -157,7 +193,9 @@
               @click="localState.contact.descriptionEditor = 'RICH'"
             >
               <a>
-                <span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true"/></span>
+                <span class="icon is-small">
+                  <i class="far fa-file-alt" aria-hidden="true"/>
+                </span>
                 <span>Rich Text</span>
               </a>
             </li>
@@ -166,7 +204,9 @@
               @click="localState.contact.descriptionEditor = 'RAW'"
             >
               <a>
-                <span class="icon is-small"><i class="fas fa-code" aria-hidden="true"/></span>
+                <span class="icon is-small">
+                  <i class="fas fa-code" aria-hidden="true"/>
+                </span>
                 <span>Raw HTML</span>
               </a>
             </li>
@@ -189,14 +229,16 @@
     </div>
 
     <div class="field is-horizontal">
-      <div class="field-label is-normal"><label class="label">Image</label></div>
+      <div class="field-label is-normal">
+        <label class="label">Image</label>
+      </div>
 
       <div class="manage-image control">
         <div class="image-container" v-show="!!localState.contact.imageUrl">
           <span class="icon is-small remove" @click="removeImage">
-            <i class="fas fa-times-circle" />
+            <i class="fas fa-times-circle"/>
           </span>
-          <img :src="localState.contact.imageUrl" />
+          <img :src="localState.contact.imageUrl">
           <div class="remove-image" @click="removeImage">remove image</div>
         </div>
 
@@ -208,37 +250,43 @@
       </div>
     </div>
 
-    <div class="invalid-form-warning help is-danger" v-show="!localState.contact.name">
-      You must provide a contact name.
-    </div>
+    <div
+      class="invalid-form-warning help is-danger"
+      v-show="!localState.contact.name"
+    >You must provide a contact name.</div>
     <div
       class="invalid-form-warning help is-danger"
       v-show="!localState.contact.number && !localState.contact.sms"
-    >
-      You must provide a phone or SMS number.
-    </div>
-    <div class="invalid-form-warning help is-danger" v-show="!allDataVaild">
-      Form contains invalid data. Please fix errors (outlined in red) and try again
-    </div>
+    >You must provide a phone or SMS number.</div>
+    <div
+      class="invalid-form-warning help is-danger"
+      v-show="!allDataVaild"
+    >Form contains invalid data. Please fix errors (outlined in red) and try again</div>
 
     <div class="bottom-buttons">
       <div class="duplicate field is-left">
         <p class="control no-expando">
           <a class="button is-light" @click="duplicateContact">
-            <span>Make a Copy</span> <span class="icon is-small"> <i class="far fa-copy" /> </span>
+            <span>Make a Copy</span>
+            <span class="icon is-small">
+              <i class="far fa-copy"/>
+            </span>
           </a>
         </p>
       </div>
       <div class="field is-grouped is-grouped-right">
         <p class="control no-expando">
-          <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive"> Save </a>
+          <a class="button is-primary" @click="saveContact" :disabled="!saveButtonActive">Save</a>
         </p>
         <p class="control no-expando">
-          <a class="button is-light" @click="cancelEdits"> Cancel </a>
+          <a class="button is-light" @click="cancelEdits">Cancel</a>
         </p>
         <p class="control no-expando" v-show="contactId !== 'NEW'">
           <a class="button is-danger is-outlined" @click="deleteContact">
-            <span>Delete</span> <span class="icon is-small"> <i class="fas fa-trash-alt" /> </span>
+            <span>Delete</span>
+            <span class="icon is-small">
+              <i class="fas fa-trash-alt"/>
+            </span>
           </a>
         </p>
       </div>
@@ -262,6 +310,7 @@ const contactDefaults = {
   mailto: '',
   number: '',
   rect: '{{0,0},{80,80}}',
+  coordinates: {},
   url: '',
   mapId: -1,
   tags: {
@@ -478,40 +527,16 @@ export default {
         .replace(/<\/div>/g, '')
         .replace(/(\r\n|\n|\r)/gm, ' ')
     },
-    onCoordinateClick({ x, y, mapIndex }) {
-      const radius = this.localState.contact.rect.split('}')[1]
-        ? this.localState.contact.rect.split('}')[1]
-        : ',{80,80'
-      this.localState.contact.rect = `{{${x},${y}}${radius}}}`
-      this.localState.contact.mapId = mapIndex
+    onCoordinateClick({ x, y, mapId }) {
+      const existing = this.localState.contact.coordinates[mapId]
+        ? this.localState.contact.coordinates[mapId]
+        : null
+      const radius =
+        existing && existing && existing.split('}')[1] ? existing.split('}')[1] : ',{80,80'
+      this.localState.contact.coordinates[mapId] = `{{${x},${y}}${radius}}}`
     },
-    resetMapCoordinates() {
-      this.localState.contact.rect = '{{0,0},{80,80}}'
-      this.localState.contact.mapId = -1
-    },
-    getCoordinates(coordinateString) {
-      if (!coordinateString) return
-      const str = coordinateString.split('}')[0]
-      return {
-        x: parseInt(str.substring(2, str.indexOf(','))),
-        y: parseInt(str.substring(str.indexOf(',') + 1, str.length)),
-      }
-    },
-    locationGroupClick(group) {
-      this.onCoordinateClick({
-        x: group[0].x,
-        y: group[0].y,
-        mapIndex: this.localState.contact.mapId,
-      })
-      this.$store.dispatch('showSuccessModal', 'Coordinates applied successfully')
-    },
-    contactToLocation({ name, rect }) {
-      return {
-        name,
-        id: uuid(),
-        x: this.getCoordinates(rect).x,
-        y: this.getCoordinates(rect).y,
-      }
+    resetMapCoordinates(mapId) {
+      delete this.localState.contact.coordinates[mapId]
     },
     phoneIsValid(number) {
       const regionCode = this.$store.state.resortMeta.country
