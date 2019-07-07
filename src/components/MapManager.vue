@@ -15,17 +15,7 @@
             <div class="edit-name" v-if="editingNameAtIndex === index">
               <input type="text" v-model="nameDraft" />
             </div>
-            <div class="id">id: {{map.id}}</div>
-            <div class="toggle-container">
-              <label for="active" class="switch" @click.stop.prevent="toggleActive(map.id, !map.active)">
-                <input id="active" type="checkbox" v-model="map.active" />
-                <span class="slider round" />
-              </label>
-            </div>
-            <div class="map-actions">
-              <span>remove</span>
-              <span>replace</span>
-            </div>
+            <slot v-bind:map="map"></slot>
           </div>
         </div>
 
@@ -33,7 +23,7 @@
           file-name-prefix="map_"
           :path-prefix="`${pathPrefix}/map_files/`"
           button-label="Add a map..."
-          @uploadComplete="onMapFileUpload"
+          @uploadComplete="e => $emit('mapUpload', e)"
         />
       </div>
     </div>
@@ -54,23 +44,19 @@ export default {
     }
   },
   props: {
+    maps: {
+      type: Array,
+    },
     pathPrefix: {
       type: String,
     },
   },
   computed: mapState({
-    maps: state => state.resortMeta.maps,
-    numActive: state => {
-      if (!this.maps) return 0
-      return this.maps.filter(map => map.active).length
-    }
+
   }),
   methods: {
     onMapFileUpload(a, b, c) {},
-    toggleActive(id, val) {
-      if (val &&  numActive > 1) alert('active  map limit warning')
-      console.log({id, val});
-    }
+
   },
 }
 </script>
@@ -82,6 +68,11 @@ export default {
     display: flex;
     align-items: stretch;
     .image-container {
+      & > *:not(.icon) {
+        min-height: 25px;
+        display: flex;
+        align-items: center;
+        }
       position: relative;
       &:not(:first-child) {
         margin-left: 1em;
