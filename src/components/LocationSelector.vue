@@ -181,16 +181,16 @@ export default {
       return (this.xCoordinate || this.yCoordinate) && !this.hidePin
     },
     maps() {
-      return this.$store.state.resortMeta.maps.filter(map => map.active)
+      return this.$store.state.maps.maps.filter(map => map.active)
     },
     activeMap() {
       if (
-        !this.$store.state.resortMeta.maps ||
-        !this.$store.state.resortMeta.maps[this.viewingMapIndex]
+        !this.$store.state.maps.maps ||
+        !this.$store.state.maps.maps[this.viewingMapIndex]
       ) {
         return {}
       } else {
-        return this.$store.state.resortMeta.maps[this.viewingMapIndex]
+        return this.$store.state.maps.maps[this.viewingMapIndex]
       }
     },
     myCoordinates() {

@@ -6,7 +6,7 @@ import uuid from 'uuid/v4'
 import 'babel-polyfill'
 
 import archives from './archives'
-// import maps from './maps'
+import maps from './maps'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 // import mayExport from '../../utils/firestore-export.json'
@@ -156,6 +156,7 @@ const store = {
               maps: resortData.maps,
               name: resortData.name,
             })
+            commit('SET_MAPS', resortData.maps, { root: true })
             resolve()
           },
           err => reject(`Error listening to contacts: ${err}`)
@@ -503,7 +504,7 @@ const store = {
   },
   modules: {
     archives,
-    // maps,
+    maps,
   },
 }
 

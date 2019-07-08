@@ -2,7 +2,7 @@
   <div class="maps">
     <site-header title="Manage Maps" />
     <map-manager
-      :maps="$store.state.resortMeta.maps"
+      :maps="$store.state.maps.maps"
       :path-prefix="$store.state.resortId"
       @mapUpload="onMapUpload"
       @removeMap="onMapRemove"
