@@ -37,17 +37,29 @@ export default {
     SiteHeader,
     MapManager,
   },
+  computed: {
+    numberOfActiveMaps() {
+      return this.$store.state.maps.maps.filter(map => map.active).length
+    },
+  },
   methods: {
-    onMapUpload({ url, index }) {
-      debugger
+    onMapUpload({ id, url, name }) {
+      this.$store.dispatch('saveNewMap', { id, url, name, active: this.numberOfActiveMaps < 2 })
     },
     onMapRemove(mapId) {
       debugger
     },
     toggleActive(id, val) {
-      debugger
-      if (val && numActive > 1) alert('active  map limit warning')
-      console.log({ id, val })
+      if (val && this.numberOfActiveMaps > 1) {
+        this.$store.dispatch('showModal', {
+          heading: 'A maximum of two maps may be active at a time',
+          message: 'Please mark another map as inactive and try again',
+          confirmButtonLabel: 'OK',
+          hideCancel: true,
+        })
+      } else {
+        this.$store.dispatch('updateMap', { id, active: val })
+      }
     },
   },
 }

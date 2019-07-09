@@ -53,7 +53,8 @@ export default {
         },
       }
       const extension = file.name.split('.')[file.name.split('.').length - 1]
-      const fileName = this.fileNamePrefix + new Date().getTime()
+      const id = new Date().getTime()
+      const fileName = this.fileNamePrefix + id
       const newImageRef = storage.ref().child(this.pathPrefix + fileName + '.' + extension)
       const uploadTask = newImageRef.put(file, metadata)
 
@@ -70,6 +71,7 @@ export default {
             console.log('File available at', downloadURL)
             this.uploading = false
             this.$emit('uploadComplete', {
+              id,
               url: downloadURL,
               fileName: fileName + extension,
             })

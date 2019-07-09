@@ -19,10 +19,22 @@ export default {
     }
   },
   actions: {
-    saveMap({ state, rootState }, map) {
-      const { mapId } = map
-      const maps = { ...state.maps }
-      maps[mapId] = map
+    saveNewMap({ state, rootState }, map) {
+      const maps = [
+        ...state.maps,
+        map
+      ]
+      RESORTS_REF.doc(rootState.resortId).update({
+        maps,
+      })
+    },
+    updateMap({ state, rootState }, updatedMap) {
+      const maps = JSON.parse(JSON.stringify(state.maps))
+      const index = maps.findIndex(map => map.id === updatedMap.id)
+      maps[index] = {
+        ...maps[index],
+        ...updatedMap
+      }
       RESORTS_REF.doc(rootState.resortId).update({
         maps,
       })

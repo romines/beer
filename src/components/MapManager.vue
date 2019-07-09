@@ -23,7 +23,7 @@
           file-name-prefix="map_"
           :path-prefix="`${pathPrefix}/map_files/`"
           button-label="Add a map..."
-          @uploadComplete="e => $emit('mapUpload', e)"
+          @uploadComplete="onMapFileUpload"
         />
       </div>
     </div>
@@ -32,6 +32,7 @@
 
 <script>
 import ImageUpload from './ImageUpload.vue'
+import moment from 'moment'
 import { mapState } from 'vuex'
 export default {
   components: {
@@ -51,11 +52,14 @@ export default {
       type: String,
     },
   },
-  computed: mapState({
-
-  }),
   methods: {
-    onMapFileUpload(a, b, c) {},
+    onMapFileUpload({ id, url }) {
+      this.$emit('mapUpload', {
+        id,
+        url,
+        name:`Map file - ${moment(parseInt(id)).format('MMMM Do, YYYY')}`
+      })
+    },
 
   },
 }

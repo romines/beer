@@ -2,12 +2,16 @@
   <div class="new-resort">
     <div class="add-new-bar box" @click="addResort" v-show="!addingResort">
       <span class="text">Add New</span>
-      <span class="icon is-small"> <i class="fas fa-plus" /> </span>
+      <span class="icon is-small">
+        <i class="fas fa-plus" />
+      </span>
     </div>
 
     <div class="add-new-form box" v-show="addingResort">
       <div class="field is-horizontal">
-        <div class="field-label is-normal"><label class="label">Name</label></div>
+        <div class="field-label is-normal">
+          <label class="label">Name</label>
+        </div>
         <div class="field-body">
           <p class="control has-icons-left">
             <input
@@ -16,13 +20,17 @@
               placeholder="Name"
               ref="resortName"
             />
-            <span class="icon is-small is-left"> <i class="fas fa-address-book" /> </span>
+            <span class="icon is-small is-left">
+              <i class="fas fa-address-book" />
+            </span>
           </p>
         </div>
       </div>
       <p class="help is-danger" v-show="!newResortNameIsValid">Resort name is already in use</p>
       <div class="field is-horizontal">
-        <div class="field-label is-normal"><label class="label">Resort Id</label></div>
+        <div class="field-label is-normal">
+          <label class="label">Resort Id</label>
+        </div>
         <div class="field-body">
           <p class="control has-icons-left">
             <input
@@ -30,13 +38,17 @@
               class="input is-expanded"
               placeholder="resort_id"
             />
-            <span class="icon is-small is-left"> <i class="fas fa-address-book" /> </span>
+            <span class="icon is-small is-left">
+              <i class="fas fa-address-book" />
+            </span>
           </p>
         </div>
       </div>
       <p class="help is-danger" v-show="!newResortIdIsValid">Resort Id is already in use</p>
       <div class="field is-horizontal">
-        <div class="field-label is-normal"><label class="label">Country</label></div>
+        <div class="field-label is-normal">
+          <label class="label">Country</label>
+        </div>
         <div class="field-body">
           <p class="control has-icons-left">
             <span class="select">
@@ -45,18 +57,27 @@
                 <option value="AU">AU</option>
               </select>
             </span>
-            <span class="icon is-left"> <i class="fas fa-globe" /> </span>
+            <span class="icon is-left">
+              <i class="fas fa-globe" />
+            </span>
           </p>
         </div>
       </div>
 
       <!-- Map management -->
-      <map-manager v-if="newResort.resortId" :path-prefix="newResort.resortId" />
+      <map-manager
+        v-if="newResort.resortId"
+        :maps="newResort.maps"
+        :path-prefix="newResort.resortId"
+        @mapUpload="onMapUpload"
+      />
 
       <!-- Map management -->
 
       <div class="field is-horizontal">
-        <div class="field-label is-normal"><label class="label">JSON</label></div>
+        <div class="field-label is-normal">
+          <label class="label">JSON</label>
+        </div>
         <div class="field-body">
           <div class="field">
             <div class="control">
@@ -90,9 +111,7 @@
                 selectedEmergencyGroup = index
                 addingEmergencyGroup = false
               "
-            >
-              {{ name }}
-            </span>
+            >{{ name }}</span>
             <span
               class="button is-small add-group"
               :class="selectedEmergencyGroup === -2 ? 'is-active' : ''"
@@ -100,9 +119,7 @@
                 selectedEmergencyGroup = -2
                 addingEmergencyGroup = true
               "
-            >
-              Add Group
-            </span>
+            >Add Group</span>
           </div>
         </div>
       </div>
@@ -118,9 +135,7 @@
 
       <div class="field is-grouped is-grouped-right">
         <p class="control no-expando">
-          <a class="button is-primary" @click="saveNewResort" :disabled="!saveButtonActive">
-            Save
-          </a>
+          <a class="button is-primary" @click="saveNewResort" :disabled="!saveButtonActive">Save</a>
         </p>
         <p class="control no-expando">
           <a
@@ -129,9 +144,7 @@
               resetNewResortForm()
               addingResort = false
             "
-          >
-            Cancel
-          </a>
+          >Cancel</a>
         </p>
       </div>
     </div>
@@ -157,7 +170,7 @@ export default {
         name: '',
         resortId: '',
         country: 'US',
-        mapFiles: [],
+        maps: [],
       },
       selectedEmergencyGroup: -1,
       addingEmergencyGroup: false,
@@ -201,6 +214,9 @@ export default {
     },
     jsonError() {
       return this.pastedJson && !this.pastedData
+    },
+    numberOfActiveMaps() {
+      this.newResort.maps.filter(map => map.active).length
     },
     groupNames() {
       if (!this.pastedData || !this.pastedData.contactGroups) return []
@@ -250,9 +266,22 @@ export default {
         this.$refs.resortName.focus()
       })
     },
-    onMapFileAdded({ url }) {
-      if (!this.newResort.mapFiles) this.newResort.mapFiles = []
-      this.newResort.mapFiles.push(url)
+    onMapUpload({ url, id, name }) {
+      const map = {
+        id,
+        url,
+        name,
+        active: this.numberOfActiveMaps < 2,
+      }
+      this.newResort.maps.push(map)
+    },
+    onMapRename({ id, name }) {
+      const index = this.resortData.maps.findIndex(map => map.id === id)
+      const map = {
+        ...this.maps[index],
+        name,
+      }
+      this.$set(this.newResort.maps, index, map)
     },
     removeImage(index) {
       this.newResort.mapFiles.splice(index, 1)
