@@ -533,7 +533,7 @@ export default {
         : null
       const radius =
         existing && existing && existing.split('}')[1] ? existing.split('}')[1] : ',{80,80'
-      this.localState.contact.coordinates[mapId] = `{{${x},${y}}${radius}}}`
+      this.$set(this.localState.contact.coordinates, mapId, `{{${x},${y}}${radius}}}`)
     },
     resetMapCoordinates(mapId) {
       delete this.localState.contact.coordinates[mapId]

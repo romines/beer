@@ -5,7 +5,7 @@
       v-show="showPin"
       :style="{ top: yPinLocation + 'px', left: xPinLocation + 'px' }"
     >
-      <i class="fas fa-map-marker-alt"/>
+      <i class="fas fa-map-marker-alt" />
     </span>
 
     <div class="field is-horizontal">
@@ -35,43 +35,38 @@
             </ul>
           </div>
           <div
-            class="thumb-container"
+            class="tab-contents"
             v-for="(map, index) in maps"
             :key="map.id"
             v-show="viewingMapIndex === index"
           >
-            <div
-              class="inner-container"
-              :class="validMapCoordinatesExist(map.id) ? 'selected' : ''"
-            >
-              <span
-                class="icon is-small remove"
-                @click="$emit('resetMapCoordinates', activeMap.id)"
-              >
-                <i class="fas fa-times-circle"/>
+            <div class="map-container" :class="validMapCoordinatesExist(map.id) ? 'selected' : ''">
+              <span class="icon is-small remove" @click="$emit('resetMapCoordinates', map.id)">
+                <i class="fas fa-times-circle" />
               </span>
-              <img :src="map.url">
+              <img :src="map.url" />
             </div>
-            <!-- <small v-if="mapId == index">
-              <span class="marker">
-                <i class="fas fa-map-marker-alt"/>
-              </span>
-              {{ `(${xCoordinate}, ${yCoordinate})` }}
-            </small>-->
+            <div class="coordinate-info">
+              <div class="map-name">{{map.name}}</div>
+              <div class="map-id">Map ID: {{map.id}}</div>
+              <div
+                class="coordinates"
+                v-if="coordinates[map.id]"
+              >Coordinates: {{`${getCoordinates(coordinates[map.id]).x}, ${getCoordinates(coordinates[map.id]).y}`}}</div>
+            </div>
           </div>
 
           <div class="field is-horizontal" v-if="matchingLocations && matchingLocations.length">
-            <div class="field-label is-normal">
-              <label class="label">&nbsp;</label>
-            </div>
             <div class="matching-pins">
               <div class="proximity-warning">
-                <div class="heading">This contact shares coordinates with the following contact(s)</div>
+                <div
+                  class="heading"
+                >This contact shares coordinates for this map with the following contact(s)</div>
               </div>
               <ul class="location-group">
                 <li class="location" v-for="location in matchingLocations" :key="location.id">
                   <span class="name">{{ location.name }}</span>
-                  <span class="coordinates">({{ location.x }}, {{ location.y }})</span>
+                  <!-- <span class="coordinates">({{ location.x }}, {{ location.y }})</span> -->
                 </li>
               </ul>
             </div>
@@ -81,9 +76,6 @@
             class="field is-horizontal"
             v-if="groupedNearbyLocations && Object.keys(groupedNearbyLocations).length"
           >
-            <div class="field-label is-normal">
-              <label class="label">&nbsp;</label>
-            </div>
             <div class="proximate-pins">
               <div class="proximity-warning">
                 <div class="heading">
@@ -184,10 +176,7 @@ export default {
       return this.$store.state.maps.maps.filter(map => map.active)
     },
     activeMap() {
-      if (
-        !this.$store.state.maps.maps ||
-        !this.$store.state.maps.maps[this.viewingMapIndex]
-      ) {
+      if (!this.$store.state.maps.maps || !this.$store.state.maps.maps[this.viewingMapIndex]) {
         return {}
       } else {
         return this.$store.state.maps.maps[this.viewingMapIndex]
@@ -237,19 +226,6 @@ export default {
       }, {})
     },
   },
-
-  // watch: {
-  //   // re-initialize localState when new values come down from above
-  //   // 06/30 This shouldn't be needed anymore.  coordinates are initialized when map is viewed.
-  //   coordinates: {
-  //     immediate: true,
-  //     deep: true,
-  //     handler() {
-  //       this.initializeCoordinates()
-  //       this.showHidePersistButtons()
-  //     },
-  //   },
-  // },
   methods: {
     initializeViewer(viewer) {
       this.$viewer = viewer
@@ -444,17 +420,13 @@ div.control {
 .viewer {
   padding-bottom: 1.1em;
 
-  .thumb-container {
-    display: inline-flex;
+  .tab-contents {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 30%;
-    &:not(:first-child) {
-      margin-left: 0.6em;
-    }
 
-    .inner-container {
+    .map-container {
       position: relative;
+      flex-basis: 45%;
 
       small {
         position: absolute;
@@ -496,6 +468,11 @@ div.control {
           display: none;
         }
       }
+    }
+
+    .coordinate-info {
+      padding-left: 1.6em;
+      font-size: 0.87em;
     }
 
     img {
