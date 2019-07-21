@@ -25,10 +25,12 @@ module.exports = functions.https.onRequest((request, response) => {
     const fixCoordinates = contact => {
       if (stringIsEmptyCoordinates(contact.rect)) delete contact.rect;
       if (contact.coordinates) {
-        Object.keys(contact.coordinates).forEach(mapId => {
+        const mapIds = Object.keys(contact.coordinates);
+        mapIds.forEach(mapId => {
           if (stringIsEmptyCoordinates(contact.coordinates[mapId]))
             delete contact.coordinates[mapId];
         });
+        if (mapIds[0] && contact.coordinates[mapIds[0]]) contact.rect = contact.coordinates[mapIds[0]];
       }
       return contact;
     };
