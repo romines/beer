@@ -5,6 +5,7 @@
       :maps="$store.state.maps.maps"
       :path-prefix="$store.state.resortId"
       @mapUpload="onMapUpload"
+      @nameChange="onNameChange"
       @removeMap="onMapRemove"
     >
       <template v-slot:default="slotProps">
@@ -21,8 +22,8 @@
           </label>
         </div>
         <div class="map-actions">
-          <span>remove</span>
-          <span>replace</span>
+          <span @click="onMapRemove(slotProps.map.id)">remove</span>
+          <span class="coming-soon">replace</span>
         </div>
       </template>
     </map-manager>
@@ -47,7 +48,14 @@ export default {
       this.$store.dispatch('saveNewMap', { id, url, name, active: this.numberOfActiveMaps < 2 })
     },
     onMapRemove(mapId) {
-      debugger
+      this.$store.commit('SHOW_MODAL', {
+        heading: 'Are you sure you want to delete this map?',
+        message: 'References to it may still exist. Consider marking inactive instead.',
+        onConfirm: () => {
+          this.$store.dispatch('deleteMap', mapId)
+          this.$store.commit('CLOSE_MODAL')
+        },
+      })
     },
     toggleActive(id, val) {
       if (val && this.numberOfActiveMaps > 1) {
@@ -60,6 +68,9 @@ export default {
       } else {
         this.$store.dispatch('updateMap', { id, active: val })
       }
+    },
+    onNameChange({ index, val }) {
+      this.$store.dispatch('updateMap', { id: this.$store.state.maps.maps[index].id, name: val })
     },
   },
 }

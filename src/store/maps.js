@@ -39,5 +39,10 @@ export default {
         maps,
       })
     },
+    deleteMap({ state, rootState }, mapId) {
+      RESORTS_REF.doc(rootState.resortId).update({
+        maps: state.maps.filter(map => map.id !== mapId)
+      })
+    },
   },
 }
