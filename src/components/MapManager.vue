@@ -129,16 +129,6 @@ export default {
       margin-left: 0.6em;
       opacity: 0.85;
     }
-    .map-actions {
-      font-size: 0.9em;
-      span:not(.coming-soon) {
-        cursor: pointer;
-        margin-right: 1.6em;
-      }
-      .coming-soon {
-        opacity: 0.7;
-      }
-    }
   }
 }
 </style>

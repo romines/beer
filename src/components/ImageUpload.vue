@@ -9,10 +9,12 @@
           accept="image/*"
           name="resume"
         />
-        <span class="file-cta">
-          <span class="file-icon"> <i class="fas fa-upload" /> </span>
-          <span class="file-label"> {{ buttonLabel }} </span>
-        </span>
+        <slot name="cta">
+          <span class="file-cta">
+            <span class="file-icon"> <i class="fas fa-upload" /> </span>
+            <span class="file-label"> {{ buttonLabel }} </span>
+          </span>
+        </slot>
       </label>
     </div>
     <progress v-show="uploading" class="progress is-info" :value="uploadProgress" max="100" />
@@ -23,6 +25,7 @@
 import { storage } from '../firebaseInit.js'
 
 export default {
+  name: 'ImageUpload',
   props: {
     fileNamePrefix: {
       type: String,

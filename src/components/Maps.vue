@@ -23,7 +23,17 @@
         </div>
         <div class="map-actions">
           <span @click="onMapRemove(slotProps.map.id)">remove</span>
-          <span class="coming-soon">replace</span>
+          <image-upload
+            file-name-prefix="map_"
+            :path-prefix="`${$store.state.resortId}/map_files/`"
+            button-label="Add a map..."
+            @uploadComplete="({ url }) => onMapReplaceUpload(slotProps.map.id, url)"
+            ref="replaceUploader"
+          >
+            <template v-slot:cta>
+              <span>replace</span>
+            </template>
+          </image-upload>
         </div>
       </template>
     </map-manager>
@@ -33,8 +43,10 @@
 <script>
 import SiteHeader from './SiteHeader.vue'
 import MapManager from './MapManager.vue'
+import ImageUpload from './ImageUpload.vue'
 export default {
   components: {
+    ImageUpload,
     SiteHeader,
     MapManager,
   },
@@ -46,6 +58,9 @@ export default {
   methods: {
     onMapUpload({ id, url, name }) {
       this.$store.dispatch('saveNewMap', { id, url, name, active: this.numberOfActiveMaps < 2 })
+    },
+    onMapReplaceUpload(id, url) {
+      this.$store.dispatch('updateMap', { id, url })
     },
     onMapRemove(mapId) {
       this.$store.commit('SHOW_MODAL', {
@@ -82,6 +97,17 @@ export default {
   align-items: center;
   .the-label {
     margin-right: 1em;
+  }
+}
+.map-actions {
+  font-size: 0.9em;
+  span {
+    cursor: pointer;
+    margin-right: 1.6em;
+  }
+  /deep/ label { margin-top: 0; }
+  .coming-soon {
+    opacity: 0.7;
   }
 }
 </style>
