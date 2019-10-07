@@ -432,11 +432,15 @@ export default {
       })
     },
     saveContact() {
-      const number = this.localState.contact.number
-        ? this.getPn(this.localState.contact.number, this.$store.state.resortMeta.country)
+      const getNumber = (input) => {
+        if (!input) return ''
+        if (input === '000') return '000'
+        return this.getPn(input, this.$store.state.resortMeta.country)
             .getNumber('international')
             .replace(/ /g, '-')
-        : ''
+      }
+      const number = getNumber(this.localState.contact.number)
+
       const sms = this.localState.contact.sms
         ? this.getPn(this.localState.contact.sms, this.$store.state.resortMeta.country).getNumber(
             'international'
