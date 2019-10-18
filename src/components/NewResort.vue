@@ -247,7 +247,7 @@ export default {
         {
           "mailto": "reservations@thredbo.com.au",
           "number": "1300-020-589",
-          "rect": "{{792,491},{80,80}}",
+          "coordinates": {},
           "z_detail": "Planning on heading to the snow for the first time? . . .",
           "name": "Reservations",
           "url": "https://www.thredbo.com.au/accommodation/"
@@ -284,7 +284,7 @@ export default {
       this.$set(this.newResort.maps, index, map)
     },
     removeImage(index) {
-      this.newResort.mapFiles.splice(index, 1)
+      this.newResort.maps.splice(index, 1)
     },
     getEmergencyGroup() {
       const getEmergencyGroupFromManualEntry = () => {

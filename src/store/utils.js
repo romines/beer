@@ -9,23 +9,12 @@ export function addMissingContactDefaults (group) {
     return contact
   }
 
-  const fixCoordinates = (contact) => {
-    if (contact.rect === '{{0,0}{80,80}}') contact.rect = '{{0,0},{80,80}}'
-    return contact
-  }
-
   const addMissingEmptyStringFields = (contact) => {
     ['imageUrl', 'mailto', 'menu', 'name', 'number', 'rect', 'sms', 'url', 'z_detail', 'z_reservations'].forEach(urlField => {
       if (contact[urlField] === undefined) {
         contact[urlField] = ''
       }
     })
-    return contact
-  }
-
-  const addMapIndex = (contact) => {
-    if (contact.rect === '') contact.mapId = -1
-    if (contact.mapId === undefined) contact.mapId = 0
     return contact
   }
 
@@ -66,10 +55,8 @@ export function addMissingContactDefaults (group) {
     ? group.list
       // TEMP
       .map(moveReservations)
-      .map(fixCoordinates)
       // end TEMP
       .map(addMissingEmptyStringFields)
-      .map(addMapIndex)
       .map(addUuid)
       .map(addHttpPrefix)
       .map(replaceNumberSpaces)

@@ -152,7 +152,7 @@ const store = {
             commit('SET_CONTACT_GROUPS', resortData)
             commit('SET_RESORT_META', {
               country: resortData.country,
-              mapFiles: resortData.mapFiles,
+              mapFiles: resortData.mapFiles, // TODO: remove
               maps: resortData.maps,
               name: resortData.name,
             })

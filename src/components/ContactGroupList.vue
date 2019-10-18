@@ -264,16 +264,6 @@ export default {
         onConfirm
       })
     },
-    initializeNewContact () {
-      return {
-        mailto: '',
-        name: '',
-        number: '',
-        rect: '',
-        url: '',
-        z_reservations: ''
-      }
-    }
   }
 
 

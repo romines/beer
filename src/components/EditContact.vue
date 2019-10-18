@@ -171,12 +171,10 @@
     </div>
 
     <location-selector
-      v-if="this.$store.state.resortMeta.mapFiles && this.$store.state.resortMeta.mapFiles.length"
+      v-if="this.$store.state.resortMeta.maps && this.$store.state.resortMeta.maps.length"
       :coordinates="localState.contact.coordinates"
       :flattened-contacts="flattenedContacts"
-      :coordinate-string="localState.contact.rect"
       :contact-id="localState.contact.id"
-      :map-id="localState.contact.mapId"
       @coordinateClick="onCoordinateClick"
       @resetMapCoordinates="resetMapCoordinates"
     />
@@ -309,10 +307,8 @@ const contactDefaults = {
   name: '',
   mailto: '',
   number: '',
-  rect: '{{0,0},{80,80}}',
   coordinates: {},
   url: '',
-  mapId: -1,
   tags: {
     summer: true,
     winter: true,

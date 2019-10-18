@@ -82,9 +82,9 @@
                   <span class="warning-title">
                     <strong>NOTICE: Nearby locations exist.</strong>
                   </span>
-                  <span class="coordinates" v-if="coordinateString">
-                    Selected coordinates: ({{ getCoordinates(coordinateString).x }},
-                    {{ getCoordinates(coordinateString).y }})
+                  <span class="coordinates" v-if="myCoordinates.x || myCoordinates.y">
+                    Selected coordinates: ({{ myCoordinates.x }},
+                    {{ myCoordinates.y }})
                   </span>
                 </div>
               </div>
@@ -120,9 +120,6 @@ export default {
   components: { Viewer },
   props: {
     contactId: {
-      type: String,
-    },
-    coordinateString: {
       type: String,
     },
     coordinates: {
@@ -190,6 +187,22 @@ export default {
         if (!contact.coordinates || !contact.coordinates[this.activeMap.id] || !this.myCoordinates)
           return false
         const testCoords = this.getCoordinates(contact.coordinates[this.activeMap.id])
+        if (
+          contact.id !== this.contactId && // not same contact
+          (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
+          Math.abs(testCoords.x - this.myCoordinates.x) < 81 && // within tolerance
+          Math.abs(testCoords.y - this.myCoordinates.y) < 81
+        ) {
+          console.log(`testCoords.x: ${testCoords.x}`);
+          console.log(`testCoords.y: ${testCoords.y}`);
+          console.log(`this.myCoordinates.x: ${this.myCoordinates.x}`);
+          console.log(`this.myCoordinates.y: ${this.myCoordinates.y}`);
+          console.log(`not same contact:  ${contact.id !== this.contactId}`)
+          console.log(`not exact match:  ${(testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y)}`)
+          console.log(`within tolerance (x):  ${Math.abs(testCoords.x - this.myCoordinates.x) < 81}`)
+          console.log(`within tolerance (y):  ${Math.abs(testCoords.y - this.myCoordinates.y) < 81 }`)
+
+        }
         return (
           contact.id !== this.contactId && // not same contact
           (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
@@ -243,6 +256,7 @@ export default {
         this.viewerDOM.currentImage.scrollWidth / this.viewerDOM.currentImage.naturalWidth
     },
     getCoordinates(coordinateString) {
+      console.log(coordinateString);
       if (!coordinateString) {
         return { x: 0, y: 0 }
       }
@@ -252,12 +266,13 @@ export default {
         y: parseInt(str.substring(str.indexOf(',') + 1, str.length)),
       }
     },
-    contactToLocation({ name, rect }) {
+    contactToLocation({ name, coordinates }) {
+      const { x, y } = this.getCoordinates(coordinates[this.activeMap.id])
       return {
         name,
         id: uuid(),
-        x: this.getCoordinates(rect).x,
-        y: this.getCoordinates(rect).y,
+        x,
+        y,
       }
     },
     getMarginOffset() {
