@@ -28,6 +28,10 @@ const defaultModalContents = {
 Vue.use(Vuex)
 
 const store = {
+  modules: {
+    archives,
+    maps,
+  },
   state: {
     user: {},
     resorts: [],
@@ -501,10 +505,6 @@ const store = {
       })
       setTimeout(closeModal, 5500)
     },
-  },
-  modules: {
-    archives,
-    maps,
   },
 }
 

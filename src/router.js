@@ -10,6 +10,7 @@ import {
   ForgotPassword,
   Login,
   Maps,
+  Tags,
   Resorts,
   Resort,
   SignUp,
@@ -59,6 +60,20 @@ const routes = [
     path: '/maps',
     name: 'Maps',
     component: Maps,
+    meta: {
+      requiresAuth: true,
+      requiresSuperAdmin: true,
+    },
+    beforeEnter: async (to, from, next) => {
+      if (!store.state.resortId) return next('/')
+      await store.dispatch('listenToResortRoot')
+      next()
+    },
+  },
+  {
+    path: '/tags',
+    name: 'Tags',
+    component: Tags,
     meta: {
       requiresAuth: true,
       requiresSuperAdmin: true,
