@@ -1,6 +1,45 @@
 <template>
-  <div class="tags">
+  <div class="tags-page">
     <site-header title="Manage Tags" />
+    <div class="main">
+      <div class="tags">
+        <div class="tag" v-for="tag in $store.state.tags.availableTags" :key="tag">
+          <span class="name">{{tag}}</span>
+          <span class="icon is-small remove" @click="$emit('removeMap', map.id)">
+            <i class="fas fa-times-circle" />
+          </span>
+        </div>
+      </div>
+      <div class="add-new-bar box" v-show="!addingTag" @click="addingTag = true">
+        <span class="text">Add New Tag</span>
+        <span class="icon is-small">
+          <i class="fas fa-plus" />
+        </span>
+      </div>
+      <div class="add-new-bar box new-group field is-grouped" v-show="addingTag">
+        <p class="control is-expanded">
+          <input
+            class="input is-small"
+            v-model="tagNameDraft"
+            @keyup.enter="createNewTag"
+            placeholder="Enter tag"
+            autofocus
+            ref="nameInput"
+          />
+        </p>
+        <p class="control">
+          <button
+            class="button is-primary is-small save"
+            :disabled="!tagNameDraft.length"
+            @click.stop="createNewTag"
+          >Save</button>
+          <button
+            class="button is-small cancel"
+            @click.stop="addingTag = false; tagNameDraft = ''"
+          >Cancel</button>
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -10,15 +49,21 @@ import SiteHeader from './SiteHeader.vue'
 
 export default {
   name: 'Tags',
-    components: {
+  components: {
     SiteHeader,
   },
-  props: {
-  },
+  props: {},
   data() {
-    return {}
+    return {
+      addingTag: false,
+      tagNameDraft: '',
+    }
   },
-  methods: {},
+  methods: {
+    createNewTag() {
+      this.$store.dispatch('saveNewTag', this.tagNameDraft)
+    },
+  },
 }
 </script>
 

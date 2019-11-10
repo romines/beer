@@ -5,9 +5,9 @@
         <label class="label">Name</label>
       </div>
       <div class="control has-icons-left">
-        <input v-model.trim="localState.contact.name" class="input" placeholder="Name">
+        <input v-model.trim="localState.contact.name" class="input" placeholder="Name" />
         <span class="icon is-small is-left">
-          <i class="fas fa-address-book"/>
+          <i class="fas fa-address-book" />
         </span>
       </div>
     </div>
@@ -25,7 +25,7 @@
         />
 
         <span class="icon is-small is-left">
-          <i class="fas fa-phone"/>
+          <i class="fas fa-phone" />
         </span>
       </div>
     </div>
@@ -43,7 +43,7 @@
           placeholder="SMS"
         />
         <span class="icon is-small is-left">
-          <i class="fas fa-mobile-alt"/>
+          <i class="fas fa-mobile-alt" />
         </span>
       </div>
     </div>
@@ -58,13 +58,13 @@
           :class="{ 'is-danger': !urlIsValid(localState.contact.url) }"
           class="input"
           placeholder="Website"
-        >
+        />
         <span class="icon is-small is-left">
-          <i class="fas fa-globe"/>
+          <i class="fas fa-globe" />
         </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.url">
           <a :href="localState.contact.url" target="_blank" tabindex="-1">
-            <i class="fas fa-external-link-alt"/>
+            <i class="fas fa-external-link-alt" />
           </a>
         </span>
       </div>
@@ -80,9 +80,9 @@
           class="input"
           :class="{ 'is-danger': !emailIsValid(localState.contact.mailto) }"
           placeholder="Email Address"
-        >
+        />
         <span class="icon is-small is-left">
-          <i class="fas fa-envelope"/>
+          <i class="fas fa-envelope" />
         </span>
       </div>
     </div>
@@ -95,8 +95,8 @@
         </div>
         <div class="toggle-container control is-expanded">
           <label for="summer" class="switch">
-            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer">
-            <span class="slider round"/>
+            <input id="summer" type="checkbox" v-model="localState.contact.tags.summer" />
+            <span class="slider round" />
           </label>
         </div>
       </div>
@@ -107,8 +107,8 @@
         </div>
         <div class="toggle-container control is-expanded">
           <label for="winter" class="switch">
-            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter">
-            <span class="slider round"/>
+            <input id="winter" type="checkbox" v-model="localState.contact.tags.winter" />
+            <span class="slider round" />
           </label>
         </div>
       </div>
@@ -120,8 +120,20 @@
       </div>
       <div class="toggle-container control is-expanded">
         <label for="dining" class="switch">
-          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining">
-          <span class="slider round"/>
+          <input id="dining" type="checkbox" v-model="localState.contact.tags.dining" />
+          <span class="slider round" />
+        </label>
+      </div>
+    </div>
+
+    <div class="field is-horizontal toggle" v-for="tag in customTags" :key="tag">
+      <div class="field-label is-normal">
+        <label class="label">{{ toUpper(tag) }}</label>
+      </div>
+      <div class="toggle-container control is-expanded">
+        <label for="dining" class="switch">
+          <input id="dining" type="checkbox" v-model="localState.contact.tags[tag]" />
+          <span class="slider round" />
         </label>
       </div>
     </div>
@@ -136,13 +148,13 @@
           :class="{ 'is-danger': !urlIsValid(localState.contact.menu) }"
           class="input"
           placeholder="Menu URL"
-        >
+        />
         <span class="icon is-small is-left">
-          <i class="fas fa-globe"/>
+          <i class="fas fa-globe" />
         </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.menu">
           <a :href="localState.contact.menu" target="_blank" tabindex="-1">
-            <i class="fas fa-external-link-alt"/>
+            <i class="fas fa-external-link-alt" />
           </a>
         </span>
       </div>
@@ -158,13 +170,13 @@
           :class="{ 'is-danger': !urlIsValid(localState.contact.z_reservations) }"
           class="input"
           placeholder="Reservations URL"
-        >
+        />
         <span class="icon is-small is-left">
-          <i class="fas fa-globe"/>
+          <i class="fas fa-globe" />
         </span>
         <span class="icon is-small is-right test-link" v-show="localState.contact.z_reservations">
           <a :href="localState.contact.z_reservations" tabindex="-1" target="_blank">
-            <i class="fas fa-external-link-alt"/>
+            <i class="fas fa-external-link-alt" />
           </a>
         </span>
       </div>
@@ -192,7 +204,7 @@
             >
               <a>
                 <span class="icon is-small">
-                  <i class="far fa-file-alt" aria-hidden="true"/>
+                  <i class="far fa-file-alt" aria-hidden="true" />
                 </span>
                 <span>Rich Text</span>
               </a>
@@ -203,7 +215,7 @@
             >
               <a>
                 <span class="icon is-small">
-                  <i class="fas fa-code" aria-hidden="true"/>
+                  <i class="fas fa-code" aria-hidden="true" />
                 </span>
                 <span>Raw HTML</span>
               </a>
@@ -234,9 +246,9 @@
       <div class="manage-image control">
         <div class="image-container" v-show="!!localState.contact.imageUrl">
           <span class="icon is-small remove" @click="removeImage">
-            <i class="fas fa-times-circle"/>
+            <i class="fas fa-times-circle" />
           </span>
-          <img :src="localState.contact.imageUrl">
+          <img :src="localState.contact.imageUrl" />
           <div class="remove-image" @click="removeImage">remove image</div>
         </div>
 
@@ -267,7 +279,7 @@
           <a class="button is-light" @click="duplicateContact">
             <span>Make a Copy</span>
             <span class="icon is-small">
-              <i class="far fa-copy"/>
+              <i class="far fa-copy" />
             </span>
           </a>
         </p>
@@ -283,7 +295,7 @@
           <a class="button is-danger is-outlined" @click="deleteContact">
             <span>Delete</span>
             <span class="icon is-small">
-              <i class="fas fa-trash-alt"/>
+              <i class="fas fa-trash-alt" />
             </span>
           </a>
         </p>
@@ -392,6 +404,12 @@ export default {
         return [...accumulated, ...group.list]
       }, [])
     },
+    customTags() {
+      return this.$store.state.tags.availableTags
+    },
+    toUpper(str) {
+      return str.charAt(0).toUpperCase() + str.substring(1)
+    }
   },
 
   watch: {
@@ -428,12 +446,12 @@ export default {
       })
     },
     saveContact() {
-      const getNumber = (input) => {
+      const getNumber = input => {
         if (!input) return ''
         if (input === '000') return '000'
         return this.getPn(input, this.$store.state.resortMeta.country)
-            .getNumber('international')
-            .replace(/ /g, '-')
+          .getNumber('international')
+          .replace(/ /g, '-')
       }
       const number = getNumber(this.localState.contact.number)
 

@@ -7,6 +7,7 @@ import 'babel-polyfill'
 
 import archives from './archives'
 import maps from './maps'
+import tags from './tags'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 // import mayExport from '../../utils/firestore-export.json'
@@ -31,6 +32,7 @@ const store = {
   modules: {
     archives,
     maps,
+    tags,
   },
   state: {
     user: {},
@@ -159,8 +161,10 @@ const store = {
               mapFiles: resortData.mapFiles, // TODO: remove
               maps: resortData.maps,
               name: resortData.name,
+
             })
             commit('SET_MAPS', resortData.maps, { root: true })
+            commit('SET_TAGS', resortData.availableTags, { root: true })
             resolve()
           },
           err => reject(`Error listening to contacts: ${err}`)

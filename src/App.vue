@@ -4,6 +4,7 @@
     <div class="top-nav-container">
       <span class="top-nav">
         <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
+        <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" :to="`/resorts/${$store.state.resortId}`">Contacts</router-link>
         <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/maps">Maps</router-link>
         <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/tags">Tags</router-link>
         <span
