@@ -241,7 +241,6 @@ export default {
         this.viewerDOM.currentImage.scrollWidth / this.viewerDOM.currentImage.naturalWidth
     },
     getCoordinates(coordinateString) {
-      console.log(coordinateString);
       if (!coordinateString) {
         return { x: 0, y: 0 }
       }

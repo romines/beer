@@ -3,9 +3,9 @@
     <site-header title="Manage Tags" />
     <div class="main">
       <div class="tags">
-        <div class="tag" v-for="tag in $store.state.tags.availableTags" :key="tag">
+        <div class="tag is-primary" v-for="tag in $store.state.tags.availableTags" :key="tag">
           <span class="name">{{tag}}</span>
-          <span class="icon is-small remove" @click="$emit('removeMap', map.id)">
+          <span class="icon is-small remove" @click="deleteTag(tag)">
             <i class="fas fa-times-circle" />
           </span>
         </div>
@@ -62,6 +62,17 @@ export default {
   methods: {
     createNewTag() {
       this.$store.dispatch('saveNewTag', this.tagNameDraft)
+      this.tagNameDraft = ''
+    },
+    deleteTag(tag) {
+      this.$store.commit('SHOW_MODAL', {
+        heading: 'Are you sure you want to delete this tag?',
+        message: '',
+        onConfirm: () => {
+          this.$store.dispatch('deleteTag', tag)
+          this.$store.commit('CLOSE_MODAL')
+        },
+      })
     },
   },
 }

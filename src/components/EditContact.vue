@@ -131,8 +131,8 @@
         <label class="label">{{ toUpper(tag) }}</label>
       </div>
       <div class="toggle-container control is-expanded">
-        <label for="dining" class="switch">
-          <input id="dining" type="checkbox" v-model="localState.contact.tags[tag]" />
+        <label :for="tag" class="switch">
+          <input :id="tag" type="checkbox" v-model="localState.contact.tags[tag]" />
           <span class="slider round" />
         </label>
       </div>
@@ -407,9 +407,6 @@ export default {
     customTags() {
       return this.$store.state.tags.availableTags
     },
-    toUpper(str) {
-      return str.charAt(0).toUpperCase() + str.substring(1)
-    }
   },
 
   watch: {
@@ -561,6 +558,9 @@ export default {
       if (!number) return true
       if (number === '000') return true
       return this.getPn(number, regionCode).a.valid
+    },
+    toUpper(str) {
+      return str.charAt(0).toUpperCase() + str.substring(1)
     },
   },
 }

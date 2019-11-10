@@ -22,7 +22,7 @@ export default {
     },
     deleteTag ({ state, rootState }, tagToDelete) {
       RESORTS_REF.doc(rootState.resortId).update({
-        maps: state.availableTags.filter(tag => tag !== tagToDelete)
+        availableTags: state.availableTags.filter(tag => tag !== tagToDelete)
       })
     },
   },
