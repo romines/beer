@@ -65,15 +65,22 @@ export default {
       this.tagNameDraft = ''
     },
     deleteTag(tag) {
+      console.log(`tagIsInUse: ${this.tagIsInUse(tag)}`);
       this.$store.commit('SHOW_MODAL', {
         heading: 'Are you sure you want to delete this tag?',
-        message: '',
+        message: this.tagIsInUse(tag) ? 'This tag is in use. If you delete it, it will be removed from any contact it has been applied to.': '',
         onConfirm: () => {
           this.$store.dispatch('deleteTag', tag)
           this.$store.commit('CLOSE_MODAL')
         },
       })
     },
+    tagIsInUse(tag) {
+      const flattenedContacts = this.$store.state.contactGroups.reduce((accumulated, group) => {
+        return [...accumulated, ...group.list]
+      }, [])
+      return flattenedContacts.filter(({ tags }) => tags[tag]).length
+    }
   },
 }
 </script>
