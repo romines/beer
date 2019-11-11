@@ -13,7 +13,7 @@ export default {
   actions: {
     saveNewTag({ state, rootState }, tag) {
       const availableTags = [
-        ...state.availableTags,
+        ...(state.availableTags ? state.availableTags : []),
         tag
       ]
       RESORTS_REF.doc(rootState.resortId).update({
