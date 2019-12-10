@@ -1,4 +1,4 @@
-const admin = require('./firebaseAdmin.js')('testing');
+const admin = require('./firebaseAdmin.js').initialize('testing');
 const moment = require('moment');
 const firestoreDocs = admin.firestore();
 const rtdb = admin.database();

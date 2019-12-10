@@ -1,6 +1,6 @@
 const args = require('yargs').argv;
 const environment = args.env ? args.env : 'staging';
-const admin = require('./firebaseAdmin.js')(environment);
+const admin = require('./firebaseAdmin.js').initialize(environment);
 // const fs = require('fs');
 console.log(`Connected to firestore with environment: ${environment}`);
 const db = admin.firestore();

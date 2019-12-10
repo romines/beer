@@ -1,4 +1,4 @@
-const admin = require('./firebaseAdmin.js')('production');
+const admin = require('./firebaseAdmin.js').initialize('production');
 const moment = require('moment');
 const fs = require('fs');
 
