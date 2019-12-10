@@ -32,7 +32,6 @@ async function main() {
   });
   if (!confirmation.yes) return;
 
-  console.log(`Copying data from ${source} to ${target}`);
   const admin = initializeApp(target);
   const sourceConfig = getConfig(source);
   const sourceApp = admin.initializeApp(sourceConfig, 'source');
@@ -42,16 +41,33 @@ async function main() {
   sourceDb.settings({ timestampsInSnapshots: true });
 
   const sourceSnapshot = await sourceDb.collection('resorts').get();
-  const sourceDocsArray = [];
-  sourceSnapshot.forEach(doc => sourceDocsArray.push(doc.data()));
 
   const targetSnapshot = await db.collection('resorts').get();
   const targetDocsArray = [];
   targetSnapshot.forEach(doc => targetDocsArray.push(doc.data()));
+  const targetDocsIds = [];
+  targetSnapshot.forEach(doc => targetDocsArray.push(doc.id));
 
-  db.collection('test')
-    .doc('foo')
-    .set({ bar: 'baz' });
+  let batch = db.batch();
+
+  targetDocsIds.forEach(resortId => {
+    const resortRef = db.collection('resorts').doc(resortId);
+    batch.delete(resortRef);
+  });
+
+  sourceSnapshot.forEach(doc => {
+    const resortId = doc.id;
+    const resortData = doc.data();
+    let targetRef = db.collection('resorts').doc(resortId);
+    batch.set(targetRef, resortData);
+  });
+
+  try {
+    await batch.commit();
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(`Successfully copied data from ${source} to ${target}!`);
+  process.exit(0);
 }
-
 main();

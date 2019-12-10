@@ -23,7 +23,7 @@ module.exports.getConfig = environment => ({
   storageBucket: `${baseUrls[environment]}.appspot.com`,
 });
 
-module.exports.initialize = function(environment, name) {
+module.exports.initialize = function(environment) {
   const config = {
     credential: admin.credential.cert(keys[environment]),
     databaseURL: `https://${baseUrls[environment]}.firebaseio.com`,
