@@ -36,21 +36,23 @@ async function main() {
   const sourceConfig = getConfig(source);
   const sourceApp = admin.initializeApp(sourceConfig, 'source');
   const db = admin.firestore();
+  const rtdb = admin.database();
   const sourceDb = admin.firestore(sourceApp);
+  const sourceRtdb = admin.database(sourceApp);
   db.settings({ timestampsInSnapshots: true });
   sourceDb.settings({ timestampsInSnapshots: true });
 
   const sourceSnapshot = await sourceDb.collection('resorts').get();
+  const sourceIds = [];
+  sourceSnapshot.forEach(doc => sourceIds.push(doc.id));
 
   const targetSnapshot = await db.collection('resorts').get();
-  const targetDocsArray = [];
-  targetSnapshot.forEach(doc => targetDocsArray.push(doc.data()));
-  const targetDocsIds = [];
-  targetSnapshot.forEach(doc => targetDocsArray.push(doc.id));
+  const targetIds = [];
+  targetSnapshot.forEach(doc => targetIds.push(doc.id));
 
   let batch = db.batch();
 
-  targetDocsIds.forEach(resortId => {
+  targetIds.forEach(resortId => {
     const resortRef = db.collection('resorts').doc(resortId);
     batch.delete(resortRef);
   });
@@ -67,7 +69,25 @@ async function main() {
   } catch (error) {
     console.log(error);
   }
-  console.log(`Successfully copied data from ${source} to ${target}!`);
+  console.log(
+    `Successfully copied firestore data from ${source} to ${target}!`
+  );
+
+  const copyRtdb = async () => {
+    // NB: does not delete extra root nodes that are present in target but not source
+    return Promise.all(
+      sourceIds.map(async id => {
+        const sourceRtdbRef = sourceRtdb.ref(id);
+        const sourceArchiveSnapshot = await sourceRtdbRef.once('value');
+        const targetRtdbRef = rtdb.ref(id);
+        await targetRtdbRef.set(sourceArchiveSnapshot.val());
+      })
+    );
+  };
+  await copyRtdb();
+  console.log(
+    `Successfully copied realtime database data from ${source} to ${target}!`
+  );
   process.exit(0);
 }
 main();
