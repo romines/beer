@@ -156,7 +156,7 @@ const store = {
               maps: resortData.maps,
               name: resortData.name,
             })
-            commit('SET_MAPS', resortData.maps, { root: true })
+            if (resortData.maps) commit('SET_MAPS', resortData.maps.map(forceIntId), { root: true })
             resolve()
           },
           err => reject(`Error listening to contacts: ${err}`)
@@ -518,6 +518,10 @@ function addGroupId(group) {
     group.id = uuid()
   }
   return group
+}
+
+function forceIntId(map) {
+  return {...map, id: parseInt(map.id)}
 }
 
 export default new Vuex.Store(store)

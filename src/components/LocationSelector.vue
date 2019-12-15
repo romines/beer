@@ -24,11 +24,11 @@
           <div class="tabs is-boxed map-selectors">
             <ul>
               <li
-                v-for="(map, index) in maps"
+                v-for="map in maps"
                 :key="map.id"
                 class="tab map-name-container"
-                :class="{'is-active': viewingMapIndex === index}"
-                @click="selectMap(index)"
+                :class="{'is-active': activeMapId === map.id}"
+                @click="selectMap(map.id)"
               >
                 <a class="map-name">{{ map.name }}</a>
               </li>
@@ -36,9 +36,9 @@
           </div>
           <div
             class="tab-contents"
-            v-for="(map, index) in maps"
+            v-for="map in maps"
             :key="map.id"
-            v-show="viewingMapIndex === index"
+            v-show="activeMapId === map.id"
           >
             <div class="map-container" :class="validMapCoordinatesExist(map.id) ? 'selected' : ''">
               <span class="icon is-small remove" @click="$emit('resetMapCoordinates', map.id)">
@@ -132,7 +132,7 @@ export default {
   data() {
     return {
       hidePin: true,
-      viewingMapIndex: 0,
+      activeMapId: 0,
       xMargin: 0,
       yMargin: 0,
       xCoordinate: 0,
@@ -159,6 +159,9 @@ export default {
       },
     }
   },
+  mounted() {
+    this.setActiveMapId()
+  },
   computed: {
     xPinLocation() {
       return this.xMargin + this.xCoordinate * this.zoomLevel
@@ -173,36 +176,20 @@ export default {
       return this.$store.state.maps.maps.filter(map => map.active)
     },
     activeMap() {
-      if (!this.$store.state.maps.maps || !this.$store.state.maps.maps[this.viewingMapIndex]) {
+      if (!this.$store.state.maps.maps) {
         return {}
       } else {
-        return this.$store.state.maps.maps[this.viewingMapIndex]
+        return this.$store.state.maps.maps.find(map => map.id === this.activeMapId)
       }
     },
     myCoordinates() {
-      return this.getCoordinates(this.coordinates[this.activeMap.id])
+      return this.getCoordinates(this.coordinates[this.activeMapId])
     },
     nearbyLocations() {
       const isMatch = contact => {
-        if (!contact.coordinates || !contact.coordinates[this.activeMap.id] || !this.myCoordinates)
+        if (!contact.coordinates || !contact.coordinates[this.activeMapId] || !this.myCoordinates)
           return false
-        const testCoords = this.getCoordinates(contact.coordinates[this.activeMap.id])
-        if (
-          contact.id !== this.contactId && // not same contact
-          (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
-          Math.abs(testCoords.x - this.myCoordinates.x) < 81 && // within tolerance
-          Math.abs(testCoords.y - this.myCoordinates.y) < 81
-        ) {
-          console.log(`testCoords.x: ${testCoords.x}`);
-          console.log(`testCoords.y: ${testCoords.y}`);
-          console.log(`this.myCoordinates.x: ${this.myCoordinates.x}`);
-          console.log(`this.myCoordinates.y: ${this.myCoordinates.y}`);
-          console.log(`not same contact:  ${contact.id !== this.contactId}`)
-          console.log(`not exact match:  ${(testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y)}`)
-          console.log(`within tolerance (x):  ${Math.abs(testCoords.x - this.myCoordinates.x) < 81}`)
-          console.log(`within tolerance (y):  ${Math.abs(testCoords.y - this.myCoordinates.y) < 81 }`)
-
-        }
+        const testCoords = this.getCoordinates(contact.coordinates[this.activeMapId])
         return (
           contact.id !== this.contactId && // not same contact
           (testCoords.x !== this.myCoordinates.x || testCoords.y !== this.myCoordinates.y) && // not exact match
@@ -218,14 +205,10 @@ export default {
 
       return this.flattenedContacts
         .filter(contact => {
-          if (
-            !contact.coordinates ||
-            !contact.coordinates[this.activeMap.id] ||
-            !this.myCoordinates
-          )
+          if (!contact.coordinates || !contact.coordinates[this.activeMapId] || !this.myCoordinates)
             return false
           if (contact.id === this.contactId) return false
-          const testCoords = this.getCoordinates(contact.coordinates[this.activeMap.id])
+          const testCoords = this.getCoordinates(contact.coordinates[this.activeMapId])
           return this.myCoordinates.x === testCoords.x && this.myCoordinates.y === testCoords.y
         })
         .map(this.contactToLocation)
@@ -247,7 +230,7 @@ export default {
       this.xCoordinate = 0
       this.yCoordinate = 0
       if (!(this.activeMap && this.coordinates)) return
-      const { x, y } = this.getCoordinates(this.coordinates[this.activeMap.id])
+      const { x, y } = this.getCoordinates(this.coordinates[this.activeMapId])
       this.xCoordinate = x
       this.yCoordinate = y
     },
@@ -256,7 +239,6 @@ export default {
         this.viewerDOM.currentImage.scrollWidth / this.viewerDOM.currentImage.naturalWidth
     },
     getCoordinates(coordinateString) {
-      console.log(coordinateString);
       if (!coordinateString) {
         return { x: 0, y: 0 }
       }
@@ -267,7 +249,7 @@ export default {
       }
     },
     contactToLocation({ name, coordinates }) {
-      const { x, y } = this.getCoordinates(coordinates[this.activeMap.id])
+      const { x, y } = this.getCoordinates(coordinates[this.activeMapId])
       return {
         name,
         id: uuid(),
@@ -285,16 +267,45 @@ export default {
         styles.filter(str => str.indexOf('margin-top') > -1).map(justTheNumber)[0]
       )
     },
-    selectMap(index) {
-      this.viewingMapIndex = index
+    selectMap(id) {
+      this.activeMapId = parseInt(id)
+    },
+    setActiveMapId() {
+      if (!(this.maps && this.maps.length)) return
+      if (this.coordinates && Object.keys(this.coordinates).length) {
+        const mapIdsWithCoordinates = this.maps
+          .map(({ id }) => id)
+          .filter(id =>
+            !!Object.keys(this.coordinates).find(
+              idFromCoordinats => parseInt(idFromCoordinats) === id
+            )
+          )
+        if (mapIdsWithCoordinates.length === 1) {
+          return this.selectMap(mapIdsWithCoordinates[0])
+        }
+        if (mapIdsWithCoordinates.length === 2) {
+          // select newer map if two exist
+          return this.selectMap(mapIdsWithCoordinates.sort((a, b) => parseInt(b) - parseInt(a))[0])
+        }
+      }
+      this.selectMap(this.maps[this.maps.length - 1].id)
     },
     onMapViewed({ detail }) {
-      // TODO initialize all handlers here? compose with component methods?
+      // calling this.selectMap() is necessary because viewer allows scrolling through maps
+      //
+      // alternative to parsing filename and finding map ID this way:
+      // use a slot withing (v-viewer) <viewer /> component to allow wrapping <img /> with
+      // arbitrary markup. attach id with a data-id attribute which we could read of this
+      // event 'detail'
+
+      if (this.getMapIdFromAlt(detail.image.alt))
+        this.selectMap(this.getMapIdFromAlt(detail.image.alt))
+
       document.querySelector('.viewer-canvas img').addEventListener('pointerdown', e => {
         this.mapMargins.marginLeft = e.target.style.marginLeft
         this.mapMargins.marginTop = e.target.style.marginTop
       })
-      this.viewingMapIndex = detail.index
+
       this.viewerDOM.currentImage = document.querySelector(`[alt="${detail.image.alt}"]`)
       this.initializeCoordinates()
       this.resetMapUI()
@@ -332,7 +343,7 @@ export default {
             this.$emit('coordinateClick', {
               x: this.xCoordinate,
               y: this.yCoordinate,
-              mapId: this.activeMap.id,
+              mapId: this.activeMapId,
             })
             this.showHidePersistButtons()
           } else {
@@ -349,7 +360,7 @@ export default {
             this.$viewer.hide()
           } else {
             // remove coordinates click
-            this.$emit('coordinateClick', { x: 0, y: 0, mapId: this.activeMap.id })
+            this.$emit('coordinateClick', { x: 0, y: 0, mapId: this.activeMapId })
           }
         }
         this.viewerDOM.saveCancelButtons.forEach(el =>
@@ -401,7 +412,7 @@ export default {
       this.$emit('coordinateClick', {
         x: group[0].x,
         y: group[0].y,
-        mapId: this.activeMap.id,
+        mapId: this.activeMapId,
       })
       this.$store.dispatch('showSuccessModal', 'Coordinates applied successfully')
     },
@@ -409,6 +420,13 @@ export default {
     validMapCoordinatesExist(mapId) {
       const { x, y } = this.getCoordinates(this.coordinates[mapId])
       return !!(x || y)
+    },
+    getMapIdFromAlt(altText) {
+      return this.maps.filter(({ url }) => {
+        const mapInStoreSlug = url.split('2Fmap_files%2Fmap_')[1].substring(0, 13)
+        const mapViewedSlug = altText.split('2Fmap_files%2Fmap_')[1].substring(0, 13)
+        return mapInStoreSlug === mapViewedSlug
+      })[0].id
     },
   },
 }
