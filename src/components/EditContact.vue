@@ -537,6 +537,7 @@ export default {
       this.localState.contact.imageUrl = ''
     },
     cleanDescription(description) {
+      if (!description) return ''
       return description
         .replace(/<div>/g, '')
         .replace(/<\/div>/g, '')

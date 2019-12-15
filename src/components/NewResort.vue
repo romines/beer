@@ -216,7 +216,7 @@ export default {
       return this.pastedJson && !this.pastedData
     },
     numberOfActiveMaps() {
-      this.newResort.maps.filter(map => map.active).length
+      return this.newResort.maps.filter(map => map.active).length
     },
     groupNames() {
       if (!this.pastedData || !this.pastedData.contactGroups) return []
