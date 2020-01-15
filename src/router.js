@@ -117,7 +117,11 @@ const routes = [
     component: PushNotifications,
     meta: {
       requiresAuth: true
-    }
+    },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    },
   },
   {
     path: '/login',
