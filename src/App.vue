@@ -2,9 +2,14 @@
   <div id="app">
     <!-- TODO: nav to separate component -->
     <div class="top-nav-container">
-      <span class="top-nav">
-        <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
-        <router-link v-if="$store.state.resortId" to="/maps">Maps</router-link>
+
+      <router-link to="/"><img src="./assets/logo.png" class="logo"/></router-link>
+
+      <div class="link-nav" v-if="$store.state.user && $store.state.user.uid">
+        <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
+      </div>
+
+      <div class="right-nav">
         <span
           v-if="$store.state.user && $store.state.user.uid"
           class="text-and-icon"
@@ -13,7 +18,7 @@
           <span class="log-out">Logout</span>
           <span class="icon is-small"><i class="fas fa-power-off"/></span> &nbsp;
         </span>
-      </span>
+      </div>
     </div>
 
     <Modal />
@@ -54,43 +59,52 @@ export default {
 
 // temp
 .top-nav-container {
-  position: fixed;
-  z-index: 10;
-  top: 0;
-  width: 100%;
-  height: 28px;
-  background-color: $boneGrey;
-  text-align: right;
-  border-bottom: 1px solid black;
+  padding:                    0.5em 1em;
+  position:                   fixed;
+  z-index:                    10;
+  top:                        0;
+  width:                      100%;
+  background-color:           $boneGrey;
+  border-bottom:              1px solid black;
+  display:                    flex;
+  align-items: center;
+
+  .logo {
+    height:                   2em;
+    margin-right:             2em;
+  }
+
+  .right-nav {
+    margin-left:              auto;
+    color:                    blue !important;
+
+    a {
+      color:                  blue !important;
+    }
+
+    & > * {
+      margin-right:           0.3em;
+      &:not(.text-and-icon) {
+        text-decoration:      underline;
+      }
+    }
+
+    .text-and-icon {
+      cursor:                 pointer;
+      position:               relative;
+      .log-out {
+        text-decoration:      underline;
+      }
+
+      .icon {
+        position:             relative;
+        top:                  0.2em;
+        left:                 0.2em;
+      }
+    }
+  }
 }
 
-.top-nav {
-  margin-right: 2.2em;
-  color: blue !important;
-  a {
-    color: blue !important;
-  }
-  & > * {
-    margin-right: 0.3em;
-    &:not(.text-and-icon) {
-      text-decoration: underline;
-    }
-  }
-
-  .text-and-icon {
-    cursor: pointer;
-    position: relative;
-    .log-out {
-      text-decoration: underline;
-    }
-
-    .icon {
-      position: relative;
-      top: 0.2em;
-      left: 0.2em;
-    }
-  }
-}
 // end temp
 
 #app {

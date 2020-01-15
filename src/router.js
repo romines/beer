@@ -4,6 +4,7 @@ import { auth } from './firebaseInit.js'
 import { promiseTo } from './store/utils.js'
 
 import Home from './components/Home'
+import PushNotifications from './components/PushNotifications'
 import {
   Archive,
   ExportJson,
@@ -111,6 +112,14 @@ const routes = [
     },
   },
   {
+    path: '/push-notifications',
+    name: 'PushNotifications',
+    component: PushNotifications,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: Login,
@@ -136,7 +145,7 @@ const routes = [
   },
 ]
 
-const router = new VueRouter({ routes })
+const router = new VueRouter({ mode: 'history', routes })
 
 router.beforeEach(async (to, from, next) => {
   if (!to.matched.some(record => record.meta.requiresAuth)) {
@@ -184,6 +193,7 @@ router.beforeEach(async (to, from, next) => {
   } else {
     // non superAdmin trying to access route requiring superAdmin
     // redirect home
+    console.log("Need superAdmin priviledges...")
     next('/')
   }
 })
