@@ -2,13 +2,14 @@
   <div class="push-notifications">
     <site-header title="Push Notifications" />
 
-    <span class="button is-primary new-push-button" @click="showCreateContact = !showCreateContact">New Push Notification</span>
+    <span class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
 
-    <create-push v-if="showCreateContact" />
+    <transition name="fade">
+      <create-push v-if="showCreatePush" v-on:closeCreatePush="showCreatePush = false" class="new-push-container" />
+    </transition>
 
+    <list-push class="list-push-container" />
 
-    <list-push />
-    
   </div>
 </template>
 
@@ -26,7 +27,7 @@ export default {
   },
   data() {
     return {
-      showCreateContact:      false
+      showCreatePush:      false
     }
   },
   computed: {},
@@ -45,6 +46,14 @@ export default {
     position:                 absolute;
     top:                      3.5em;
     right:                    0.5em;
+  }
+
+  .new-push-container {
+    margin-top:               1em;
+  }
+
+  .list-push-container {
+    margin-top:               2em;
   }
 }
 

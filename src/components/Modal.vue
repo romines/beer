@@ -11,12 +11,12 @@
           <div class="contents">{{ contents.message }}</div>
           <div class="field is-grouped" v-show="!contents.buttonLess">
             <p class="control no-expando confirm">
-              <a class="button is-primary" @click="onConfirm" :class="{ 'is-loading': contents.loading }">
+              <a class="button is-primary" @click="onConfirm" v-bind:disabled="showLoading" :class="{ 'is-loading': contents.loading }">
                 {{ contents.confirmButtonLabel ? contents.confirmButtonLabel : 'Confirm' }}
               </a>
             </p>
             <p class="control no-expando cancel" v-if="!contents.hideCancel">
-              <a class="button is-light" @click="onCancel">
+              <a class="button is-light" @click="onCancel" v-bind:disabled="showLoading">
                 {{ contents.cancelButtonLabel ? contents.cancelButtonLabel : 'Cancel' }}
               </a>
             </p>
@@ -32,6 +32,8 @@
 
 <script>
 
+import { mapGetters } from 'vuex'
+
 export default {
   data () {
     return {
@@ -42,12 +44,11 @@ export default {
     }
   },
   computed: {
-    show () {
-      return this.$store.state.modal.show
-    },
-    contents () {
-      return this.$store.state.modal.contents
-    },
+    ...mapGetters({
+      show: 'modalShow',
+      contents: 'modalContents',
+      showLoading: 'modalShowLoading'
+    }),
     applicableClasses () {
       let stylesObj = {
         'is-active': this.localState.show
@@ -66,9 +67,7 @@ export default {
         this.animationClass = ''
       } else {
         this.animationClass = 'fadeOut'
-        setTimeout(() => { // TODO (?) this could be replaced with a callback on animation complete...
-          this.localState.show = show
-        }, 850);
+        this.localState.show = show
       }
     }
   },
@@ -78,9 +77,8 @@ export default {
     },
     onConfirm () {
       if (typeof this.$store.state.modal.contents.onConfirm === 'function') this.$store.state.modal.contents.onConfirm()
-    }
-
-    , onCancel () {
+    },
+    onCancel () {
       if (typeof this.$store.state.modal.contents.onCancel === 'function') this.$store.state.modal.contents.onCancel()
       this.close()
     }

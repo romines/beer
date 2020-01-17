@@ -16,5 +16,3 @@ export const firestore = firebase.firestore()
 export const database = firebase.database()
 export const auth = firebase.auth()
 export const storage = firebase.storage()
-
-firestore.settings({timestampsInSnapshots: true})

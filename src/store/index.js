@@ -22,7 +22,7 @@ const defaultModalContents = {
   buttonLess: false,
   hideCancel: false,
   loading: false,
-  classList: [],
+  classList: []
 }
 
 Vue.use(Vuex)
@@ -39,6 +39,7 @@ const store = {
     modal: {
       show: false,
       contents: defaultModalContents,
+      showLoading: false
     },
     openContactIsDirty: false,
     openGroupIsDirty: false,
@@ -69,7 +70,10 @@ const store = {
     },
     CLOSE_MODAL(state) {
       state.modal.show = false
-      state.modal.content = defaultModalContents
+      state.modal.contents = defaultModalContents
+    },
+    SET_MODAL_LOADING_STATE (state, boolean) {
+      state.modal.showLoading = boolean
     },
     SET_LOADING_STATE(state, loading) {
       console.log('SET_LOADING_STATE . . .')
@@ -501,6 +505,24 @@ const store = {
       })
       setTimeout(closeModal, 5500)
     },
+
+    setModalLoadingState({commit}, boolean) {
+      commit('SET_MODAL_LOADING_STATE', boolean)
+    }
+  },
+  getters: {
+    modal (state) {
+      return state.modal
+    },
+    modalShowLoading (state) {
+      return state.modal.showLoading
+    },
+    modalContents (state) {
+      return state.modal.contents
+    },
+    modalShow (state) {
+      return state.modal.show
+    }
   },
   modules: {
     archives,

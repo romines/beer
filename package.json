@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "awesome-phonenumber": "^2.2.6",
+    "axios": "^0.19.1",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
@@ -34,6 +35,7 @@
     "v-click-outside": "^1.0.5",
     "v-viewer": "^1.4.0",
     "vue": "^2.6.10",
+    "vue-axios": "^2.1.5",
     "vue-cleave": "^1.2.2",
     "vue-router": "^3.0.7",
     "vue2-editor": "^2.6.6",

@@ -167,4 +167,15 @@ li {
 a {
   color: #42b983;
 }
+
+
+
+// TRANSITIONS
+
+.fade-enter { opacity: 0; }
+
+.fade-leave-to { opacity: 0; }
+
+.fade-enter-active,
+.fade-leave-active { transition: opacity 0.75s; }
 </style>

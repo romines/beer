@@ -7,6 +7,9 @@ const config      = JSON.parse(process.env.FIREBASE_CONFIG);
 const token       = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.development;
 
 module.exports = functions.https.onRequest((request, response) => {
+  response.set('Access-Control-Allow-Origin', "*")
+  response.set('Access-Control-Allow-Headers', "*")
+  response.set('Access-Control-Allow-Methods', 'GET, POST')
   // Example input: {"message": "Hello!"}
   // if (req.body.message === undefined) {
   //   // This is an error case, as "message" is required.
@@ -23,5 +26,10 @@ module.exports = functions.https.onRequest((request, response) => {
   //   res.status(200).send("Success");
   // }
   console.log(token)
-  response.send('MEOW');
+  console.log(request.body)
+
+  setTimeout(() => {
+    response.send('Success');
+  }, 2600)
+
 });
