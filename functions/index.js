@@ -4,3 +4,4 @@
 exports.httpEndpoint = require('./httpEndpoint');
 exports.generateThumbnail = require('./generateThumbnail');
 exports.twitterActivity = require('./twitterActivity');
+exports.pushNotification = require('./pushNotification');

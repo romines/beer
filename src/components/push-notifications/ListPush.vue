@@ -1,6 +1,6 @@
 <template>
   <div class="list-push">
-    <p>Lish Push</p>
+    <p>List Push</p>
   </div>
 </template>
 

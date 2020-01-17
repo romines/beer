@@ -1,8 +1,14 @@
 <template>
   <div class="push-notifications">
     <site-header title="Push Notifications" />
-    <create-push />
+
+    <span class="button is-primary new-push-button" @click="showCreateContact = !showCreateContact">New Push Notification</span>
+
+    <create-push v-if="showCreateContact" />
+
+
     <list-push />
+    
   </div>
 </template>
 
@@ -19,7 +25,9 @@ export default {
     ListPush
   },
   data() {
-    return {}
+    return {
+      showCreateContact:      false
+    }
   },
   computed: {},
   created() {},
@@ -31,6 +39,13 @@ export default {
 
 .push-notifications {
 
+  position:                   relative;
+
+  .new-push-button {
+    position:                 absolute;
+    top:                      3.5em;
+    right:                    0.5em;
+  }
 }
 
 </style>

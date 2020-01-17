@@ -1,6 +1,6 @@
 <template>
   <div class="create-push">
-    <p>New Push</p>
+    <h2 class="subtitle">New Push</h2>
   </div>
 </template>
 
@@ -9,13 +9,13 @@
 export default {
   components: {
 
-    
   },
   data() {
-    return {}
+    return {
+
+    }
   },
   computed: {},
-  created() {},
   methods: {},
 }
 </script>

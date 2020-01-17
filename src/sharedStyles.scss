@@ -25,14 +25,13 @@ $title-color: $dark;
 .icon { cursor: pointer; }
 
 body {
-  margin: 0;
-  padding-top: 3.5em;
+  margin: 3.5em 0 0 0;
 }
 
 .main {
   max-width: 772px;
-  margin: -28px auto;
-  padding: 43px .85rem;
+  margin: 0 auto;
+  padding: 2em .85rem;
   background-color: white;
 }
 // .title {
