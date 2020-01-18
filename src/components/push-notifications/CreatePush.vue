@@ -10,8 +10,8 @@
     </div>
 
     <div class="cancel-save">
-      <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
       <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">Send</span>
+      <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
     </div>
 
   </div>
@@ -45,8 +45,8 @@ export default {
       this.$emit('closeCreatePush')
     },
     showConfirmModal () {
-      const onConfirm = () => {
 
+      const onConfirm = () => {
         let baseUrl = 'http://localhost:5001/rta-staging/us-central1/pushNotification'
 
         this.$store.dispatch('setModalLoadingState', true)
@@ -60,9 +60,9 @@ export default {
           this.cancelMessage()
         }).catch((response) => {
           console.log(response)
+          this.$store.dispatch('setModalLoadingState', false)
           this.$store.dispatch('showErrorModal', 'There was an error with your request and your message was not sent. Please try again later or contact Resorts Tapped for support.')
         })
-
       }
 
       this.$store.commit('SHOW_MODAL', {
@@ -100,10 +100,6 @@ export default {
 
   .cancel-save {
     margin-top:                 1em;
-
-    .is-light {
-      margin-right:             1em;
-    }
   }
 
 }
