@@ -47,7 +47,7 @@ export default {
     showConfirmModal () {
 
       const onConfirm = () => {
-        let baseUrl = 'http://localhost:5001/rta-staging/us-central1/pushNotification'
+        let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createPushNotification'
 
         this.$store.dispatch('setModalLoadingState', true)
 
@@ -62,6 +62,7 @@ export default {
           console.log(response)
           this.$store.dispatch('setModalLoadingState', false)
           this.$store.dispatch('showErrorModal', 'There was an error with your request and your message was not sent. Please try again later or contact Resorts Tapped for support.')
+          this.cancelMessage()
         })
       }
 
