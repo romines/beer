@@ -163,6 +163,7 @@ export default {
 
             .device-image {
               width:                2em;
+              margin-right:         0.25em;
             }
           }
         }
