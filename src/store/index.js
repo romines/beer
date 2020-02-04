@@ -32,6 +32,7 @@ const store = {
     user: {},
     resorts: [],
     resortId: '',
+    pushWooshData: {},
     resortMeta: {},
     contactGroups: [],
     emergencyGroup: {},
@@ -58,6 +59,9 @@ const store = {
     },
     SET_RESORT_META(state, resortMeta) {
       state.resortMeta = resortMeta
+    },
+    SET_PUSHWOOSH_DATA(state, pushWooshData) {
+      state.pushWooshData = pushWooshData
     },
     SET_CONTACT_GROUPS(state, { contactGroups, emergencyGroup }) {
       console.log('SET_CONTACT_GROUPS . . .')
@@ -145,6 +149,20 @@ const store = {
       ])
     },
 
+    setPushWooshData({ rootState, commit }) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.resortId).onSnapshot(
+          doc => {
+            const resortData = doc.data()
+            console.log('SETTING PUSHWOOSH DATA')
+            commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
+            resolve()
+          },
+          err => reject(`Error listening to contacts: ${err}`)
+        )
+      })
+    },
+
     listenToResortRoot({ rootState, commit }) {
       console.log('listen[ing]ToResortRoot . . .')
 
@@ -173,6 +191,7 @@ const store = {
       commit('SET_USER', {})
       commit('SET_CONTACT_GROUPS', {})
       commit('SET_RESORT_META', {})
+      commit('SET_PUSHWOOSH_DATA', {})
       dispatch('resetArchiveState')
     },
 
@@ -522,6 +541,9 @@ const store = {
     },
     modalShow (state) {
       return state.modal.show
+    },
+    pushWooshData (state) {
+      return state.pushWooshData
     }
   },
   modules: {

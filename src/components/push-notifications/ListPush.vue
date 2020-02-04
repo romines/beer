@@ -4,6 +4,7 @@
 
     <div class="push-notifications">
       <LoadingSpinner v-if="isLoadingPushes" isBlack="true"></LoadingSpinner>
+      <div v-else-if="pushNotifications.length == 0" class="no-messages">No messages to display.</div>
       <div v-else v-for="notification in pushNotifications" class="notification-container">
         <div class="header" @click="showNotificationDetails(notification.id)">
           <span class="id">{{notification.id}}</span>
@@ -42,6 +43,7 @@
 
 import LoadingSpinner from '../utilities/LoadingSpinner.vue'
 import moment from 'moment'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -56,6 +58,9 @@ export default {
       currentNotification:        {}
     }
   },
+  computed: {
+    ...mapGetters(['pushWooshData'])
+  },
   created() {
     this.getPushNotifications()
   },
@@ -63,6 +68,7 @@ export default {
     getPushNotifications () {
       this.isLoadingPushes = true
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotifications'
+      baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
         let body = JSON.parse(response.data.body)
@@ -112,6 +118,10 @@ export default {
 .list-push {
 
   .push-notifications {
+
+    .no-messages {
+      font-style:                   italic;
+    }
 
     .notification-container {
       border:                       1px solid #dfe0e2;

@@ -120,6 +120,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       store.commit('SET_LOADING_STATE', false)
+      store.dispatch('setPushWooshData')
       next()
     },
   },
