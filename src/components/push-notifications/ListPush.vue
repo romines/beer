@@ -63,10 +63,12 @@ export default {
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotifications'
 
       this.axios.get(baseUrl).then((response) => {
-        response.data.rows.map((notification) => {
+        let body = JSON.parse(response.data.body)
+
+        body.response.rows.map((notification) => {
           notification.sendDate = moment(notification.sendDate).format('lll')
         })
-        this.pushNotifications  = response.data.rows
+        this.pushNotifications  = body.response.rows
         this.isLoadingPushes    = false
       })
 
@@ -80,9 +82,10 @@ export default {
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotification'
 
       this.axios.get(baseUrl + "?messageId=" + id).then((response) => {
-        let messageDetails = response.data
+        let body            = JSON.parse(response.data.body)
+        let messageDetails  = body.response.message
 
-        messageDetails.created = moment(messageDetails.created).format('lll')
+        messageDetails.created  = moment(messageDetails.created).format('lll')
         messageDetails.sendDate = moment(messageDetails.send_date).format('lll')
 
         this.currentNotification    = messageDetails
@@ -138,10 +141,16 @@ export default {
         .message-details {
 
           .detail {
+
+            display:                flex;
+
             > label {
               font-weight:          bold;
-              width:                9em;
-              display:              inline-block;
+              width:                20%;
+            }
+
+            > span {
+              width:                80%;
             }
           }
         }
