@@ -23,7 +23,9 @@
               <label>Status:</label><span class="status">{{currentNotification.status}}</span>
             </div>
             <div class="detail platforms">
-              <label>Platforms:</label><span class="platforms">{{currentNotification.platforms}}</span>
+              <label>Platforms:</label><span class="platforms">
+                <img v-for="platformId in currentNotification.platforms" v-bind:src="getDeviceImage(platformId)" class="device-image">
+              </span>
             </div>
             <div class="detail message-content">
               <label>Message:</label><span class="message-content">{{currentNotification.content.en}}</span>
@@ -85,8 +87,9 @@ export default {
         let body            = JSON.parse(response.data.body)
         let messageDetails  = body.response.message
 
-        messageDetails.created  = moment(messageDetails.created).format('lll')
-        messageDetails.sendDate = moment(messageDetails.send_date).format('lll')
+        messageDetails.platforms  = JSON.parse(messageDetails.platforms)
+        messageDetails.created    = moment(messageDetails.created).format('lll')
+        messageDetails.sendDate   = moment(messageDetails.send_date).format('lll')
 
         this.currentNotification    = messageDetails
         this.isLoadingNotification  = false
@@ -94,6 +97,11 @@ export default {
     },
     showNotification (id) {
       return this.currentNotificationId == id
+    },
+    getDeviceImage (id) {
+      let fileName = this.$globals.deviceImageMapping[id]
+      // let string = '../../assets/icons/bb.svg'
+      return require(`../../assets/icons/${fileName}`)
     }
   },
 }
@@ -151,6 +159,10 @@ export default {
 
             > span {
               width:                80%;
+            }
+
+            .device-image {
+              width:                2em;
             }
           }
         }
