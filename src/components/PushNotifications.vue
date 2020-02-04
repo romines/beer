@@ -5,10 +5,10 @@
     <span class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
 
     <transition name="fade">
-      <create-push v-if="showCreatePush" v-on:closeCreatePush="showCreatePush = false" class="new-push-container" />
+      <create-push v-if="showCreatePush" v-on:closeCreatePush="showCreatePush = false" v-on:pushCreated="onPushCreated()" class="new-push-container" />
     </transition>
 
-    <list-push class="list-push-container" />
+    <list-push ref="listPush" class="list-push-container" />
 
   </div>
 </template>
@@ -32,7 +32,11 @@ export default {
   },
   computed: {},
   created() {},
-  methods: {},
+  methods: {
+    onPushCreated () {
+      this.$refs.listPush.getPushNotifications()
+    }
+  },
 }
 </script>
 

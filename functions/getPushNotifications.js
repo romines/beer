@@ -4,7 +4,7 @@ const httpRequest = require('request');
 const functions   = require('firebase-functions');
 const config      = JSON.parse(process.env.FIREBASE_CONFIG);
 // TODO update this to use prod credentials
-const token       = functions.config().pushwoosh.production;
+const token       = functions.config().pushwoosh.development;
 // const token       = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.staging;
 
 // Use production for now just to get messages
@@ -33,46 +33,9 @@ module.exports = functions.https.onRequest((req, res) => {
     }
   }
 
-  console.log(fullRequest)
-
   httpRequest.post(fullRequest, (error, response, body) => {
     // TODO add error handling
     res.status(200).send(response)
-
-    // res.status(200).send({
-    //   "rows": [
-    //     {
-    //       "id":91133,
-    //       "createDate":"2015-11-27 07:01:31",
-    //       "sendDate":"2015-11-27 07:01:31",
-    //       "content":{"en":"This is a big test."},
-    //       "url":null,
-    //       "filter":"#000Integer(\u226045)",
-    //       "richPageId":null,
-    //       "geozone":"{\"lat\":55.002825809793,\"lng\":82.905578613281,\"range\":1000}"
-    //     },
-    //     {
-    //       "id":91134,
-    //       "createDate":"2015-11-28 11:31:31",
-    //       "sendDate":"2015-11-28 11:31:31",
-    //       "content":{"en":"The Gondola has been put on hold. There was a lot of wind. This is a really long message. Hooray"},
-    //       "url":null,
-    //       "filter":"#000Integer(\u226045)",
-    //       "richPageId":null,
-    //       "geozone":"{\"lat\":55.002825809793,\"lng\":82.905578613281,\"range\":1000}"
-    //     },
-    //     {
-    //       "id":91135,
-    //       "createDate":"2015-11-29 15:44:22",
-    //       "sendDate":"2015-11-29 15:44:22",
-    //       "content":{"en":"We just got a lot of snow"},
-    //       "url":null,
-    //       "filter":"#000Integer(\u226045)",
-    //       "richPageId":null,
-    //       "geozone":"{\"lat\":55.002825809793,\"lng\":82.905578613281,\"range\":1000}"
-    //     },
-    //   ]
-    // })
   })
 
 

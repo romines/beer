@@ -4,7 +4,7 @@ const httpRequest = require('request');
 const functions   = require('firebase-functions');
 const config      = JSON.parse(process.env.FIREBASE_CONFIG);
 // TODO update this to use prod credentials
-const token       = functions.config().pushwoosh.production;
+const token       = functions.config().pushwoosh.development;
 // const token       = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.staging;
 
 // Use production for now just to get messages
