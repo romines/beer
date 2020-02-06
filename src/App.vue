@@ -40,8 +40,9 @@ export default {
   },
   methods: {
     logOut() {
-      this.$store.dispatch('logOut')
-      this.$router.replace('/login')
+      this.$store.dispatch('logOut').then(() => {
+        this.$router.replace('/login')
+      })
     },
   },
 }

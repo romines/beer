@@ -67,12 +67,6 @@ export default {
       password: '',
     }
   },
-  computed: {
-
-
-  },
-  created () {
-  },
   methods: {
     logIn () {
       this.$store.commit('SET_LOADING_STATE', true)

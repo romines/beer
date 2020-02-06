@@ -128,11 +128,17 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    meta: {
+      blockedForUsers: true,
+    }
   },
   {
     path: '/reset',
     name: 'Reset Password',
     component: ForgotPassword,
+    meta: {
+      blockedForUsers: true,
+    }
   },
   {
     path: '/sign-up/:encodedResortId',
@@ -153,6 +159,17 @@ const routes = [
 const router = new VueRouter({ mode: 'history', routes })
 
 router.beforeEach(async (to, from, next) => {
+
+  if (to.matched.some(record => record.meta.blockedForUsers) && auth.currentUser) {
+    // Route is off-limits to logged-in users
+    // Return them to previous route or root page
+    let path = from.path ? from.path : '/'
+
+    return next({
+      path: path,
+    })
+  }
+
   if (!to.matched.some(record => record.meta.requiresAuth)) {
     // route is open to unauthenticated users
     store.commit('SET_LOADING_STATE', false)

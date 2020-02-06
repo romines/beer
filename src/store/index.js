@@ -203,10 +203,13 @@ const store = {
     },
 
     logOut({ commit }) {
-      auth.signOut().then(() => {
-        commit('SET_RESORT_ID', '')
-        commit('SET_USER', {})
-        commit('SET_CONTACT_GROUPS', {})
+      return new Promise((resolve, reject) => {
+        auth.signOut().then(() => {
+          commit('SET_RESORT_ID', '')
+          commit('SET_USER', {})
+          commit('SET_CONTACT_GROUPS', {})
+          resolve()
+        })
       })
     },
 
