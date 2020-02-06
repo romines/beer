@@ -7,3 +7,4 @@ exports.twitterActivity = require('./twitterActivity');
 exports.createPushNotification = require('./createPushNotification');
 exports.getPushNotifications = require('./getPushNotifications');
 exports.getPushNotification = require('./getPushNotification');
+exports.getTagStats = require('./getTagStats');

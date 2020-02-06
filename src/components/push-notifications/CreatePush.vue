@@ -38,7 +38,19 @@ export default {
       return this.messageBody.length > 0
     }
   },
+  created () {
+    // this.getCities()
+  },
   methods: {
+    getCities () {
+      // This tests the getTagStats functionality, but it does not quite give us what we want, I don't think.
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getTagStats'
+      baseUrl += '?tagName=City'
+
+      this.axios.get(baseUrl).then((response) => {
+        console.log(JSON.parse(response.data.body))
+      })
+    },
     cancelMessage () {
       this.messageBody = ''
       this.messageLink = ''
