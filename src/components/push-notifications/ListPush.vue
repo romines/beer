@@ -51,7 +51,7 @@ export default {
   },
   data() {
     return {
-      isLoadingPushes:            true,
+      isLoadingPushes:            false,
       isLoadingNotification:      true,
       pushNotifications:          [],
       currentNotificationId:      null,
@@ -65,8 +65,9 @@ export default {
     this.getPushNotifications()
   },
   methods: {
-    getPushNotifications () {
-      this.isLoadingPushes = true
+    getPushNotifications (skipLoading) {
+      if (!skipLoading) this.isLoadingPushes = true
+
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotifications'
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
@@ -74,7 +75,7 @@ export default {
         let body = JSON.parse(response.data.body)
 
         body.response.rows.map((notification) => {
-          notification.sendDate = moment(notification.sendDate).format('lll')
+          notification.sendDate = moment.utc(notification.sendDate).local().format('lll')
         })
         this.pushNotifications  = body.response.rows
         this.isLoadingPushes    = false
@@ -94,8 +95,8 @@ export default {
         let messageDetails  = body.response.message
 
         messageDetails.platforms  = JSON.parse(messageDetails.platforms)
-        messageDetails.created    = moment(messageDetails.created).format('lll')
-        messageDetails.sendDate   = moment(messageDetails.send_date).format('lll')
+        messageDetails.created    = moment.utc(messageDetails.created).local().format('lll')
+        messageDetails.sendDate   = moment.utc(messageDetails.send_date).local().format('lll')
 
         this.currentNotification    = messageDetails
         this.isLoadingNotification  = false
@@ -106,7 +107,6 @@ export default {
     },
     getDeviceImage (id) {
       let fileName = this.$globals.deviceImageMapping[id]
-      // let string = '../../assets/icons/bb.svg'
       return require(`../../assets/icons/${fileName}`)
     }
   },

@@ -25,6 +25,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "bulma": "^0.7.1",
+    "csv-parse": "^4.8.5",
     "deep-equal": "^1.0.1",
     "firebase": "^7.7.0",
     "firebase-admin": "^8.9.1",

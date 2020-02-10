@@ -67,7 +67,7 @@ export default {
           messageBody: this.messageBody
         }).then((response) => {
           this.$store.dispatch('setModalLoadingState', false)
-          console.log(response)
+          // console.log(response)
           this.$store.dispatch('showSuccessModal', 'Message successfully sent!')
           this.cancelMessage()
           this.$emit('pushCreated')

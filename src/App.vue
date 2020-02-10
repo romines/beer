@@ -7,14 +7,15 @@
 
       <div class="link-nav" v-if="$store.state.user && $store.state.user.uid">
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
+        <router-link v-bind:to="{ name: 'Settings' }">Settings</router-link>
       </div>
 
       <div class="right-nav">
         <span
           v-if="$store.state.user && $store.state.user.uid"
           class="text-and-icon"
-          @click="logOut"
-        >
+          @click="logOut">
+          
           <span class="log-out">Logout</span>
           <span class="icon is-small"><i class="fas fa-power-off"/></span> &nbsp;
         </span>
@@ -69,6 +70,13 @@ export default {
   border-bottom:              1px solid black;
   display:                    flex;
   align-items: center;
+
+  .link-nav {
+
+    > a {
+      margin-right:           1em;
+    }
+  }
 
   .logo {
     height:                   2em;

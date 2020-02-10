@@ -16,11 +16,10 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Origin', "*")
   res.set('Access-Control-Allow-Headers', "*")
   res.set('Access-Control-Allow-Methods', 'GET')
-  console.log(req.query.applicationCode)
 
   let applicationCode = req.query.applicationCode ? req.query.applicationCode : "1DBC6-F4481" // default to crystal for now
 
-  applicationCode = "1DBC6-F4481" // Crystal MTN
+  // applicationCode = "1DBC6-F4481" // Crystal MTN
 
   let requestBody = {
     "request": {

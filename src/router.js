@@ -5,6 +5,7 @@ import { promiseTo } from './store/utils.js'
 
 import Home from './components/Home'
 import PushNotifications from './components/PushNotifications'
+import Settings from './components/Settings'
 import {
   Archive,
   ExportJson,
@@ -120,9 +121,24 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       store.commit('SET_LOADING_STATE', false)
-      store.dispatch('setPushWooshData')
-      next()
+      store.dispatch('setPushWooshData').then(() => {
+        next()
+      })
+    }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: {
+      requiresAuth: true
     },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      store.dispatch('setPushWooshData').then(() => {
+        next()
+      })
+    }
   },
   {
     path: '/login',

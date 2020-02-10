@@ -34,7 +34,7 @@ export default {
   created() {},
   methods: {
     onPushCreated () {
-      this.$refs.listPush.getPushNotifications()
+      this.$refs.listPush.getPushNotifications(true)
     }
   },
 }

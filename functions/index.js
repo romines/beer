@@ -8,3 +8,4 @@ exports.createPushNotification = require('./createPushNotification');
 exports.getPushNotifications = require('./getPushNotifications');
 exports.getPushNotification = require('./getPushNotification');
 exports.getTagStats = require('./getTagStats');
+exports.exportSubscribers = require('./exportSubscribers');
