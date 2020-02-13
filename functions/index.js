@@ -9,3 +9,5 @@ exports.getPushNotifications = require('./getPushNotifications');
 exports.getPushNotification = require('./getPushNotification');
 exports.getTagStats = require('./getTagStats');
 exports.exportSubscribers = require('./exportSubscribers');
+exports.exportSegment = require('./exportSegment');
+exports.getResults = require('./getResults');

@@ -8,7 +8,7 @@
       <div v-else v-for="notification in pushNotifications" class="notification-container">
         <div class="header" @click="showNotificationDetails(notification.id)">
           <span class="id">{{notification.id}}</span>
-          <span class="message-content">{{notification.content.en}}</span>
+          <span class="message-content">{{ displayMessageContent(notification) }}</span>
           <span class="send-date">{{notification.sendDate}}</span>
         </div>
         <div v-if="showNotification(notification.id)" class="body">
@@ -29,7 +29,7 @@
               </span>
             </div>
             <div class="detail message-content">
-              <label>Message:</label><span class="message-content">{{currentNotification.content.en}}</span>
+              <label>Message:</label><span class="message-content">{{ displayMessageContent(currentNotification) }}</span>
             </div>
           </div>
         </div>
@@ -80,7 +80,6 @@ export default {
         this.pushNotifications  = body.response.rows
         this.isLoadingPushes    = false
       })
-
     },
     showNotificationDetails (id) {
       if (this.currentNotificationId == id) this.currentNotificationId = null
@@ -108,6 +107,9 @@ export default {
     getDeviceImage (id) {
       let fileName = this.$globals.deviceImageMapping[id]
       return require(`../../assets/icons/${fileName}`)
+    },
+    displayMessageContent (notification) {
+      return notification.content.en || notification.content.default
     }
   },
 }

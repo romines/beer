@@ -2,7 +2,14 @@
   <div class="settings">
     <site-header title="Settings" />
 
-    {{this.cityOptions}}
+    <button v-if="this.requestId" v-on:click="getApplicationSubscribers()">Get Subscribers</button>
+
+    <LoadingSpinner v-if="isPageLoading" isBlack="true"></LoadingSpinner>
+    <div v-else class="city-options-container">
+      <div v-for="(value, key) in this.cityOptions">
+        {{key}}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -12,43 +19,61 @@ import { mapGetters } from 'vuex'
 import SiteHeader from './SiteHeader.vue'
 import parse from 'csv-parse'
 import Vue from 'vue'
+import LoadingSpinner from './utilities/LoadingSpinner.vue'
 
 export default {
   components: {
-    SiteHeader
+    SiteHeader,
+    LoadingSpinner
   },
   data() {
     return {
-      cityOptions:    {}
+      cityOptions:      {},
+      isPageLoading:    false,
+      requestId:        ''
     }
   },
   computed: {
     ...mapGetters(['pushWooshData'])
   },
   created() {
-    this.getApplicationSubscribers()
+    this.setExportSubscribersRequestId()
+    // this.getApplicationSubscribers()
   },
   methods: {
-    getApplicationSubscribers () {
+    setExportSubscribersRequestId () {
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/exportSubscribers'
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
-        let csvData = response.data.body
+        this.requestId = response.data
+      })
+    },
+    getApplicationSubscribers () {
+      this.isPageLoading = true
 
-        let parsed = parse(csvData, {}, (err, output) => {
-          output.forEach((row, index) => {
-            if (index === 0) return true
-            if (row[5]) {
-              let parsedRow = JSON.parse(row[5])
-              if (parsedRow.City) this.incrementCityCount(parsedRow.City)
-            }
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getResults'
+      baseUrl += "?requestId=" + this.requestId
+
+      this.axios.get(baseUrl).then((response) => {
+
+        if (response.data.error) {
+          this.isPageLoading = false
+        } else {
+          let csvData = response.data.body
+
+          let parsed = parse(csvData, {}, (err, output) => {
+            output.forEach((row, index) => {
+              if (index === 0) return true
+              if (row[5]) {
+                let parsedRow = JSON.parse(row[5])
+                if (parsedRow.City) this.incrementCityCount(parsedRow.City)
+              }
+            })
           })
-        })
 
-        // this.axios.get(url).then((response) => {
-        //   console.log(response)
-        // })
+          this.isPageLoading = false
+        }
       })
     },
     incrementCityCount (city) {

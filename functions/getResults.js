@@ -17,41 +17,53 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Headers', "*")
   res.set('Access-Control-Allow-Methods', 'GET')
 
-  let applicationCode = req.query.applicationCode ? req.query.applicationCode : "1DBC6-F4481" // default to crystal for now
-
-  // applicationCode = "1DBC6-F4481" // Crystal MTN
+  let requestId = req.query.requestId
 
   let requestBody = {
     "request": {
-      "auth":         token, // API access token from Pushwoosh Control Panel
-      "application":  applicationCode
+      "auth":       token,
+      "request_id": requestId
     }
   }
 
-  let fullRequest = {
-    url: 'https://cp.pushwoosh.com/json/1.3/exportSubscribers',
+  let request = {
+    url: 'https://cp.pushwoosh.com/json/1.3/getResults',
     body: JSON.stringify(requestBody),
     headers: {
       'Content-Type': 'application/json'
     }
   }
 
-  httpRequest.post(fullRequest, (error, response, body) => {
-    // TODO add error handling
-    let parsedResponseBody = JSON.parse(response.body)
-    var requestId
+  httpRequest.post(request, (error, response, body) => {
+    // One case of error
+    // {
+    //   status_code: 420,
+    //   status_message: 'Request is still being processed',
+    //   response: null
+    // }
 
-    if (parsedResponseBody.response) {
-      requestId = parsedResponseBody.response.request_id
+    // Expected response body
+    // {"status_code":200,"status_message":"OK","response":{"url":"https:\\/\\/export.pushwoosh.com\\/devices\\/a1345091d2670b9ee92a278e309c5153.csv"}}
+
+    let parsed  = JSON.parse(response.body)
+
+    if (!parsed.response) {
+      res.status(200).send({ error: parsed.status_message })
     } else {
-      var phrase      = parsedResponseBody.status_message
-      var myRegexp    = /id:(.*)/;
-      var match       = myRegexp.exec(phrase);
-      requestId       = match[1].trim()
+      let url = parsed.response.url
+      console.log(url)
+      httpRequest.get({
+        url: url,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }, (error, response, body) => {
+        res.status(200).send(response)
+      })
     }
 
-    res.status(200).send(requestId)
-
   })
+
+
 
 });

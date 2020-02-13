@@ -19,17 +19,17 @@ module.exports = functions.https.onRequest((req, res) => {
 
   let applicationCode = req.query.applicationCode ? req.query.applicationCode : "1DBC6-F4481" // default to crystal for now
 
-  // applicationCode = "1DBC6-F4481" // Crystal MTN
+  applicationCode = "1DBC6-F4481" // Crystal MTN
 
   let requestBody = {
     "request": {
-      "auth":         token, // API access token from Pushwoosh Control Panel
-      "application":  applicationCode
+      "auth":           token, // API access token from Pushwoosh Control Panel
+      "devices_filter":  "A(\"" + applicationCode + "\")"
     }
   }
 
   let fullRequest = {
-    url: 'https://cp.pushwoosh.com/json/1.3/exportSubscribers',
+    url: 'https://cp.pushwoosh.com/json/1.3/exportSegment',
     body: JSON.stringify(requestBody),
     headers: {
       'Content-Type': 'application/json'
@@ -50,8 +50,47 @@ module.exports = functions.https.onRequest((req, res) => {
       requestId       = match[1].trim()
     }
 
-    res.status(200).send(requestId)
+    let resultsBody = {
+      "request": {
+        "auth":       token,
+        "request_id": requestId
+      }
+    }
 
+    httpRequest.post({
+      url: 'https://cp.pushwoosh.com/json/1.3/getResults',
+      body: JSON.stringify(resultsBody),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }, (error, response, body) => {
+      // One case of error
+      // {
+      //   status_code: 420,
+      //   status_message: 'Request is still being processed',
+      //   response: null
+      // }
+
+      let parsed  = JSON.parse(response.body)
+
+      if (!parsed.response) {
+        res.status(200).send({ error: parsed.status_message })
+      } else {
+        let url     = parsed.response.url
+
+        httpRequest.get({
+          url: url,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }, (error, response, body) => {
+          res.status(200).send(response)
+        })
+      }
+
+    })
   })
+
+
 
 });
