@@ -51,7 +51,7 @@ module.exports = functions.https.onRequest((req, res) => {
       res.status(200).send({ error: parsed.status_message })
     } else {
       let url = parsed.response.url
-      console.log(url)
+
       httpRequest.get({
         url: url,
         headers: {

@@ -2,7 +2,7 @@
   <div class="settings">
     <site-header title="Settings" />
 
-    <button v-if="this.requestId" v-on:click="getApplicationSubscribers()">Get Subscribers</button>
+    <button v-on:click="setExportSubscribersRequestId()">Refresh data</button>
 
     <LoadingSpinner v-if="isPageLoading" isBlack="true"></LoadingSpinner>
     <div v-else class="city-options-container">
@@ -20,6 +20,7 @@ import SiteHeader from './SiteHeader.vue'
 import parse from 'csv-parse'
 import Vue from 'vue'
 import LoadingSpinner from './utilities/LoadingSpinner.vue'
+import moment from 'moment'
 
 export default {
   components: {
@@ -29,15 +30,15 @@ export default {
   data() {
     return {
       cityOptions:      {},
-      isPageLoading:    false,
-      requestId:        ''
+      isPageLoading:    false
     }
   },
   computed: {
     ...mapGetters(['pushWooshData'])
   },
   created() {
-    this.setExportSubscribersRequestId()
+    console.log(this.pushWooshData)
+    // this.setExportSubscribersRequestId()
     // this.getApplicationSubscribers()
   },
   methods: {
@@ -46,7 +47,20 @@ export default {
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
-        this.requestId = response.data
+        console.log(this.pushWooshData.currentRequestId)
+        console.log(this.pushWooshData.currentRequestDate)
+        debugger
+        this.pushWooshData.lastRequestId        = this.pushWooshData.currentRequestId
+        this.pushWooshData.lastRequestDate      = this.pushWooshData.currentRequestDate
+        this.pushWooshData.currentRequestId     = response.data
+        this.pushWooshData.currentRequestDate   = moment().utc().toDate()
+        console.log(this.pushWooshData)
+        console.log(this.pushWooshData.lastRequestId)
+        console.log(this.pushWooshData.lastRequestDate)
+        debugger
+        this.$store.dispatch('savePushwooshData', this.pushWooshData).then(() => {
+          debugger
+        })
       })
     },
     getApplicationSubscribers () {

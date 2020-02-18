@@ -50,45 +50,8 @@ module.exports = functions.https.onRequest((req, res) => {
       requestId       = match[1].trim()
     }
 
-    let resultsBody = {
-      "request": {
-        "auth":       token,
-        "request_id": requestId
-      }
-    }
+    res.status(200).send(requestId)
 
-    httpRequest.post({
-      url: 'https://cp.pushwoosh.com/json/1.3/getResults',
-      body: JSON.stringify(resultsBody),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }, (error, response, body) => {
-      // One case of error
-      // {
-      //   status_code: 420,
-      //   status_message: 'Request is still being processed',
-      //   response: null
-      // }
-
-      let parsed  = JSON.parse(response.body)
-
-      if (!parsed.response) {
-        res.status(200).send({ error: parsed.status_message })
-      } else {
-        let url     = parsed.response.url
-
-        httpRequest.get({
-          url: url,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }, (error, response, body) => {
-          res.status(200).send(response)
-        })
-      }
-
-    })
   })
 
 

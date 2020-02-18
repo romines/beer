@@ -163,6 +163,16 @@ const store = {
       })
     },
 
+    savePushwooshData({ rootState }, pushWooshData) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.resortId).doc('pushWooshData').set(pushWooshData).then((something) => {
+          console.log(something)
+          debugger
+        })
+        resolve()
+      })
+    },
+
     listenToResortRoot({ rootState, commit }) {
       console.log('listen[ing]ToResortRoot . . .')
 
