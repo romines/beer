@@ -163,13 +163,12 @@ const store = {
       })
     },
 
-    savePushwooshData({ rootState }, pushWooshData) {
+    savePushwooshData({ dispatch, rootState }, pushWooshData) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).doc('pushWooshData').set(pushWooshData).then((something) => {
-          console.log(something)
-          debugger
+        RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then(() => {
+          dispatch('setPushWooshData')
+          resolve()
         })
-        resolve()
       })
     },
 
