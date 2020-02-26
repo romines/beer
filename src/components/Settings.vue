@@ -4,20 +4,40 @@
     <button v-on:click="setExportSubscribersRequestId()">Refresh request_id</button>
     <button v-on:click="resetApplicationSubscribers(currentRequestData.currentRequestId)">Reset subscribers</button>
     <button v-on:click="saveSubscriberCityOptions()">Save Subscribers</button>
+    <div class="current-request-id">Request Id: {{currentRequestData.currentRequestId}}</div>
+    <div class="current-request-id">Request Date: {{currentRequestData.currentRequestDate}}</div>
 
     <div class="preferred-cities-container">
-      Preferred Cities: {{pushWooshData.preferredCities}}
-      {{topCityOptions}}
+      <h2 class="subtitle">Your Preferred Cities</h2>
+      <div class="city-options-list">
+        <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option preferred">
+          {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+          <span> (X) </span>
+        </span>
+      </div>
     </div>
 
     <LoadingSpinner v-if="isResettingSubscribers" isBlack="true"></LoadingSpinner>
-    <div v-else class="city-options-container">
-      <div class="current-request-id">Request Id: {{currentRequestData.currentRequestId}}</div>
-      <div class="current-request-id">Request Date: {{currentRequestData.currentRequestDate}}</div>
-      <div v-for="key in topCityOptionsKeys">
-        {{key}} - {{pushWooshData.exportSubscribersCityOptions[key]}}
+    <div v-else>
+      <div class="city-options-container city-options-list">
+        <h2 class="subtitle">Most Popular Cities</h2>
+        <span v-for="key in topCityOptionsKeys" v-on:click="addOrRemoveCityOptionFromPreferred(key)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(key) }">
+          {{key}} - <b>{{pushWooshData.exportSubscribersCityOptions[key]}}</b>
+        </span>
       </div>
 
+      <div class="city-options-search-container city-options-list">
+        <h2 class="subtitle">Search All Your Cities</h2>
+        <input v-model="currentCityOptionsSearch" class="input" placeholder="Search by city name..." />
+        <div v-if="currentSearchResults.length > 0">
+          <span v-for="city in currentSearchResults" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(city) }">
+            {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+          </span>
+        </div>
+        <div v-else-if="currentCityOptionsSearch.length > 0" class="no-results">
+          No results. Please refine your search
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -45,7 +65,8 @@ export default {
       cityOptions:                  {},
       isResettingSubscribers:       false,
       isSettingExportSubscribers:   false,
-      currentRequestData:           {}
+      currentRequestData:           {},
+      currentCityOptionsSearch:     ''
     }
   },
   computed: {
@@ -57,6 +78,17 @@ export default {
     topCityOptionsKeys () {
       let topNumber = 20
       return this.sortedCityOptionsKeys.slice(0, 20)
+    },
+    currentSearchResults () {
+      if (this.currentCityOptionsSearch.length === 0) return []
+
+      let results = []
+
+      Object.keys(this.pushWooshData.exportSubscribersCityOptions).forEach((key) => {
+        if (key.includes(this.currentCityOptionsSearch)) results.push(key)
+      })
+
+      return results
     }
   },
   created() {
@@ -91,6 +123,24 @@ export default {
           this.setCurrentRequestData()
         })
       })
+    },
+    isCityPreferredCityOption (key) {
+      return this.pushWooshData.preferredCityOptions.includes(key)
+    },
+    addOrRemoveCityOptionFromPreferred (key) {
+      if (this.isCityPreferredCityOption(key)) {
+        // remove
+        let index = this.pushWooshData.preferredCityOptions.indexOf(key)
+        this.pushWooshData.preferredCityOptions.splice(index, 1)
+        this.$store.dispatch('savePushwooshData', this.pushWooshData)
+      } else {
+        // add
+        this.pushWooshData.preferredCityOptions.push(key)
+        this.$store.dispatch('savePushwooshData', this.pushWooshData).then(() => {
+
+        })
+      }
+
     },
     // TODO
     // I think it would be better to store this raw data on the pushWooshData object in firestore, that way it would load faster.
@@ -156,6 +206,43 @@ export default {
 
 .settings {
 
+  .subtitle {
+    margin-top:                     1em;
+  }
+
+  .city-options-list {
+
+    .city-option {
+      padding:                      0.5em;
+      border-radius:                2em;
+      border:                       1px solid black;
+      display:                      inline-block;
+      margin:                       0.25em;
+      cursor:                       pointer;
+      background-color:             whitesmoke;
+
+      &:hover {
+        background-color:           black;
+        color:                      white;
+        border:                     1px solid white;
+      }
+
+      &.preferred {
+        background-color:           #209cee;
+        color:                      white;
+        border:                     1px solid white;
+      }
+    }
+  }
+
+  .city-options-search-container {
+    margin-bottom:                  8em;
+
+    .no-results {
+      margin:                       1em 0.5em;
+      font-style:                   italic;
+    }
+  }
 
 }
 </style>

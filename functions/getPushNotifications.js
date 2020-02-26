@@ -40,6 +40,7 @@ module.exports = functions.https.onRequest((req, res) => {
 
   httpRequest.post(fullRequest, (error, response, body) => {
     // TODO add error handling
+    console.log(response)
     res.status(200).send(response)
   })
 
