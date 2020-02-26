@@ -9,6 +9,13 @@
       <input v-bind:value="remainingCharacters" type="text" name="limit" size="4" readonly>
     </div>
 
+    <div class="city-options-list">
+      <h2>Your Cities</h2>
+      <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="city-option" v-bind:class="{ selected : isCitySelected(city) }">
+        {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+      </span>
+    </div>
+
     <div class="cancel-save">
       <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">Send</span>
       <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
@@ -19,18 +26,23 @@
 
 <script>
 
-export default {
-  components: {
+import { mapGetters } from 'vuex'
 
-  },
+// TODO
+// Add link input
+
+export default {
+  components: {},
   data() {
     return {
-      messageBody:      '',
-      messageLimit:     200,
-      messageLink:      ''
+      messageBody:          '',
+      messageLimit:         200,
+      messageLink:          '',
+      selectedCities:       []
     }
   },
   computed: {
+    ...mapGetters(['pushWooshData']),
     remainingCharacters () {
       return this.messageLimit - this.messageBody.length
     },
@@ -85,7 +97,18 @@ export default {
         showLoading: false,
         onConfirm,
       })
-    }
+    },
+    addOrRemoveCityFromSelected (city) {
+      if (this.selectedCities.includes(city)) {
+        let index = this.selectedCities.indexOf(city)
+        this.selectedCities.splice(index, 1)
+      } else {
+        this.selectedCities.push(city)
+      }
+    },
+    isCitySelected (city) {
+      return this.selectedCities.includes(city)
+    },
   }
 }
 </script>
@@ -109,6 +132,36 @@ export default {
     > input {
       font-size:                0.9em;
       text-align:               center;
+    }
+  }
+
+  .city-options-list {
+
+    > h2 {
+      margin:                   0.5em 0;
+      font-size:                1.15em;
+    }
+
+    .city-option {
+      padding:                      0.5em;
+      border-radius:                2em;
+      border:                       1px solid black;
+      display:                      inline-block;
+      margin:                       0.25em;
+      cursor:                       pointer;
+      background-color:             whitesmoke;
+
+      &:hover {
+        background-color:           black;
+        color:                      white;
+        border:                     1px solid white;
+      }
+
+      &.selected {
+        background-color:           #209cee;
+        color:                      white;
+        border:                     1px solid white;
+      }
     }
   }
 

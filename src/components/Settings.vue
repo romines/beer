@@ -129,16 +129,15 @@ export default {
     },
     addOrRemoveCityOptionFromPreferred (key) {
       if (this.isCityPreferredCityOption(key)) {
-        // remove
+        // remove city
         let index = this.pushWooshData.preferredCityOptions.indexOf(key)
         this.pushWooshData.preferredCityOptions.splice(index, 1)
         this.$store.dispatch('savePushwooshData', this.pushWooshData)
       } else {
-        // add
+        // TODO
+        // Add loading step
         this.pushWooshData.preferredCityOptions.push(key)
-        this.$store.dispatch('savePushwooshData', this.pushWooshData).then(() => {
-
-        })
+        this.$store.dispatch('savePushwooshData', this.pushWooshData)
       }
 
     },
