@@ -9,6 +9,11 @@
       <input v-bind:value="remainingCharacters" type="text" name="limit" size="4" readonly>
     </div>
 
+    <div class="link-container">
+      <label>Link: </label>
+      <input v-bind:value="messageLink" class="input" type="text" name="limit">
+    </div>
+
     <div class="city-options-list">
       <h2>Your Cities</h2>
       <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="city-option" v-bind:class="{ selected : isCitySelected(city) }">
@@ -17,7 +22,7 @@
     </div>
 
     <div class="cancel-save">
-      <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">Send</span>
+      <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">{{sendMessageText}}</span>
       <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
     </div>
 
@@ -48,6 +53,10 @@ export default {
     },
     messageIsValid () {
       return this.messageBody.length > 0
+    },
+    sendMessageText () {
+      if (this.selectedCities.length > 0) return 'Send to selected cities'
+      else return 'Send to all users'
     }
   },
   created () {
@@ -76,7 +85,8 @@ export default {
         this.$store.dispatch('setModalLoadingState', true)
 
         this.axios.post(baseUrl, {
-          messageBody: this.messageBody
+          messageBody:    this.messageBody,
+          selectedCities: this.selectedCities
         }).then((response) => {
           this.$store.dispatch('setModalLoadingState', false)
           // console.log(response)
@@ -117,6 +127,10 @@ export default {
 
 .create-push {
 
+  padding:                      1em;
+  border:                       1px solid #dfe0e2;
+  border-radius:                1em;
+
   .push-message-body {
     height:                     10em;
     width:                      75%;
@@ -135,6 +149,17 @@ export default {
     }
   }
 
+  .link-container {
+    display:                    flex;
+    align-items:                center;
+    margin:                     0.75em 0;
+
+    > input {
+      width:                    60%;
+      margin-left:              0.5em;
+    }
+  }
+
   .city-options-list {
 
     > h2 {
@@ -143,13 +168,14 @@ export default {
     }
 
     .city-option {
-      padding:                      0.5em;
-      border-radius:                2em;
+      padding:                      0.25em 0.5em;
+      border-radius:                1em;
       border:                       1px solid black;
       display:                      inline-block;
       margin:                       0.25em;
       cursor:                       pointer;
       background-color:             whitesmoke;
+      font-size:                    0.8em;
 
       &:hover {
         background-color:           black;

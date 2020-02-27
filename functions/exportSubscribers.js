@@ -19,6 +19,7 @@ module.exports = functions.https.onRequest((req, res) => {
 
   let applicationCode = req.query.applicationCode ? req.query.applicationCode : "F1360-7EBF3" // default to crystal for now
 
+  // TODO remove this and similar
   applicationCode = "1DBC6-F4481" // Crystal MTN
 
   let requestBody = {
