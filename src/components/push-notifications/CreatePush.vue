@@ -10,15 +10,37 @@
     </div>
 
     <div class="link-container">
-      <label>Link: </label>
+      <h2>Link:</h2>
       <input v-bind:value="messageLink" class="input" type="text" name="limit">
     </div>
 
-    <div class="city-options-list">
+    <div class="options-list">
       <h2>Your Cities</h2>
-      <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="city-option" v-bind:class="{ selected : isCitySelected(city) }">
-        {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
-      </span>
+
+      <div v-if="pushWooshData.preferredCityOptions.length > 0" class="options-container">
+        <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="option" v-bind:class="{ selected : isCitySelected(city) }">
+          {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+        </span>
+      </div>
+      <div v-else class="no-results">
+        You do not have any preferred cities. Please visit the settings page.
+      </div>
+    </div>
+
+    <div class="geo-zones-list options-list">
+      <h2>Your GeoZones</h2>
+
+      <div class="geo-zone-container">
+        <div v-if="geoZonesExist" v-for="cluster in geoZones" class="cluster">
+          <span class="cluster-name">{{cluster.name}}:</span>
+          <span v-for="zone in cluster.geoZones" v-on:click="selectGeoZone(zone)" class="option" v-bind:class="{ selected : isGeoZoneSelected(zone) }">
+            {{zone.name}}
+          </span>
+        </div>
+        <div v-else class="no-results">
+          You do not have any geo zones set up yet.
+        </div>
+      </div>
     </div>
 
     <div class="cancel-save">
@@ -43,7 +65,9 @@ export default {
       messageBody:          '',
       messageLimit:         200,
       messageLink:          '',
-      selectedCities:       []
+      selectedCities:       [],
+      geoZones:             {},
+      selectedGeoZone:      {}
     }
   },
   computed: {
@@ -55,21 +79,27 @@ export default {
       return this.messageBody.length > 0
     },
     sendMessageText () {
-      if (this.selectedCities.length > 0) return 'Send to selected cities'
+      if (Object.keys(this.selectedGeoZone).length > 0) return 'Send to all users in zone'
+      else if (this.selectedCities.length > 0) return 'Send to selected cities'
       else return 'Send to all users'
+    },
+    geoZonesExist () {
+      if (Object.keys(this.geoZones).length > 1) return true
+      return this.geoZones[0].geoZones
     }
   },
   created () {
-    // this.getCities()
+    this.getGeoZones()
   },
   methods: {
-    getCities () {
+    getGeoZones () {
       // This tests the getTagStats functionality, but it does not quite give us what we want, I don't think.
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getTagStats'
-      baseUrl += '?tagName=City'
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getGeoZones'
+      baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
-        console.log(JSON.parse(response.data.body))
+        let body = JSON.parse(response.data.body)
+        this.geoZones = body.response.clusters
       })
     },
     cancelMessage () {
@@ -85,8 +115,9 @@ export default {
         this.$store.dispatch('setModalLoadingState', true)
 
         this.axios.post(baseUrl, {
-          messageBody:    this.messageBody,
-          selectedCities: this.selectedCities
+          messageBody:      this.messageBody,
+          selectedCities:   this.selectedCities,
+          geoZone:          this.selectedGeoZone
         }).then((response) => {
           this.$store.dispatch('setModalLoadingState', false)
           // console.log(response)
@@ -109,6 +140,7 @@ export default {
       })
     },
     addOrRemoveCityFromSelected (city) {
+      this.selectedGeoZone = {}
       if (this.selectedCities.includes(city)) {
         let index = this.selectedCities.indexOf(city)
         this.selectedCities.splice(index, 1)
@@ -118,6 +150,14 @@ export default {
     },
     isCitySelected (city) {
       return this.selectedCities.includes(city)
+    },
+    selectGeoZone (zone) {
+      this.selectedCities = []
+      if (zone === this.selectedGeoZone) this.selectedGeoZone = {}
+      else this.selectedGeoZone = zone
+    },
+    isGeoZoneSelected (zone) {
+      return this.selectedGeoZone.id == zone.id
     },
   }
 }
@@ -154,20 +194,31 @@ export default {
     align-items:                center;
     margin:                     0.75em 0;
 
+    > h2 {
+      margin:                   0.5em 0;
+      font-size:                1.15em;
+    }
+
     > input {
       width:                    60%;
       margin-left:              0.5em;
     }
   }
 
-  .city-options-list {
+  .options-list {
+
+    margin-top:                 1.25em;
 
     > h2 {
       margin:                   0.5em 0;
       font-size:                1.15em;
     }
 
-    .city-option {
+    .options-container {
+      padding:                  0 0.5em;
+    }
+
+    .option {
       padding:                      0.25em 0.5em;
       border-radius:                1em;
       border:                       1px solid black;
@@ -189,10 +240,21 @@ export default {
         border:                     1px solid white;
       }
     }
+
+    .no-results {
+      font-style:                   italic;
+      padding:                      0.25em 0.5em;
+    }
+  }
+
+  .geo-zones-list {
+    .geo-zone-container {
+      padding:                      0 0.5em;
+    }
   }
 
   .cancel-save {
-    margin-top:                 1em;
+    margin-top:                 2em;
   }
 
 }

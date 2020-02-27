@@ -11,3 +11,4 @@ exports.getTagStats = require('./getTagStats');
 exports.exportSubscribers = require('./exportSubscribers');
 exports.exportSegment = require('./exportSegment');
 exports.getResults = require('./getResults');
+exports.getGeoZones = require('./getGeoZones');

@@ -33,6 +33,16 @@ module.exports = functions.https.onRequest((req, res) => {
       }
     }
 
+    // selectedCities: ["us_kirkland", "us_renton"]
+
+    if (req.body.geoZone.lat) {
+      requestBody["request"]["notifications"][0]["geoZones"] = {
+        "lat": req.body.geoZone.lat,
+        "lng": req.body.geoZone.lng,
+        "range": req.body.geoZone.range
+      }
+    }
+
     httpRequest.post({
       url: 'https://cp.pushwoosh.com/json/1.3/createMessage',
       json: requestBody,
