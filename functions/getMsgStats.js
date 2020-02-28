@@ -17,17 +17,15 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Headers', "*")
   res.set('Access-Control-Allow-Methods', 'GET')
 
-  let requestId = req.query.requestId
-
   let requestBody = {
     "request": {
-      "auth":       token,
-      "request_id": requestId
+      "auth":     token,
+      "message":  req.query.messageCode
     }
   }
 
   let request = {
-    url: 'https://cp.pushwoosh.com/json/1.3/getResults',
+    url: 'https://cp.pushwoosh.com/json/1.3/getMsgStats',
     body: JSON.stringify(requestBody),
     headers: {
       'Content-Type': 'application/json'
@@ -35,37 +33,7 @@ module.exports = functions.https.onRequest((req, res) => {
   }
 
   httpRequest.post(request, (error, response, body) => {
-    // One case of error
-    // {
-    //   status_code: 420,
-    //   status_message: 'Request is still being processed',
-    //   response: null
-    // }
-
-    // Expected response body
-    // {"status_code":200,"status_message":"OK","response":{"url":"https:\\/\\/export.pushwoosh.com\\/devices\\/a1345091d2670b9ee92a278e309c5153.csv"}}
-
-    let parsed  = JSON.parse(response.body)
-
-    if (!parsed.response) {
-      res.status(200).send({ error: parsed.status_message })
-    } else {
-      let url = parsed.response.url
-
-      if (!url) {
-        res.status(200).send(response)
-      } else {
-        httpRequest.get({
-          url: url,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }, (error, response, body) => {
-          res.status(200).send(response)
-        })
-      }
-    }
-
+    res.status(200).send(response)
   })
 
 

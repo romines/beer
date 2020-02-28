@@ -12,3 +12,4 @@ exports.exportSubscribers = require('./exportSubscribers');
 exports.exportSegment = require('./exportSegment');
 exports.getResults = require('./getResults');
 exports.getGeoZones = require('./getGeoZones');
+exports.getMsgStats = require('./getMsgStats');

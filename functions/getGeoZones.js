@@ -17,8 +17,6 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Headers', "*")
   res.set('Access-Control-Allow-Methods', 'GET')
 
-  let requestId = req.query.requestId
-
   let requestBody = {
     "request": {
       "auth":         token,

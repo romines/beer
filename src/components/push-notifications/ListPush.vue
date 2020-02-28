@@ -6,7 +6,7 @@
       <LoadingSpinner v-if="isLoadingPushes" isBlack="true"></LoadingSpinner>
       <div v-else-if="pushNotifications.length == 0" class="no-messages">No messages to display.</div>
       <div v-else v-for="notification in pushNotifications" class="notification-container">
-        <div class="header" @click="showNotificationDetails(notification.id)">
+        <div class="header" @click="showNotificationDetails(notification)">
           <span class="id">{{notification.id}}</span>
           <span class="message-content">{{ displayMessageContent(notification) }}</span>
           <span class="send-date">{{notification.sendDate}}</span>
@@ -20,13 +20,31 @@
             <div class="detail send-date">
               <label>Sent At:</label><span class="send-date">{{currentNotification.sendDate}}</span>
             </div>
-            <div class="detail status">
-              <label>Status:</label><span class="status">{{currentNotification.status}}</span>
-            </div>
             <div class="detail platforms">
               <label>Platforms:</label><span class="platforms">
                 <img v-for="platformId in currentNotification.platforms" v-bind:src="getDeviceImage(platformId)" class="device-image">
               </span>
+            </div>
+            <div class="detail status">
+              <label>Status:</label><span class="status">{{currentNotification.status}}</span>
+            </div>
+            <div class="detail statistic">
+              <label>Sent to:</label>
+              <span v-if="currentPendingRequestId" class="loading">Statistics will be available momentarily</span>
+              <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
+              <span v-else class="stat">{{currentNotification.statistics.conversion.send}}</span>
+            </div>
+            <div class="detail statistic">
+              <label>Delivered to:</label>
+              <span v-if="currentPendingRequestId" class="loading">Please wait a minute and then click refresh</span>
+              <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
+              <span v-else class="stat">{{currentNotification.statistics.conversion.delivery}}</span>
+            </div>
+            <div class="detail statistic">
+              <label>Open Count:</label>
+              <button v-if="currentPendingRequestId" v-on:click="getMsgStatResults(currentPendingRequestId)" class="button is-primary">Refresh</button>
+              <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
+              <span v-else class="stat">{{currentNotification.statistics.conversion.open}}</span>
             </div>
             <div class="detail message-content">
               <label>Message:</label><span class="message-content">{{ displayMessageContent(currentNotification) }}</span>
@@ -43,6 +61,7 @@
 
 import LoadingSpinner from '../utilities/LoadingSpinner.vue'
 import moment from 'moment'
+import Vue from 'vue'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -55,7 +74,11 @@ export default {
       isLoadingNotification:      true,
       pushNotifications:          [],
       currentNotificationId:      null,
-      currentNotification:        {}
+      currentNotification:        {},
+      currentRetryCount:          0,
+      maxRetryCount:              10,
+      currentPendingRequestId:    null,
+      isLoadingMsgStats:          false
     }
   },
   computed: {
@@ -81,15 +104,17 @@ export default {
         this.isLoadingPushes    = false
       })
     },
-    showNotificationDetails (id) {
-      if (this.currentNotificationId == id) this.currentNotificationId = null
-      else this.currentNotificationId = id
+    showNotificationDetails (notification) {
+      if (this.currentNotificationId == notification.id) this.currentNotificationId = null
+      else this.currentNotificationId = notification.id
+
+      this.getPushNotificationStats(notification)
 
       this.isLoadingNotification = true
 
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotification'
 
-      this.axios.get(baseUrl + "?messageId=" + id).then((response) => {
+      this.axios.get(baseUrl + "?messageId=" + notification.id).then((response) => {
         let body            = JSON.parse(response.data.body)
         let messageDetails  = body.response.message
 
@@ -99,6 +124,46 @@ export default {
 
         this.currentNotification    = messageDetails
         this.isLoadingNotification  = false
+      })
+    },
+    getPushNotificationStats (notification) {
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getMsgStats'
+      baseUrl += '?messageCode=' + notification.code
+      this.isLoadingMsgStats = true
+
+      this.axios.get(baseUrl).then((response) => {
+        let res         = JSON.parse(response.data.body)
+        let requestId   = res.response.request_id
+        this.getMsgStatResults(requestId)
+      })
+
+    },
+    getMsgStatResults (requestId) {
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getResults'
+      baseUrl += '?requestId=' + requestId
+
+      this.currentPendingRequestId = null
+      this.isLoadingMsgStats = true
+
+      this.axios.get(baseUrl).then((response) => {
+        if (response.data.error) {
+          if (this.currentRetryCount < this.maxRetryCount) {
+            this.currentRetryCount += 1
+            this.getMsgStatResults(requestId)
+          } else {
+            this.currentPendingRequestId = requestId
+          }
+        } else {
+          // Reset pending retry values
+          this.currentRetryCount        = 0
+          this.currentPendingRequestId  = null
+
+          let res = JSON.parse(response.data.body)
+          Vue.set(this.currentNotification, 'statistics', res.response)
+
+          // Must go after #set above
+          this.isLoadingMsgStats = false
+        }
       })
     },
     showNotification (id) {
@@ -176,6 +241,13 @@ export default {
             .device-image {
               width:                2em;
               margin-right:         0.25em;
+            }
+          }
+
+          .statistic {
+            .loading {
+              display:                inline-block;
+              font-style:             italic;
             }
           }
         }
