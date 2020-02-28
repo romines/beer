@@ -33,8 +33,7 @@ module.exports = functions.https.onRequest((req, res) => {
       }
     }
 
-    // selectedCities: ["us_kirkland", "us_renton"]
-
+    // Add geozone info
     if (req.body.geoZone.lat) {
       requestBody["request"]["notifications"][0]["geoZones"] = {
         "lat": req.body.geoZone.lat,
@@ -42,6 +41,18 @@ module.exports = functions.https.onRequest((req, res) => {
         "range": req.body.geoZone.range
       }
     }
+
+    // Add selected cities info
+    if (req.body.selectedCities && req.body.selectedCities.length > 0) {
+      let array = [ ["City", "IN", req.body.selectedCities ] ]
+      requestBody["request"]["notifications"][0]["conditions"] = array
+    }
+
+    // Add message link
+    if (req.body.messageLink && req.body.messageLink.length > 0) {
+      requestBody["request"]["notifications"][0]["link"] = req.body.messageLink
+    }
+
 
     httpRequest.post({
       url: 'https://cp.pushwoosh.com/json/1.3/createMessage',

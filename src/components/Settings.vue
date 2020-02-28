@@ -11,7 +11,7 @@
       <h2 class="subtitle">Your Preferred Cities</h2>
       <div class="city-options-list">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option preferred">
-          {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+          {{pushWooshData.exportSubscribersCityOptions[city]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]['count']}}</b>
           <span> (X) </span>
         </span>
       </div>
@@ -22,7 +22,7 @@
       <div class="city-options-container city-options-list">
         <h2 class="subtitle">Most Popular Cities</h2>
         <span v-for="key in topCityOptionsKeys" v-on:click="addOrRemoveCityOptionFromPreferred(key)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(key) }">
-          {{key}} - <b>{{pushWooshData.exportSubscribersCityOptions[key]}}</b>
+          {{pushWooshData.exportSubscribersCityOptions[key]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[key]['count']}}</b>
         </span>
       </div>
 
@@ -31,7 +31,7 @@
         <input v-model="currentCityOptionsSearch" class="input" placeholder="Search by city name..." />
         <div v-if="currentSearchResults.length > 0">
           <span v-for="city in currentSearchResults" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(city) }">
-            {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+            {{pushWooshData.exportSubscribersCityOptions[city]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]['count']}}</b>
           </span>
         </div>
         <div v-else-if="currentCityOptionsSearch.length > 0" class="no-results">
@@ -85,7 +85,7 @@ export default {
       let results = []
 
       Object.keys(this.pushWooshData.exportSubscribersCityOptions).forEach((key) => {
-        if (key.includes(this.currentCityOptionsSearch)) results.push(key)
+        if (this.pushWooshData.exportSubscribersCityOptions[key]['cityName'].includes(this.currentCityOptionsSearch)) results.push(key)
       })
 
       return results
@@ -151,6 +151,7 @@ export default {
       baseUrl += "?requestId=" + requestId
 
       this.axios.get(baseUrl).then((response) => {
+        console.log(response.data.body)
         if (response.data.error) {
           this.isResettingSubscribers = false
           if (response.data.error === "Request is still being processed") {
@@ -192,9 +193,10 @@ export default {
 
       if (this.cityOptions[newCityName]) {
         let currentValue = this.cityOptions[newCityName]
-        Vue.set(this.cityOptions, newCityName, currentValue + 1)
+        currentValue.count += 1
+        Vue.set(this.cityOptions, newCityName, currentValue)
       } else {
-        Vue.set(this.cityOptions, newCityName, 1)
+        Vue.set(this.cityOptions, newCityName, { cityName: city, count: 1 } )
       }
     }
   }

@@ -11,7 +11,7 @@
 
     <div class="link-container">
       <h2>Link:</h2>
-      <input v-bind:value="messageLink" class="input" type="text" name="limit">
+      <input v-model="messageLink" class="input" type="text" name="limit">
     </div>
 
     <div class="options-list">
@@ -19,7 +19,7 @@
 
       <div v-if="pushWooshData.preferredCityOptions.length > 0" class="options-container">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="option" v-bind:class="{ selected : isCitySelected(city) }">
-          {{city}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]}}</b>
+          {{pushWooshData.exportSubscribersCityOptions[city]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]['count']}}</b>
         </span>
       </div>
       <div v-else class="no-results">
@@ -86,6 +86,11 @@ export default {
     geoZonesExist () {
       if (Object.keys(this.geoZones).length > 1) return true
       return this.geoZones[0].geoZones
+    },
+    selectedCityNames () {
+      return this.selectedCities.map((city) => {
+        return this.pushWooshData.exportSubscribersCityOptions[city]['cityName']
+      })
     }
   },
   created () {
@@ -116,8 +121,9 @@ export default {
 
         this.axios.post(baseUrl, {
           messageBody:      this.messageBody,
-          selectedCities:   this.selectedCities,
-          geoZone:          this.selectedGeoZone
+          selectedCities:   this.selectedCityNames,
+          geoZone:          this.selectedGeoZone,
+          messageLink:      this.messageLink
         }).then((response) => {
           this.$store.dispatch('setModalLoadingState', false)
           // console.log(response)
