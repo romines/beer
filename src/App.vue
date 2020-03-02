@@ -6,6 +6,7 @@
       <router-link to="/"><img src="./assets/logo.png" class="logo"/></router-link>
 
       <div class="link-nav" v-if="$store.state.user && $store.state.user.uid">
+        <router-link v-bind:to="{ name: 'Home' }">Contacts</router-link>
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
         <router-link v-bind:to="{ name: 'Settings' }">Settings</router-link>
       </div>
@@ -15,7 +16,7 @@
           v-if="$store.state.user && $store.state.user.uid"
           class="text-and-icon"
           @click="logOut">
-          
+
           <span class="log-out">Logout</span>
           <span class="icon is-small"><i class="fas fa-power-off"/></span> &nbsp;
         </span>
@@ -44,7 +45,7 @@ export default {
       this.$store.dispatch('logOut').then(() => {
         this.$router.replace('/login')
       })
-    },
+    }
   },
 }
 </script>
@@ -75,7 +76,17 @@ export default {
 
     > a {
       margin-right:           1em;
+      color:                  #272c30;
+
+      &.router-link-exact-active {
+        color:                #42b983;
+      }
+
+      &:hover {
+        text-decoration:      underline;
+      }
     }
+
   }
 
   .logo {
