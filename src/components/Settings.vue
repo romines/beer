@@ -11,7 +11,7 @@
       <h2 class="subtitle">Your Preferred Cities</h2>
       <div class="city-options-list">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option preferred">
-          {{pushWooshData.exportSubscribersCityOptions[city]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]['count']}}</b>
+          {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
           <span> (X) </span>
         </span>
       </div>
@@ -22,7 +22,7 @@
       <div class="city-options-container city-options-list">
         <h2 class="subtitle">Most Popular Cities</h2>
         <span v-for="key in topCityOptionsKeys" v-on:click="addOrRemoveCityOptionFromPreferred(key)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(key) }">
-          {{pushWooshData.exportSubscribersCityOptions[key]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[key]['count']}}</b>
+          {{ findSafeCityData(key, 'cityName') }} - <b>{{ findSafeCityData(key, 'count') }}</b>
         </span>
       </div>
 
@@ -31,7 +31,7 @@
         <input v-model="currentCityOptionsSearch" class="input" placeholder="Search by city name..." />
         <div v-if="currentSearchResults.length > 0">
           <span v-for="city in currentSearchResults" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(city) }">
-            {{pushWooshData.exportSubscribersCityOptions[city]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]['count']}}</b>
+            {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
           </span>
         </div>
         <div v-else-if="currentCityOptionsSearch.length > 0" class="no-results">
@@ -73,7 +73,7 @@ export default {
     ...mapGetters(['pushWooshData']),
     sortedCityOptionsKeys () {
       let options = this.pushWooshData.exportSubscribersCityOptions
-      return Object.keys(options).sort(function(a,b){return options[b]-options[a]})
+      return Object.keys(options).sort((a,b) => { return options[b]['count'] - options[a]['count'] })
     },
     topCityOptionsKeys () {
       let topNumber = 20
@@ -97,6 +97,11 @@ export default {
     this.setCurrentRequestData()
   },
   methods: {
+    findSafeCityData (city, fieldName) {
+      if (this.pushWooshData.exportSubscribersCityOptions[city]) return this.pushWooshData.exportSubscribersCityOptions[city][fieldName]
+      else if (fieldName === 'count') return 'N/A'
+      else return city
+    },
     setCurrentRequestData () {
       this.currentRequestData["currentRequestId"]   = this.pushWooshData.exportSubscribers.currentRequestId
       this.currentRequestData["currentRequestDate"] = moment(this.pushWooshData.exportSubscribers.currentRequestDate)
@@ -151,7 +156,6 @@ export default {
       baseUrl += "?requestId=" + requestId
 
       this.axios.get(baseUrl).then((response) => {
-        console.log(response.data.body)
         if (response.data.error) {
           this.isResettingSubscribers = false
           if (response.data.error === "Request is still being processed") {
@@ -185,7 +189,7 @@ export default {
       this.pushWooshData.exportSubscribersCityOptions = this.cityOptions
 
       this.$store.dispatch('savePushwooshData', this.pushWooshData).then(() => {
-        console.log('SAVED CITY OPTIONS')
+
       })
     },
     incrementCityCount (city) {

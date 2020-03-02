@@ -2,19 +2,23 @@
   <div class="push-notifications">
     <site-header title="Push Notifications" />
 
-    <span class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
+    <span v-if="!pwMissingAppIdWarning" class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
 
     <transition name="fade">
       <create-push v-if="showCreatePush" v-on:closeCreatePush="showCreatePush = false" v-on:pushCreated="onPushCreated()" class="new-push-container" />
     </transition>
 
-    <list-push ref="listPush" class="list-push-container" />
+    <list-push v-if="!pwMissingAppIdWarning" ref="listPush" class="list-push-container" />
+    <div v-else>
+      {{pwMissingAppIdWarning}}
+    </div>
 
   </div>
 </template>
 
 <script>
 
+import { mapGetters } from 'vuex'
 import SiteHeader from './SiteHeader.vue'
 import CreatePush from './push-notifications/CreatePush.vue'
 import ListPush from './push-notifications/ListPush.vue'
@@ -27,11 +31,16 @@ export default {
   },
   data() {
     return {
-      showCreatePush:      false
+      showCreatePush:         false,
+      pwMissingAppIdWarning:  null
     }
   },
-  computed: {},
-  created() {},
+  computed: {
+    ...mapGetters(['pushWooshData']),
+  },
+  created() {
+    if (!this.pushWooshData || !this.pushWooshData.appId) this.pwMissingAppIdWarning = 'Missing application id. Please contact Resorts Tapped for assistance.'
+  },
   methods: {
     onPushCreated () {
       this.$refs.listPush.getPushNotifications(true)

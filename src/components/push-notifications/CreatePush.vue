@@ -19,7 +19,7 @@
 
       <div v-if="pushWooshData.preferredCityOptions.length > 0" class="options-container">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="option" v-bind:class="{ selected : isCitySelected(city) }">
-          {{pushWooshData.exportSubscribersCityOptions[city]['cityName']}} - <b>{{pushWooshData.exportSubscribersCityOptions[city]['count']}}</b>
+          {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
         </span>
       </div>
       <div v-else class="no-results">
@@ -97,6 +97,11 @@ export default {
     this.getGeoZones()
   },
   methods: {
+    findSafeCityData (city, fieldName) {
+      if (this.pushWooshData.exportSubscribersCityOptions[city]) return this.pushWooshData.exportSubscribersCityOptions[city][fieldName]
+      else if (fieldName === 'count') return 'N/A'
+      else return city
+    },
     getGeoZones () {
       // This tests the getTagStats functionality, but it does not quite give us what we want, I don't think.
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getGeoZones'

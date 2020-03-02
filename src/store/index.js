@@ -32,7 +32,12 @@ const store = {
     user: {},
     resorts: [],
     resortId: '',
-    pushWooshData: {},
+    pushWooshData: {
+      appId: '',
+      exportSubscribers: {},
+      exportSubscribersCityOptions: {},
+      preferredCityOptions: []
+    },
     resortMeta: {},
     contactGroups: [],
     emergencyGroup: {},
@@ -61,7 +66,9 @@ const store = {
       state.resortMeta = resortMeta
     },
     SET_PUSHWOOSH_DATA(state, pushWooshData) {
-      state.pushWooshData = pushWooshData
+      Object.keys(pushWooshData).forEach((key) => {
+        state.pushWooshData[key] = pushWooshData[key]
+      })
     },
     SET_CONTACT_GROUPS(state, { contactGroups, emergencyGroup }) {
       console.log('SET_CONTACT_GROUPS . . .')
