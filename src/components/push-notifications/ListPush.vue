@@ -26,7 +26,7 @@
               </span>
             </div>
             <div class="detail status">
-              <label>Status:</label><span class="status">{{currentNotification.status}}</span>
+              <label>Status:</label><span class="status-note" v-bind:class="[currentNotification.status]">{{currentNotification.status}}</span>
             </div>
             <div class="detail statistic">
               <label>Sent to:</label>
@@ -242,12 +242,34 @@ export default {
               width:                2em;
               margin-right:         0.25em;
             }
+
+            &.status {
+
+              .status-note {
+
+                width:                auto;
+                border-radius:        4px;
+
+                &.done {
+                  background-color:   #00d1b2;
+                  padding:            0.15em 0.4em;
+                  color:              white;
+                }
+
+                &.pending {
+                  background-color:   #e67e22;
+                  padding:            0.15em 0.4em;
+                  color:              white;
+                }
+
+              }
+            }
           }
 
           .statistic {
             .loading {
-              display:                inline-block;
-              font-style:             italic;
+              display:              inline-block;
+              font-style:           italic;
             }
           }
         }
