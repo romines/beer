@@ -156,14 +156,20 @@ const store = {
       ])
     },
 
-    setPushWooshData({ rootState, commit }) {
+    setPushWooshData({ rootState, commit, dispatch }) {
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).onSnapshot(
           doc => {
             const resortData = doc.data()
             console.log('SETTING PUSHWOOSH DATA')
-            commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
-            resolve()
+            // If there is no PW data object in firestore, create one
+            if (!resortData.pushWooshData) {
+              console.log('MISSING PW DATA... SETTING...')
+              dispatch('savePushwooshData', rootState.pushWooshData)
+            } else {
+              commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
+              resolve()
+            }
           },
           err => reject(`Error listening to contacts: ${err}`)
         )
