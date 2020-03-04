@@ -251,7 +251,7 @@ export default {
                 border-radius:        4px;
 
                 &.done {
-                  background-color:   #00d1b2;
+                  background-color:   #00b894;
                   padding:            0.15em 0.4em;
                   color:              white;
                 }

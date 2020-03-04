@@ -3,13 +3,11 @@
 const httpRequest = require('request');
 const functions   = require('firebase-functions');
 const config      = JSON.parse(process.env.FIREBASE_CONFIG);
-// TODO update this to use prod credentials
-const token       = functions.config().pushwoosh.development;
-// const token       = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.staging;
+const token       = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.development;
 
-if (process.env.NODE_ENV === 'development') {
-  token = functions.config().pushwoosh.development
-}
+// if (process.env.NODE_ENV === 'development') {
+//   token = functions.config().pushwoosh.development
+// }
 
 module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Origin', "*")
@@ -64,7 +62,5 @@ module.exports = functions.https.onRequest((req, res) => {
       res.status(200).send(response)
     })
   }
-
-
 
 });
