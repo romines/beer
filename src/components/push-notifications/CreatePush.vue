@@ -55,9 +55,6 @@
 
 import { mapGetters } from 'vuex'
 
-// TODO
-// Add link input
-
 export default {
   components: {},
   data() {

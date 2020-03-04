@@ -3,7 +3,6 @@
 const httpRequest = require('request');
 const functions   = require('firebase-functions');
 const config      = JSON.parse(process.env.FIREBASE_CONFIG);
-// TODO update this to use prod credentials
 const token       = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.development;
 
 module.exports = functions.https.onRequest((req, res) => {

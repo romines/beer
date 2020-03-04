@@ -44,10 +44,6 @@
 
 <script>
 
-// TODO
-// Allow add/remove by click functionality for settings
-// Allow typeahead search for other city options
-
 import { mapGetters } from 'vuex'
 import SiteHeader from './SiteHeader.vue'
 import parse from 'csv-parse'
@@ -159,11 +155,8 @@ export default {
         if (response.data.error) {
           this.isResettingSubscribers = false
           if (response.data.error === "Request is still being processed") {
-            // TODO
-            // Display error message on screen
+            // TODO display message on screen
             console.log("REQUEST STILL PROCESSING")
-            // this.setCurrentRequestDataToLast(this.pushWooshData)
-            // this.resetApplicationSubscribers(this.pushWooshData.exportSubscribers.lastRequestId)
           }
         } else {
           let csvData = response.data.body
