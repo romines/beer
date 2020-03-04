@@ -31,7 +31,8 @@
       <h2>Your GeoZones</h2>
 
       <div class="geo-zone-container">
-        <div v-if="geoZonesExist" v-for="cluster in geoZones" class="cluster">
+        <LoadingSpinner v-if="geoZonesAreLoading" isBlack="true"></LoadingSpinner>
+        <div v-else-if="geoZonesExist" v-for="cluster in geoZones" class="cluster">
           <span class="cluster-name">{{cluster.name}}:</span>
           <span v-for="zone in cluster.geoZones" v-on:click="selectGeoZone(zone)" class="option" v-bind:class="{ selected : isGeoZoneSelected(zone) }">
             {{zone.name}}
@@ -54,9 +55,12 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import LoadingSpinner from '../utilities/LoadingSpinner.vue'
 
 export default {
-  components: {},
+  components: {
+    LoadingSpinner
+  },
   data() {
     return {
       messageBody:          '',
@@ -64,7 +68,8 @@ export default {
       messageLink:          '',
       selectedCities:       [],
       geoZones:             {},
-      selectedGeoZone:      {}
+      selectedGeoZone:      {},
+      geoZonesAreLoading:   false
     }
   },
   computed: {
@@ -100,6 +105,7 @@ export default {
       else return city
     },
     getGeoZones () {
+      this.geoZonesAreLoading = true
       // This tests the getTagStats functionality, but it does not quite give us what we want, I don't think.
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getGeoZones'
       baseUrl += '?applicationCode=' + this.pushWooshData.appId
@@ -107,6 +113,7 @@ export default {
       this.axios.get(baseUrl).then((response) => {
         let body = JSON.parse(response.data.body)
         this.geoZones = body.response.clusters
+        this.geoZonesAreLoading = false
       })
     },
     cancelMessage () {
