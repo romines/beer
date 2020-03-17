@@ -105,8 +105,13 @@ export default {
       })
     },
     showNotificationDetails (notification) {
-      if (this.currentNotificationId == notification.id) this.currentNotificationId = null
-      else this.currentNotificationId = notification.id
+      // Check if opening or closing...
+      if (this.currentNotificationId == notification.id) {
+        this.currentNotificationId = null
+        return
+      } else {
+        this.currentNotificationId = notification.id
+      }
 
       this.getPushNotificationStats(notification)
 
@@ -130,6 +135,7 @@ export default {
       let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getMsgStats'
       baseUrl += '?messageCode=' + notification.code
       this.isLoadingMsgStats = true
+      this.currentRetryCount = 0      // Reset retry count on new open
 
       this.axios.get(baseUrl).then((response) => {
         let res         = JSON.parse(response.data.body)
@@ -159,6 +165,7 @@ export default {
           this.currentPendingRequestId  = null
 
           let res = JSON.parse(response.data.body)
+          console.log(res)
           Vue.set(this.currentNotification, 'statistics', res.response)
 
           // Must go after #set above

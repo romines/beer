@@ -111,8 +111,8 @@ export default {
       baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
-        let body = JSON.parse(response.data.body)
-        this.geoZones = body.response.clusters
+        let body                = JSON.parse(response.data.body)
+        this.geoZones           = body.response.clusters
         this.geoZonesAreLoading = false
       })
     },
@@ -125,6 +125,7 @@ export default {
 
       const onConfirm = () => {
         let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createPushNotification'
+        baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
         this.$store.dispatch('setModalLoadingState', true)
 
@@ -140,7 +141,6 @@ export default {
           this.cancelMessage()
           this.$emit('pushCreated')
         }).catch((response) => {
-          console.log(response)
           this.$store.dispatch('setModalLoadingState', false)
           this.$store.dispatch('showErrorModal', 'There was an error with your request and your message was not sent. Please try again later or contact Resorts Tapped for support.')
           this.cancelMessage()
@@ -148,9 +148,9 @@ export default {
       }
 
       this.$store.commit('SHOW_MODAL', {
-        heading: 'Please confirm that you want to send the following message:',
-        message: this.messageBody,
-        showLoading: false,
+        heading:      'Please confirm that you want to send the following message:',
+        message:      this.messageBody,
+        showLoading:  false,
         onConfirm,
       })
     },

@@ -14,13 +14,15 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Headers', "*")
   res.set('Access-Control-Allow-Methods', 'POST')
 
+  let applicationCode = req.query.applicationCode
+
   if (!req.body.messageBody) {
     res.send('WTF');
   } else {
 
     let requestBody = {
       "request": {
-        "application": "FD90D-D956E", // Jackson Dev
+        "application": applicationCode,
         "auth": token, // API access token from Pushwoosh Control Panel
         "notifications": [
           {
@@ -33,7 +35,7 @@ module.exports = functions.https.onRequest((req, res) => {
 
     // Add geozone info
     if (req.body.geoZone.lat) {
-      requestBody["request"]["notifications"][0]["geoZones"] = {
+      requestBody["request"]["notifications"][0]["geozone"] = {
         "lat": req.body.geoZone.lat,
         "lng": req.body.geoZone.lng,
         "range": req.body.geoZone.range
@@ -51,7 +53,7 @@ module.exports = functions.https.onRequest((req, res) => {
       requestBody["request"]["notifications"][0]["link"] = req.body.messageLink
     }
 
-
+    console.log(requestBody["request"]["notifications"][0])
     httpRequest.post({
       url: 'https://cp.pushwoosh.com/json/1.3/createMessage',
       json: requestBody,
