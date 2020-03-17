@@ -8,6 +8,7 @@
           {{ contents.heading }}
         </div>
         <div class="body">
+          <div class="bolded">{{ contents.bolded }}</div>
           <div class="contents">{{ contents.message }}</div>
           <div class="field is-grouped" v-show="!contents.buttonLess">
             <p class="control no-expando confirm">
@@ -92,6 +93,9 @@ export default {
 
   .title {
     justify-content: flex-start;
+  }
+  .bolded {
+    font-weight: bold;
   }
   .contents {
     margin-bottom: 1em;

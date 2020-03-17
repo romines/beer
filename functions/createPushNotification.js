@@ -26,8 +26,10 @@ module.exports = functions.https.onRequest((req, res) => {
         "auth": token, // API access token from Pushwoosh Control Panel
         "notifications": [
           {
-            "send_date": "now",  // required. YYYY-MM-DD HH:mm OR 'now'
-            "content": req.body.messageBody
+            "send_date":        "now",  // required. YYYY-MM-DD HH:mm OR 'now'
+            "content":          req.body.messageBody,
+            "ios_title":        req.body.messageTitle,
+            "android_header":   req.body.messageTitle
           }
         ]
       }
@@ -36,9 +38,9 @@ module.exports = functions.https.onRequest((req, res) => {
     // Add geozone info
     if (req.body.geoZone.lat) {
       requestBody["request"]["notifications"][0]["geozone"] = {
-        "lat": req.body.geoZone.lat,
-        "lng": req.body.geoZone.lng,
-        "range": req.body.geoZone.range
+        "lat":    req.body.geoZone.lat,
+        "lng":    req.body.geoZone.lng,
+        "range":  req.body.geoZone.range
       }
     }
 
@@ -53,7 +55,6 @@ module.exports = functions.https.onRequest((req, res) => {
       requestBody["request"]["notifications"][0]["link"] = req.body.messageLink
     }
 
-    console.log(requestBody["request"]["notifications"][0])
     httpRequest.post({
       url: 'https://cp.pushwoosh.com/json/1.3/createMessage',
       json: requestBody,

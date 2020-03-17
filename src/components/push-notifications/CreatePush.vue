@@ -2,6 +2,10 @@
   <div class="create-push">
     <h2 class="subtitle">New Push Notification</h2>
 
+    <h2>Title:</h2>
+    <input v-model="messageTitle" class="input message-title" type="text" name="title">
+
+    <h2>Message Body:</h2>
     <textarea v-model="messageBody" maxlength="200" class="push-message-body" placeholder="Type your push message here..." />
 
     <div class="remaining-characters">
@@ -64,6 +68,7 @@ export default {
   data() {
     return {
       messageBody:          '',
+      messageTitle:         '',
       messageLimit:         200,
       messageLink:          '',
       selectedCities:       [],
@@ -131,6 +136,7 @@ export default {
 
         this.axios.post(baseUrl, {
           messageBody:      this.messageBody,
+          messageTitle:     this.messageTitle,
           selectedCities:   this.selectedCityNames,
           geoZone:          this.selectedGeoZone,
           messageLink:      this.messageLink
@@ -149,6 +155,7 @@ export default {
 
       this.$store.commit('SHOW_MODAL', {
         heading:      'Please confirm that you want to send the following message:',
+        bolded:       this.messageTitle,
         message:      this.messageBody,
         showLoading:  false,
         onConfirm,
@@ -186,6 +193,11 @@ export default {
   border:                       1px solid #dfe0e2;
   border-radius:                1em;
 
+  .message-title {
+    width:                      60%;
+    margin-bottom:              1em;
+  }
+
   .push-message-body {
     height:                     10em;
     width:                      75%;
@@ -193,6 +205,8 @@ export default {
     display:                    block;
     padding:                    0.5em;
     border-radius:              0.25em;
+    border-color:               #dbdbdb;
+    box-shadow:                 inset 0 1px 2px rgba(10, 10, 10, 0.1);
   }
 
   .remaining-characters {
