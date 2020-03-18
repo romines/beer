@@ -137,3 +137,22 @@ input:checked + .slider:before {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+/* ALERTS */
+.alert {
+  padding: .5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}

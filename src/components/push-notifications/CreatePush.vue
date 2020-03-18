@@ -6,12 +6,16 @@
     <input v-model="messageTitle" class="input message-title" type="text" name="title">
 
     <h2>Message Body:</h2>
-    <textarea v-model="messageBody" maxlength="200" class="push-message-body" placeholder="Type your push message here..." />
+    <textarea v-model="messageBody" maxlength="1000" class="push-message-body" placeholder="Type your push message here..." />
 
-    <div class="remaining-characters">
+    <div v-if="messageBody.length > 200" class="message-warning alert alert-warning">
+      <span>Your message is over 200 characters in length. Please note that your message may appear truncated on some device home screens.</span>
+    </div>
+
+    <!-- <div class="remaining-characters">
       <span class="">Notifications may be up to 200 characters in length. Available characters:</span>
       <input v-bind:value="remainingCharacters" type="text" name="limit" size="4" readonly>
-    </div>
+    </div> -->
 
     <div class="link-container">
       <h2>Link:</h2>
@@ -114,9 +118,9 @@ export default {
   },
   computed: {
     ...mapGetters(['pushWooshData']),
-    remainingCharacters () {
-      return this.messageLimit - this.messageBody.length
-    },
+    // remainingCharacters () {
+    //   return this.messageLimit - this.messageBody.length
+    // },
     messageIsValid () {
       return this.messageBody.length > 0
     },
@@ -246,6 +250,13 @@ export default {
     color:                      #363636;
   }
 
+  .message-warning {
+    width:                      75%;
+    font-style:                 italic;
+    font-size:                  0.9em;
+    margin-top:                 0.5em;
+  }
+
   .remaining-characters {
     margin-top:                 1em;
 
@@ -256,18 +267,10 @@ export default {
   }
 
   .link-container {
-    display:                    flex;
-    align-items:                center;
-    margin:                     0.75em 0;
-
-    > h2 {
-      margin:                   0.5em 0;
-      font-size:                1.15em;
-    }
+    margin:                     1em 0;
 
     > input {
       width:                    60%;
-      margin-left:              0.5em;
     }
   }
 
