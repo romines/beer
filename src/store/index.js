@@ -8,6 +8,7 @@ import 'babel-polyfill'
 import archives from './archives'
 import maps from './maps'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
+import pwConfig from '../static/pwConfig.js'
 
 // import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
@@ -165,6 +166,10 @@ const store = {
             // If there is no PW data object in firestore, create one
             if (!resortData.pushWooshData) {
               console.log('MISSING PW DATA... SETTING...')
+              let pushWooshEnv = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
+              let pwId = pwConfig[pushWooshEnv][rootState.resortId]
+              if (!pwId) console.log('MISSING PW ID IN PWCONFIG FILE. PLEASE SET!')
+              rootState.pushWooshData.appId = pwId
               dispatch('savePushwooshData', rootState.pushWooshData)
             } else {
               commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)

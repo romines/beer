@@ -17,6 +17,7 @@ src/firebaseConfig.js
 utils/backups
 src/assets/*.json
 utils/*.json
+!utils/pwConfig.json
 !utils/package.json
 !utils/package-lock.json
 utils/*.json.bak
