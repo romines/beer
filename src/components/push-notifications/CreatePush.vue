@@ -48,6 +48,33 @@
       </div>
     </div>
 
+    <div class="silent-push">
+      <input v-model="isSilentPush" type="checkbox">
+      <label>Silent Push</label>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Enable to pass custom data to the app without having the user informed</span>
+      </span>
+
+      <transition name="fade">
+        <div v-if="isSilentPush" class="silent-push-options">
+          <div class="option">
+            <span>Time Valid (mins):</span><input v-model="silentSettings.validMinutes" class="input" type="number">
+          </div>
+          <div class="option">
+            <span>Repeat Limit:</span><input v-model="silentSettings.repeatLimit" class="input" type="number">
+          </div>
+          <div class="option">
+            <span>Repeat Interval:</span><input v-model="silentSettings.repeatInterval" class="input" type="number">
+          </div>
+          <!-- <div class="option">
+            <span>Start Time:</span><input v-model="silentSettings.startTime" class="input" type="date">
+            {{silentSettings.startTime}}
+          </div> -->
+        </div>
+      </transition>
+    </div>
+
     <div class="cancel-save">
       <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">{{sendMessageText}}</span>
       <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
@@ -60,6 +87,7 @@
 
 import { mapGetters } from 'vuex'
 import LoadingSpinner from '../utilities/LoadingSpinner.vue'
+import moment from 'moment'
 
 export default {
   components: {
@@ -74,7 +102,14 @@ export default {
       selectedCities:       [],
       geoZones:             {},
       selectedGeoZone:      {},
-      geoZonesAreLoading:   false
+      geoZonesAreLoading:   false,
+      isSilentPush:         false,
+      silentSettings: {
+        // startTime:          undefined,
+        validMinutes:       60,
+        repeatInterval:     1,
+        repeatLimit:        1
+      }
     }
   },
   computed: {
@@ -139,7 +174,8 @@ export default {
           messageTitle:     this.messageTitle,
           selectedCities:   this.selectedCityNames,
           geoZone:          this.selectedGeoZone,
-          messageLink:      this.messageLink
+          messageLink:      this.messageLink,
+          silentSettings:   this.isSilentPush ? this.silentSettings : undefined     // only send if active
         }).then((response) => {
           this.$store.dispatch('setModalLoadingState', false)
           // console.log(response)
@@ -283,8 +319,46 @@ export default {
     }
   }
 
+  .silent-push {
+    display:                        flex;
+    align-items:                    center;
+    flex-wrap:                      wrap;
+    margin-top:                     1em;
+
+    > input {
+      margin-right:                 0.5em;
+      display:                      inline-block;
+    }
+
+    .fa-info-circle {
+      margin-left:                  0.5em;
+      cursor:                       pointer;
+    }
+
+    .silent-push-options {
+      display:                      block;
+      width:                        100%;
+      padding:                      0.25em 1em;
+
+      .option {
+        display:                    flex;
+        align-items:                center;
+        margin:                     0.5em 0;
+
+        > span {
+          width:                    9em;
+        }
+
+        .input {
+          max-width:                5em;
+          height:                   1.75em;
+        }
+      }
+    }
+  }
+
   .cancel-save {
-    margin-top:                 2em;
+    margin-top:                     2em;
   }
 
 }

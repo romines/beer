@@ -15,6 +15,7 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Methods', 'POST')
 
   let applicationCode = req.query.applicationCode
+  let silentSettings  = req.body.silentSettings
 
   if (!req.body.messageBody) {
     res.send('WTF');
@@ -36,6 +37,16 @@ module.exports = functions.https.onRequest((req, res) => {
           }
         ]
       }
+    }
+
+    // Add silent settings
+    if (silentSettings) {
+      requestBody["request"]["notifications"][0]["dataType"]        = -1
+      requestBody["request"]["notifications"][0]["ios_silent"]      = 1
+      requestBody["request"]["notifications"][0]["android_silent"]  = 1
+      requestBody["request"]["notifications"][0]["validMinutes"]    = silentSettings.validMinutes
+      requestBody["request"]["notifications"][0]["repeatInterval"]  = silentSettings.repeatInterval
+      requestBody["request"]["notifications"][0]["repeatLimit"]     = silentSettings.repeatLimit
     }
 
     // Add geozone info
