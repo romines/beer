@@ -207,6 +207,7 @@ export default {
     border-radius:              0.25em;
     border-color:               #dbdbdb;
     box-shadow:                 inset 0 1px 2px rgba(10, 10, 10, 0.1);
+    color:                      #363636;
   }
 
   .remaining-characters {

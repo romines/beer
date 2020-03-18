@@ -29,7 +29,10 @@ module.exports = functions.https.onRequest((req, res) => {
             "send_date":        "now",  // required. YYYY-MM-DD HH:mm OR 'now'
             "content":          req.body.messageBody,
             "ios_title":        req.body.messageTitle,
-            "android_header":   req.body.messageTitle
+            "android_header":   req.body.messageTitle,
+            "data": {
+              "message_title":  req.body.messageTitle
+            }
           }
         ]
       }

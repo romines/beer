@@ -46,6 +46,12 @@
               <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
               <span v-else class="stat">{{currentNotification.statistics.conversion.open}}</span>
             </div>
+
+            <div class="detail message-title">
+              <label>Title:</label>
+              <span v-if="currentNotification.title" class="status-note">{{currentNotification.title}}</span>
+              <span v-else>None provided</span>
+            </div>
             <div class="detail message-content">
               <label>Message:</label><span class="message-content">{{ displayMessageContent(currentNotification) }}</span>
             </div>
@@ -126,6 +132,10 @@ export default {
         messageDetails.platforms  = JSON.parse(messageDetails.platforms)
         messageDetails.created    = moment.utc(messageDetails.created).local().format('lll')
         messageDetails.sendDate   = moment.utc(messageDetails.send_date).local().format('lll')
+
+        if (messageDetails.data && messageDetails.data.default) {
+          messageDetails.title = JSON.parse(messageDetails.data.default).message_title
+        }
 
         this.currentNotification    = messageDetails
         this.isLoadingNotification  = false
@@ -271,12 +281,17 @@ export default {
 
               }
             }
-          }
 
-          .statistic {
-            .loading {
-              display:              inline-block;
-              font-style:           italic;
+            &.statistic {
+
+              .loading {
+                display:              inline-block;
+                font-style:           italic;
+              }
+            }
+
+            &.message-title {
+              margin-top:             1em;
             }
           }
         }
