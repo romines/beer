@@ -101,6 +101,7 @@
 import { mapGetters } from 'vuex'
 import LoadingSpinner from '../utilities/LoadingSpinner.vue'
 import moment from 'moment'
+import { functionsBaseUrl } from '../../firebaseInit.js'
 
 export default {
   components: {
@@ -162,7 +163,7 @@ export default {
     getGeoZones () {
       this.geoZonesAreLoading = true
       // This tests the getTagStats functionality, but it does not quite give us what we want, I don't think.
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getGeoZones'
+      let baseUrl = functionsBaseUrl + '/getGeoZones'
       baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
@@ -192,7 +193,7 @@ export default {
       })
     },
     sendPushNotification () {
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createPushNotification'
+      let baseUrl = functionsBaseUrl + '/createPushNotification'
       baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
       this.$store.dispatch('setModalLoadingState', true)
@@ -211,7 +212,7 @@ export default {
       })
     },
     sendTargetedMessage () {
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createTargetedMessage'
+      let baseUrl = functionsBaseUrl + '/createTargetedMessage'
       baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
       this.$store.dispatch('setModalLoadingState', true)

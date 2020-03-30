@@ -50,6 +50,7 @@ import parse from 'csv-parse'
 import Vue from 'vue'
 import LoadingSpinner from './utilities/LoadingSpinner.vue'
 import moment from 'moment'
+import { functionsBaseUrl } from '../firebaseInit.js'
 
 export default {
   components: {
@@ -109,7 +110,7 @@ export default {
     setExportSubscribersRequestId () {
       this.isSettingExportSubscribers = true
 
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/exportSubscribers'
+      let baseUrl = functionsBaseUrl + '/exportSubscribers'
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
@@ -148,7 +149,7 @@ export default {
     resetApplicationSubscribers (requestId) {
       this.isResettingSubscribers = true
 
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getResults'
+      let baseUrl = functionsBaseUrl + '/getResults'
       baseUrl += "?requestId=" + requestId
 
       this.axios.get(baseUrl).then((response) => {

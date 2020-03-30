@@ -72,6 +72,7 @@ import LoadingSpinner from '../utilities/LoadingSpinner.vue'
 import moment from 'moment'
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
+import { functionsBaseUrl } from '../../firebaseInit.js'
 
 export default {
   components: {
@@ -100,7 +101,7 @@ export default {
     getPushNotifications (skipLoading) {
       if (!skipLoading) this.isLoadingPushes = true
 
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotifications'
+      let baseUrl = functionsBaseUrl + '/getPushNotifications'
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
@@ -126,7 +127,7 @@ export default {
 
       this.isLoadingNotification = true
 
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getPushNotification'
+      let baseUrl = functionsBaseUrl + '/getPushNotification'
 
       this.axios.get(baseUrl + "?messageId=" + notification.id).then((response) => {
         let body            = JSON.parse(response.data.body)
@@ -147,7 +148,7 @@ export default {
       })
     },
     getPushNotificationStats (notification) {
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getMsgStats'
+      let baseUrl = functionsBaseUrl + '/getMsgStats'
       baseUrl += '?messageCode=' + notification.code
       this.isLoadingMsgStats = true
       this.currentRetryCount = 0      // Reset retry count on new open
@@ -160,7 +161,7 @@ export default {
 
     },
     getMsgStatResults (requestId) {
-      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/getResults'
+      let baseUrl = functionsBaseUrl + '/getResults'
       baseUrl += '?requestId=' + requestId
 
       this.currentPendingRequestId = null
@@ -180,7 +181,6 @@ export default {
           this.currentPendingRequestId  = null
 
           let res = JSON.parse(response.data.body)
-          console.log(res)
           Vue.set(this.currentNotification, 'statistics', res.response)
 
           // Must go after #set above
