@@ -96,6 +96,7 @@ export default {
   },
   created() {
     this.getPushNotifications()
+    this.setBaseDistanceTagId()
   },
   methods: {
     getPushNotifications (skipLoading) {
@@ -112,6 +113,23 @@ export default {
         })
         this.pushNotifications  = body.response.rows
         this.isLoadingPushes    = false
+      })
+    },
+    setBaseDistanceTagId () {
+      let baseUrl = functionsBaseUrl + '/getTagStats'
+      baseUrl += "?applicationCode=" + this.pushWooshData.appId
+      baseUrl += "&tagName=basedistance"
+
+      this.axios.get(baseUrl).then((response) => {
+        let body          = JSON.parse(response.data.body)
+        let oldRequestId  = this.pushWooshData.baseDistanceRequestIds.current ? this.pushWooshData.baseDistanceRequestIds.current : body.response.request_id
+
+        this.pushWooshData.baseDistanceRequestIds = {
+          current: body.response.request_id,
+          former: oldRequestId
+        }
+        // Saves new request_id to "current" slot, bumps old id to "former" slot
+        this.$store.dispatch('savePushwooshData', this.pushWooshData)
       })
     },
     showNotificationDetails (notification) {

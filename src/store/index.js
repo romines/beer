@@ -37,7 +37,8 @@ const store = {
       appId: '',
       exportSubscribers: {},
       exportSubscribersCityOptions: {},
-      preferredCityOptions: []
+      preferredCityOptions: [],
+      baseDistanceRequestIds: {}
     },
     resortMeta: {},
     contactGroups: [],

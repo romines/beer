@@ -23,7 +23,7 @@
     </div>
 
     <div class="options-list">
-      <h2>Your Cities</h2>
+      <h2>Your Preferred Cities</h2>
 
       <div v-if="pushWooshData.preferredCityOptions.length > 0" class="options-container">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="option" v-bind:class="{ selected : isCitySelected(city) }">
@@ -84,7 +84,7 @@
       <label>Local Push</label>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
-        <span class="tooltiptext top">Will send notification to resort area.</span>
+        <span class="tooltiptext top">Will send notification to any user within a 20,000 meter radius of resort.</span>
       </span>
     </div>
 
@@ -152,7 +152,8 @@ export default {
     }
   },
   created () {
-    this.getGeoZones()
+    // this.getGeoZones()
+    this.getBaseDistanceStats()
   },
   methods: {
     findSafeCityData (city, fieldName) {
@@ -162,7 +163,7 @@ export default {
     },
     getGeoZones () {
       this.geoZonesAreLoading = true
-      // This tests the getTagStats functionality, but it does not quite give us what we want, I don't think.
+
       let baseUrl = functionsBaseUrl + '/getGeoZones'
       baseUrl += '?applicationCode=' + this.pushWooshData.appId
 
@@ -170,6 +171,15 @@ export default {
         let body                = JSON.parse(response.data.body)
         this.geoZones           = body.response.clusters
         this.geoZonesAreLoading = false
+      })
+    },
+    getBaseDistanceStats () {
+      let baseUrl = functionsBaseUrl + '/getResults'
+      baseUrl += "?requestId=" + this.pushWooshData.baseDistanceRequestIds.current
+
+      this.axios.get(baseUrl).then((response) => {
+        console.log(response)
+        // TODO if request is still processing, get old request
       })
     },
     cancelMessage () {

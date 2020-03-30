@@ -13,11 +13,11 @@ module.exports = functions.https.onRequest((req, res) => {
 
   let requestBody = {
     "request": {
-      "auth":   token,
-      "tag":    req.query.tagName
+      "auth":         token,
+      "tag":          req.query.tagName
     }
   }
-
+  console.log(requestBody)
   httpRequest.post({
     url: 'https://cp.pushwoosh.com/json/1.3/getTagStats',
     body: JSON.stringify(requestBody),
@@ -25,28 +25,7 @@ module.exports = functions.https.onRequest((req, res) => {
       'Content-Type': 'application/json'
     }
   }, (error, response, body) => {
-
-    let parsedResponseBody = JSON.parse(response.body)
-
-    console.log(parsedResponseBody)
-
-    let resultsBody = {
-      "request": {
-        "auth":       token,
-        "request_id": parsedResponseBody.response.request_id
-      }
-    }
-
-    httpRequest.post({
-      url: 'https://cp.pushwoosh.com/json/1.3/getResults',
-      body: JSON.stringify(resultsBody),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }, (error, response, body) => {
-      // We need to make another request for the actual CSV
-      res.status(200).send(response)
-    })
+    res.status(200).send(response)
   })
 
 
