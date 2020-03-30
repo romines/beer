@@ -35,7 +35,7 @@
       </div>
     </div>
 
-    <div class="geo-zones-list options-list">
+    <!-- <div class="geo-zones-list options-list">
       <h2>Your GeoZones</h2>
 
       <div class="geo-zone-container">
@@ -50,7 +50,7 @@
           You do not have any geo zones set up yet.
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div class="silent-push">
       <input v-model="isSilentPush" type="checkbox">
@@ -77,6 +77,15 @@
           </div> -->
         </div>
       </transition>
+    </div>
+
+    <div class="local-push">
+      <input v-model="isLocalPush" type="checkbox">
+      <label>Local Push</label>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Will send notification to resort area.</span>
+      </span>
     </div>
 
     <div class="cancel-save">
@@ -108,6 +117,7 @@ export default {
       selectedGeoZone:      {},
       geoZonesAreLoading:   false,
       isSilentPush:         false,
+      isLocalPush:          false,
       silentSettings: {
         // startTime:          undefined,
         validMinutes:       60,
@@ -127,6 +137,7 @@ export default {
     sendMessageText () {
       if (Object.keys(this.selectedGeoZone).length > 0) return 'Send to all users in zone'
       else if (this.selectedCities.length > 0) return 'Send to selected cities'
+      else if (this.isLocalPush) return 'Send to local users'
       else return 'Send to all users'
     },
     geoZonesExist () {
@@ -168,29 +179,8 @@ export default {
     showConfirmModal () {
 
       const onConfirm = () => {
-        let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createPushNotification'
-        baseUrl += '?applicationCode=' + this.pushWooshData.appId
-
-        this.$store.dispatch('setModalLoadingState', true)
-
-        this.axios.post(baseUrl, {
-          messageBody:      this.messageBody,
-          messageTitle:     this.messageTitle,
-          selectedCities:   this.selectedCityNames,
-          geoZone:          this.selectedGeoZone,
-          messageLink:      this.messageLink,
-          silentSettings:   this.isSilentPush ? this.silentSettings : undefined     // only send if active
-        }).then((response) => {
-          this.$store.dispatch('setModalLoadingState', false)
-          // console.log(response)
-          this.$store.dispatch('showSuccessModal', 'Message successfully sent!')
-          this.cancelMessage()
-          this.$emit('pushCreated')
-        }).catch((response) => {
-          this.$store.dispatch('setModalLoadingState', false)
-          this.$store.dispatch('showErrorModal', 'There was an error with your request and your message was not sent. Please try again later or contact Resorts Tapped for support.')
-          this.cancelMessage()
-        })
+        if (this.isLocalPush) this.sendTargetedMessage()
+        else this.sendPushNotification()
       }
 
       this.$store.commit('SHOW_MODAL', {
@@ -200,6 +190,53 @@ export default {
         showLoading:  false,
         onConfirm,
       })
+    },
+    sendPushNotification () {
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createPushNotification'
+      baseUrl += '?applicationCode=' + this.pushWooshData.appId
+
+      this.$store.dispatch('setModalLoadingState', true)
+
+      this.axios.post(baseUrl, {
+        messageBody:      this.messageBody,
+        messageTitle:     this.messageTitle,
+        selectedCities:   this.selectedCityNames,
+        geoZone:          this.selectedGeoZone,
+        messageLink:      this.messageLink,
+        silentSettings:   this.isSilentPush ? this.silentSettings : undefined     // only send if active
+      }).then((response) => {
+        this.onMessageSuccess()
+      }).catch((response) => {
+        this.onMessageFail()
+      })
+    },
+    sendTargetedMessage () {
+      let baseUrl = 'http://localhost:5001/rta-staging/us-central1/createTargetedMessage'
+      baseUrl += '?applicationCode=' + this.pushWooshData.appId
+
+      this.$store.dispatch('setModalLoadingState', true)
+
+      this.axios.post(baseUrl, {
+        messageBody:      this.messageBody,
+        messageTitle:     this.messageTitle,
+        messageLink:      this.messageLink,
+      }).then((response) => {
+        this.onMessageSuccess()
+      }).catch((response) => {
+        this.onMessageFail()
+      })
+    },
+    onMessageSuccess () {
+      this.$store.dispatch('setModalLoadingState', false)
+      // console.log(response)
+      this.$store.dispatch('showSuccessModal', 'Message successfully sent!')
+      this.cancelMessage()
+      this.$emit('pushCreated')
+    },
+    onMessageFail () {
+      this.$store.dispatch('setModalLoadingState', false)
+      this.$store.dispatch('showErrorModal', 'There was an error with your request and your message was not sent. Please try again later or contact Resorts Tapped for support.')
+      this.cancelMessage()
     },
     addOrRemoveCityFromSelected (city) {
       this.selectedGeoZone = {}
@@ -221,6 +258,21 @@ export default {
     isGeoZoneSelected (zone) {
       return this.selectedGeoZone.id == zone.id
     },
+  },
+  watch: {
+    isLocalPush (val) {
+      if (val) {
+        // Reset other push options if local push is selected
+        this.isSilentPush   = false
+        this.selectedCities = []
+      }
+    },
+    isSilentPush (val) {
+      if (val) this.isLocalPush = false
+    },
+    selectedCities (val) {
+      if (val.length > 0) this.isLocalPush = false
+    }
   }
 }
 </script>

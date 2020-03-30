@@ -41,12 +41,13 @@ module.exports = functions.https.onRequest((req, res) => {
 
     // Add silent settings
     if (silentSettings) {
-      requestBody["request"]["notifications"][0]["dataType"]        = -1
-      requestBody["request"]["notifications"][0]["ios_silent"]      = 1
-      requestBody["request"]["notifications"][0]["android_silent"]  = 1
-      requestBody["request"]["notifications"][0]["validMinutes"]    = silentSettings.validMinutes
-      requestBody["request"]["notifications"][0]["repeatInterval"]  = silentSettings.repeatInterval
-      requestBody["request"]["notifications"][0]["repeatLimit"]     = silentSettings.repeatLimit
+      requestBody["request"]["notifications"][0]["dataType"]          = -1
+      requestBody["request"]["notifications"][0]["ios_silent"]        = 1
+      requestBody["request"]["notifications"][0]["android_silent"]    = 1
+      requestBody["request"]["notifications"][0]["validMinutes"]      = silentSettings.validMinutes
+      requestBody["request"]["notifications"][0]["repeatInterval"]    = silentSettings.repeatInterval
+      requestBody["request"]["notifications"][0]["repeatLimit"]       = silentSettings.repeatLimit
+      requestBody["request"]["notifications"][0]["data"]["is_silent"] = true
     }
 
     // Add geozone info

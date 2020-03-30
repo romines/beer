@@ -20,6 +20,9 @@
             <div class="detail send-date">
               <label>Sent At:</label><span class="send-date">{{currentNotification.sendDate}}</span>
             </div>
+            <div class="detail is-silent">
+              <label>Silent Push?:</label><span class="is-silent">{{currentNotification.isSilent ? 'Yes' : 'No'}}</span>
+            </div>
             <div class="detail platforms">
               <label>Platforms:</label><span class="platforms">
                 <img v-for="platformId in currentNotification.platforms" v-bind:src="getDeviceImage(platformId)" class="device-image">
@@ -134,7 +137,9 @@ export default {
         messageDetails.sendDate   = moment.utc(messageDetails.send_date).local().format('lll')
 
         if (messageDetails.data && messageDetails.data.default) {
-          messageDetails.title = JSON.parse(messageDetails.data.default).message_title
+          let parsed = JSON.parse(messageDetails.data.default)
+          messageDetails.title    = parsed.message_title
+          messageDetails.isSilent = parsed.is_silent
         }
 
         this.currentNotification    = messageDetails
@@ -188,12 +193,13 @@ export default {
     },
     getDeviceImage (id) {
       let fileName = this.$globals.deviceImageMapping[id]
+      if (!fileName) return // sometimes we may not have a mapping...
       return require(`../../assets/icons/${fileName}`)
     },
     displayMessageContent (notification) {
       return notification.content.en || notification.content.default
     }
-  },
+  }
 }
 </script>
 
