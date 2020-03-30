@@ -3,7 +3,7 @@
     <!-- TODO: nav to separate component -->
     <div v-if="$store.state.user && $store.state.user.uid" class="top-nav-container">
 
-      <router-link to="/"><img src="./assets/logo.png" class="logo"/></router-link>
+      <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
       <div class="link-nav">
         <router-link v-bind:to="{ name: 'Home' }">Contacts</router-link>
@@ -36,11 +36,21 @@ export default {
     Modal,
     LoadingSpinner,
   },
+  beforeRouteEnter () {
+    if (this.$store.state.user.superAdmin) return next('/resorts')
+  },
   methods: {
     logOut() {
       this.$store.dispatch('logOut').then(() => {
         this.$router.replace('/login')
       })
+    },
+    goToLandingPage () {
+      if (this.$store.state.user.superAdmin) {
+        this.$router.replace('/resorts')
+      } else {
+        this.$router.replace('/').catch(() => {})
+      }
     }
   },
 }

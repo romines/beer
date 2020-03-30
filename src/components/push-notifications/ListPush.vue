@@ -124,6 +124,9 @@ export default {
         let body          = JSON.parse(response.data.body)
         let oldRequestId  = this.pushWooshData.baseDistanceRequestIds.current ? this.pushWooshData.baseDistanceRequestIds.current : body.response.request_id
 
+        // { "status_code": 420, "status_message": "Request is still being processed", "response": null }
+        if (!body.response) return
+
         this.pushWooshData.baseDistanceRequestIds = {
           current: body.response.request_id,
           former: oldRequestId

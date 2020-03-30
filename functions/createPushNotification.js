@@ -41,7 +41,7 @@ module.exports = functions.https.onRequest((req, res) => {
 
     // Add silent settings
     if (silentSettings) {
-      requestBody["request"]["notifications"][0]["dataType"]          = -1
+      requestBody["request"]["notifications"][0]["dataType"]          = -2
       requestBody["request"]["notifications"][0]["ios_silent"]        = 1
       requestBody["request"]["notifications"][0]["android_silent"]    = 1
       requestBody["request"]["notifications"][0]["validMinutes"]      = silentSettings.validMinutes
