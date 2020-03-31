@@ -177,7 +177,7 @@ const store = {
               resolve()
             }
           },
-          err => reject(`Error listening to contacts: ${err}`)
+          err => reject(`Error fetching PW firestore data: ${err}`)
         )
       })
     },

@@ -14,3 +14,4 @@ exports.exportSegment = require('./exportSegment');
 exports.getResults = require('./getResults');
 exports.getGeoZones = require('./getGeoZones');
 exports.getMsgStats = require('./getMsgStats');
+exports.getSetSubscribers = require('./tasks/getSetSubscribers');

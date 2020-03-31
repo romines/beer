@@ -1,5 +1,6 @@
 <template>
   <div class="settings">
+    {{pushWooshData}}
     <site-header title="Settings" />
     <button v-on:click="setExportSubscribersRequestId()">Refresh request_id</button>
     <button v-on:click="resetApplicationSubscribers(currentRequestData.currentRequestId)">Reset subscribers</button>
@@ -91,7 +92,8 @@ export default {
   created() {
     // this.setExportSubscribersRequestId()
     // this.resetApplicationSubscribers(this.pushWooshData.exportSubscribers.currentRequestId)
-    this.setCurrentRequestData()
+    // this.setCurrentRequestData()
+    this.getSetSubscribers()
   },
   methods: {
     findSafeCityData (city, fieldName) {
@@ -124,6 +126,13 @@ export default {
           this.isSettingExportSubscribers = false
           this.setCurrentRequestData()
         })
+      })
+    },
+    getSetSubscribers () {
+      let baseUrl = functionsBaseUrl + '/getSetSubscribers'
+
+      this.axios.get(baseUrl).then((response) => {
+        console.log(response)
       })
     },
     isCityPreferredCityOption (key) {

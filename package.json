@@ -19,6 +19,7 @@
     "cypress:run": "cross-env CYPRESS_RUN_BINARY=../cypress/build/linux/Cypress/Cypress NODE_ENV=testing cypress run"
   },
   "dependencies": {
+    "@google-cloud/firestore": "3.7.2",
     "awesome-phonenumber": "^2.2.6",
     "axios": "^0.19.1",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
