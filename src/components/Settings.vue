@@ -1,20 +1,17 @@
 <template>
   <div class="settings">
-    {{pushWooshData}}
     <site-header title="Settings" />
-    <button v-on:click="setExportSubscribersRequestId()">Refresh request_id</button>
-    <button v-on:click="resetApplicationSubscribers(currentRequestData.currentRequestId)">Reset subscribers</button>
-    <button v-on:click="saveSubscriberCityOptions()">Save Subscribers</button>
-    <div class="current-request-id">Request Id: {{currentRequestData.currentRequestId}}</div>
-    <div class="current-request-id">Request Date: {{currentRequestData.currentRequestDate}}</div>
 
     <div class="preferred-cities-container">
       <h2 class="subtitle">Your Preferred Cities</h2>
-      <div class="city-options-list">
+      <div v-if="pushWooshData.preferredCityOptions.length > 0" class="city-options-list">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option preferred">
           {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
           <span> (X) </span>
         </span>
+      </div>
+      <div v-else class="no-cities">
+        No preferred cities have been set.
       </div>
     </div>
 
@@ -58,7 +55,7 @@ export default {
     SiteHeader,
     LoadingSpinner
   },
-  data() {
+  data () {
     return {
       cityOptions:                  {},
       isResettingSubscribers:       false,
@@ -89,121 +86,26 @@ export default {
       return results
     }
   },
-  created() {
-    // this.setExportSubscribersRequestId()
-    // this.resetApplicationSubscribers(this.pushWooshData.exportSubscribers.currentRequestId)
-    // this.setCurrentRequestData()
-    this.getSetSubscribers()
-  },
+  created () {},
   methods: {
     findSafeCityData (city, fieldName) {
       if (this.pushWooshData.exportSubscribersCityOptions[city]) return this.pushWooshData.exportSubscribersCityOptions[city][fieldName]
       else if (fieldName === 'count') return 'N/A'
       else return city
     },
-    setCurrentRequestData () {
-      this.currentRequestData["currentRequestId"]   = this.pushWooshData.exportSubscribers.currentRequestId
-      this.currentRequestData["currentRequestDate"] = moment(this.pushWooshData.exportSubscribers.currentRequestDate)
-    },
-    setCurrentRequestDataToLast (pushWooshData) {
-      this.currentRequestData["currentRequestId"]   = pushWooshData.exportSubscribers.lastRequestId
-      this.currentRequestData["currentRequestDate"] = pushWooshData.exportSubscribers.lastRequestDate
-    },
-    setExportSubscribersRequestId () {
-      this.isSettingExportSubscribers = true
-
-      let baseUrl = functionsBaseUrl + '/exportSubscribers'
-      baseUrl += "?applicationCode=" + this.pushWooshData.appId
-
-      this.axios.get(baseUrl).then((response) => {
-
-        this.pushWooshData.exportSubscribers.lastRequestId        = this.pushWooshData.exportSubscribers.currentRequestId   || ''
-        this.pushWooshData.exportSubscribers.lastRequestDate      = this.pushWooshData.exportSubscribers.currentRequestDate || ''
-        this.pushWooshData.exportSubscribers.currentRequestId     = response.data
-        this.pushWooshData.exportSubscribers.currentRequestDate   = moment().utc().toDate().toString()
-
-        this.$store.dispatch('savePushwooshData', this.pushWooshData).then(() => {
-          this.isSettingExportSubscribers = false
-          this.setCurrentRequestData()
-        })
-      })
-    },
-    getSetSubscribers () {
-      let baseUrl = functionsBaseUrl + '/getSetSubscribers'
-
-      this.axios.get(baseUrl).then((response) => {
-        console.log(response)
-      })
-    },
     isCityPreferredCityOption (key) {
       return this.pushWooshData.preferredCityOptions.includes(key)
     },
     addOrRemoveCityOptionFromPreferred (key) {
       if (this.isCityPreferredCityOption(key)) {
-        // remove city
+        // Remove city
         let index = this.pushWooshData.preferredCityOptions.indexOf(key)
         this.pushWooshData.preferredCityOptions.splice(index, 1)
-        this.$store.dispatch('savePushwooshData', this.pushWooshData)
+        this.$store.dispatch('updatePushWooshData', this.pushWooshData)
       } else {
-        // TODO
-        // Add loading step
+        // Add city
         this.pushWooshData.preferredCityOptions.push(key)
-        this.$store.dispatch('savePushwooshData', this.pushWooshData)
-      }
-
-    },
-    // TODO
-    // I think it would be better to store this raw data on the pushWooshData object in firestore, that way it would load faster.
-    // We would then need to just periodically update that data (every day?). Ideally automagically but manual could be an option.
-    resetApplicationSubscribers (requestId) {
-      this.isResettingSubscribers = true
-
-      let baseUrl = functionsBaseUrl + '/getResults'
-      baseUrl += "?requestId=" + requestId
-
-      this.axios.get(baseUrl).then((response) => {
-        if (response.data.error) {
-          this.isResettingSubscribers = false
-          if (response.data.error === "Request is still being processed") {
-            // TODO display message on screen
-            console.log("REQUEST STILL PROCESSING")
-          }
-        } else {
-          let csvData = response.data.body
-
-          let parsed = parse(csvData, {}, (err, output) => {
-            output.forEach((row, index) => {
-              if (index === 0) return true // Skip headers
-              if (row[5]) {
-                let parsedRow = JSON.parse(row[5])
-                if (parsedRow.City) this.incrementCityCount(parsedRow.City)
-              }
-            })
-          })
-          console.log('SUBSCRIBERS RESET')
-          this.isResettingSubscribers = false
-        }
-      })
-    },
-    saveSubscriberCityOptions () {
-      // Only allow save if cityOptions is set
-      if (Object.keys(this.cityOptions).length === 0) return
-
-      this.pushWooshData.exportSubscribersCityOptions = this.cityOptions
-
-      this.$store.dispatch('savePushwooshData', this.pushWooshData).then(() => {
-
-      })
-    },
-    incrementCityCount (city) {
-      let newCityName = city.replace(/,/g, '').replace(/ /g, '_')
-
-      if (this.cityOptions[newCityName]) {
-        let currentValue = this.cityOptions[newCityName]
-        currentValue.count += 1
-        Vue.set(this.cityOptions, newCityName, currentValue)
-      } else {
-        Vue.set(this.cityOptions, newCityName, { cityName: city, count: 1 } )
+        this.$store.dispatch('updatePushWooshData', this.pushWooshData)
       }
     }
   }
@@ -241,6 +143,11 @@ export default {
         border:                     1px solid white;
       }
     }
+  }
+
+  .no-cities {
+    font-style:                     italic;
+    padding:                        0.5em 1em;
   }
 
   .city-options-search-container {

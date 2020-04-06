@@ -121,7 +121,7 @@ const routes = [
       if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
-      store.dispatch('setPushWooshData').then(() => {
+      store.dispatch('initializePushWooshData').then(() => {
         next()
       })
     }
@@ -137,7 +137,7 @@ const routes = [
       if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
-      store.dispatch('setPushWooshData').then(() => {
+      store.dispatch('initializePushWooshData').then(() => {
         next()
       })
     }

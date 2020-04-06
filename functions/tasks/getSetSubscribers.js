@@ -15,7 +15,12 @@ const firestore = new Firestore({
 
 const RESORTS_REF = firestore.collection(COLLECTION_NAME)
 
+
+
 module.exports = functions.https.onRequest((req, res) => {
+  res.set('Access-Control-Allow-Origin', "*")
+  res.set('Access-Control-Allow-Headers', "*")
+  res.set('Access-Control-Allow-Methods', 'GET')
 
   RESORTS_REF.get().then((querySnapshot) => {
     let docs = []
@@ -39,8 +44,8 @@ function getSetRequestIdForDoc(doc) {
       resolve({ status: 'Doc not set in pwConfig file', id: doc.id})
     } else {
       fetchSubscriberRequestId(applicationCode).then((requestId) => {
-        const resortData  = doc.data()
-        let pwData        = resortData.pushWooshData || {}
+        let resortData  = doc.data()
+        let pwData      = resortData.pushWooshData || {}
 
         pwData.exportSubscribers = pwData.exportSubscribers ? pwData.exportSubscribers : {}
 

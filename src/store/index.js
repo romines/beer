@@ -158,34 +158,31 @@ const store = {
       ])
     },
 
-    setPushWooshData({ rootState, commit, dispatch }) {
+    initializePushWooshData({ rootState, commit, dispatch }) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).onSnapshot(
-          doc => {
-            const resortData = doc.data()
-            console.log('SETTING PUSHWOOSH DATA')
-            // If there is no PW data object in firestore, create one
-            if (!resortData.pushWooshData) {
-              console.log('MISSING PW DATA... SETTING...')
-              let pushWooshEnv = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
-              let pwId = pwConfig[pushWooshEnv][rootState.resortId]
-              if (!pwId) console.log('MISSING PW ID IN PWCONFIG FILE. PLEASE SET!')
-              rootState.pushWooshData.appId = pwId
-              dispatch('savePushwooshData', rootState.pushWooshData)
-            } else {
-              commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
-              resolve()
-            }
-          },
-          err => reject(`Error fetching PW firestore data: ${err}`)
-        )
+
+        RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
+          const resortData = doc.data()
+          // If there is no PW data object in firestore, create one
+          if (!resortData.pushWooshData) {
+            console.log('MISSING PW DATA... SETTING...')
+            let pushWooshEnv = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
+            let pwId = pwConfig[pushWooshEnv][rootState.resortId]
+            if (!pwId) console.log('MISSING PW ID IN PWCONFIG FILE. PLEASE SET!')
+            rootState.pushWooshData.appId = pwId
+            dispatch('updatePushWooshData', rootState.pushWooshData)
+          } else {
+            commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
+            resolve()
+          }
+        })
       })
     },
 
-    savePushwooshData({ dispatch, rootState }, pushWooshData) {
+    updatePushWooshData({ rootState, commit }, pushWooshData) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then(() => {
-          dispatch('setPushWooshData')
+        RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then((response) => {
+          commit('SET_PUSHWOOSH_DATA', pushWooshData)
           resolve()
         })
       })

@@ -132,7 +132,7 @@ export default {
           former: oldRequestId
         }
         // Saves new request_id to "current" slot, bumps old id to "former" slot
-        this.$store.dispatch('savePushwooshData', this.pushWooshData)
+        this.$store.dispatch('updatePushWooshData', this.pushWooshData)
       })
     },
     showNotificationDetails (notification) {
