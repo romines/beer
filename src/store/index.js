@@ -164,17 +164,28 @@ const store = {
         RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
           const resortData = doc.data()
           // If there is no PW data object in firestore, create one
-          if (!resortData.pushWooshData) {
+          if (!resortData.pushWooshData || !resortData.pushWooshData.appId) {
             console.log('MISSING PW DATA... SETTING...')
             let pushWooshEnv = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
             let pwId = pwConfig[pushWooshEnv][rootState.resortId]
             if (!pwId) console.log('MISSING PW ID IN PWCONFIG FILE. PLEASE SET!')
             rootState.pushWooshData.appId = pwId
-            dispatch('updatePushWooshData', rootState.pushWooshData)
+            dispatch('updatePushWooshData', rootState.pushWooshData).then(() => {
+              resolve()
+            })
           } else {
             commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
             resolve()
           }
+        })
+      })
+    },
+
+    clearPushWooshData({ rootState, commit }, pushWooshData) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: {} }).then((response) => {
+          commit('SET_PUSHWOOSH_DATA', pushWooshData)
+          resolve()
         })
       })
     },

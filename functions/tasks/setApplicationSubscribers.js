@@ -31,11 +31,15 @@ module.exports = functions.https.onRequest((req, res) => {
 
         RESORTS_REF.doc(resortId).update({ pushWooshData: pwData }).then(() => {
           res.status(200).send('DONE')
+        }).catch((error) => {
+          res.status(500).send(error)
         })
       })
     }).catch((error) => {
       res.status(500).send(error)
     })
+  }).catch((error) => {
+    res.status(500).send(error)
   })
 });
 
@@ -43,11 +47,17 @@ module.exports = functions.https.onRequest((req, res) => {
 function getApplicationSubscribers(doc) {
 
   return new Promise((resolve, reject) => {
-    let resortData  = doc.data()
-    let requestId   = resortData.pushWooshData.exportSubscribers.currentRequestId
+    let resortData = doc.data()
+
+    if (!resortData.pushWooshData || !resortData.pushWooshData.exportSubscribers) {
+      reject('Missing PW data for ' + resortData.resortId)
+      return
+    }
+
+    let requestId = resortData.pushWooshData.exportSubscribers.currentRequestId
 
     if (!requestId) {
-      resolve('No exportSubscribers.currentRequestId present on ' + resortData.resort_id)
+      reject('No exportSubscribers.currentRequestId present on ' + resortData.resortId)
       return
     }
 

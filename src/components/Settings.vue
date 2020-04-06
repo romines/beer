@@ -86,7 +86,7 @@ export default {
       return results
     }
   },
-  created () {},
+  created () { },
   methods: {
     findSafeCityData (city, fieldName) {
       if (this.pushWooshData.exportSubscribersCityOptions[city]) return this.pushWooshData.exportSubscribersCityOptions[city][fieldName]

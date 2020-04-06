@@ -54,9 +54,10 @@ function getSetRequestIdForDoc(doc) {
 
         RESORTS_REF.doc(doc.id).update({ pushWooshData: pwData }).then(() => {
           resolve('SUCCESS')
+        }).catch((error) => {
+          reject(error)
         })
       }).catch((error) => {
-        console.log(error)
         reject(error)
       })
     }
@@ -95,8 +96,9 @@ function fetchSubscriberRequestId(applicationCode) {
         var match       = myRegexp.exec(phrase);
         requestId       = match[1].trim()
       }
-
       resolve(requestId)
+    }).catch((error) => {
+      reject(error)
     })
   })
 }
