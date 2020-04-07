@@ -181,10 +181,10 @@ const store = {
       })
     },
 
-    clearPushWooshData({ rootState, commit }, pushWooshData) {
+    clearPushWooshData({ rootState, commit }) {
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: {} }).then((response) => {
-          commit('SET_PUSHWOOSH_DATA', pushWooshData)
+          commit('SET_PUSHWOOSH_DATA', {})
           resolve()
         })
       })

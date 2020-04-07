@@ -26,6 +26,8 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
+      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+
       Promise.all([
         store.dispatch('listenToResortRoot'),
         store.dispatch('listenToPublishedContacts'),
