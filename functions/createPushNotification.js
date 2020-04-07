@@ -47,9 +47,10 @@ module.exports = functions.https.onRequest((req, res) => {
       requestBody["request"]["notifications"][0]["validMinutes"]      = silentSettings.validMinutes
       requestBody["request"]["notifications"][0]["repeatInterval"]    = silentSettings.repeatInterval
       requestBody["request"]["notifications"][0]["repeatLimit"]       = silentSettings.repeatLimit
+      requestBody["request"]["notifications"][0]["priority"]          = silentSettings.isHighPriority ? 0 : 1
       requestBody["request"]["notifications"][0]["data"]["is_silent"] = true
     }
-
+    console.log(requestBody["request"]["notifications"][0])
     // Add geozone info
     if (req.body.geoZone.lat) {
       requestBody["request"]["notifications"][0]["geozone"] = {

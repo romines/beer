@@ -71,10 +71,15 @@
           <div class="option">
             <span>Repeat Interval:</span><input v-model="silentSettings.repeatInterval" class="input" type="number">
           </div>
-          <!-- <div class="option">
-            <span>Start Time:</span><input v-model="silentSettings.startTime" class="input" type="date">
-            {{silentSettings.startTime}}
-          </div> -->
+          <div class="option">
+            <span>High priority:</span>
+            <div class="toggle-container">
+              <label for="no-sort" class="switch">
+                <input v-model="silentSettings.isHighPriority" id="no-sort" type="checkbox">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
         </div>
       </transition>
     </div>
@@ -120,10 +125,10 @@ export default {
       isSilentPush:         false,
       isLocalPush:          false,
       silentSettings: {
-        // startTime:          undefined,
         validMinutes:       60,
         repeatInterval:     1,
-        repeatLimit:        1
+        repeatLimit:        1,
+        isHighPriority:     false
       }
     }
   },
