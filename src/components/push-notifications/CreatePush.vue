@@ -124,6 +124,8 @@ export default {
       geoZonesAreLoading:   false,
       isSilentPush:         false,
       isLocalPush:          false,
+      currentRetryCount:    0,
+      maxRetryCount:        5,
       silentSettings: {
         validMinutes:       60,
         repeatInterval:     1,
@@ -158,7 +160,7 @@ export default {
   },
   created () {
     // this.getGeoZones()
-    this.getBaseDistanceStats()
+    this.getBaseDistanceStats(this.pushWooshData.baseDistanceRequestIds.current)
   },
   methods: {
     findSafeCityData (city, fieldName) {
@@ -178,13 +180,30 @@ export default {
         this.geoZonesAreLoading = false
       })
     },
-    getBaseDistanceStats () {
+    getBaseDistanceStats (requestId) {
       let baseUrl = functionsBaseUrl + '/getResults'
       baseUrl += "?requestId=" + this.pushWooshData.baseDistanceRequestIds.current
 
+      this.isLoadingMsgStats = true
+      this.currentRetryCount = 0      // Reset retry count on new open
+
       this.axios.get(baseUrl).then((response) => {
-        console.log(response)
-        // TODO if request is still processing, get old request
+        console.log(response.data)
+        // If request is still processing, get older data, if it exists
+        if (response.data.error && this.pushWooshData.baseDistanceRequestIds.former) {
+          if (this.currentRetryCount < this.maxRetryCount) {
+            this.currentRetryCount += 1
+            this.getBaseDistanceStats(this.pushWooshData.baseDistanceRequestIds.current)
+          } else {
+            this.getBaseDistanceStats(this.pushWooshData.baseDistanceRequestIds.former)
+          }
+        } else {
+          // Reset pending retry values
+          this.currentRetryCount = 0
+
+          let res = JSON.parse(response.data.body)
+          console.log(res)
+        }
       })
     },
     cancelMessage () {
