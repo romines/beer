@@ -12,11 +12,6 @@
       <span>Your message is over 200 characters in length. Please note that your message may appear truncated on some device home screens.</span>
     </div>
 
-    <!-- <div class="remaining-characters">
-      <span class="">Notifications may be up to 200 characters in length. Available characters:</span>
-      <input v-bind:value="remainingCharacters" type="text" name="limit" size="4" readonly>
-    </div> -->
-
     <div class="link-container">
       <h2>Link:</h2>
       <input v-model="messageLink" class="input" type="text" name="limit">
@@ -87,6 +82,7 @@
     <div class="local-push">
       <input v-model="isLocalPush" type="checkbox">
       <label>Local Push</label>
+      <span v-if="localDevicesCount"> ({{localDevicesCount}})</span>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
         <span class="tooltiptext top">Will send notification to any user within a 20,000 meter radius of resort.</span>
@@ -124,8 +120,10 @@ export default {
       geoZonesAreLoading:   false,
       isSilentPush:         false,
       isLocalPush:          false,
+      localDevicesCount:    null,
       currentRetryCount:    0,
-      maxRetryCount:        5,
+      formerRetryCount:     0,
+      maxRetryCount:        3,
       silentSettings: {
         validMinutes:       60,
         repeatInterval:     1,
@@ -136,9 +134,6 @@ export default {
   },
   computed: {
     ...mapGetters(['pushWooshData']),
-    // remainingCharacters () {
-    //   return this.messageLimit - this.messageBody.length
-    // },
     messageIsValid () {
       return this.messageBody.length > 0
     },
@@ -181,28 +176,32 @@ export default {
       })
     },
     getBaseDistanceStats (requestId) {
+      this.currentRetryCount  = 0      // Reset retry count on new open
+      this.formerRetryCount   = 0
+      this.getBaseDistanceStatsResults(requestId)
+    },
+    getBaseDistanceStatsResults (requestId) {
       let baseUrl = functionsBaseUrl + '/getResults'
-      baseUrl += "?requestId=" + this.pushWooshData.baseDistanceRequestIds.current
-
-      this.isLoadingMsgStats = true
-      this.currentRetryCount = 0      // Reset retry count on new open
+      baseUrl += "?requestId=" + requestId
 
       this.axios.get(baseUrl).then((response) => {
-        console.log(response.data)
         // If request is still processing, get older data, if it exists
         if (response.data.error && this.pushWooshData.baseDistanceRequestIds.former) {
           if (this.currentRetryCount < this.maxRetryCount) {
             this.currentRetryCount += 1
-            this.getBaseDistanceStats(this.pushWooshData.baseDistanceRequestIds.current)
+            this.getBaseDistanceStatsResults(this.pushWooshData.baseDistanceRequestIds.current)
           } else {
-            this.getBaseDistanceStats(this.pushWooshData.baseDistanceRequestIds.former)
+            if (this.formerRetryCount > this.maxRetryCount) return
+            this.formerRetryCount += 1
+            this.getBaseDistanceStatsResults(this.pushWooshData.baseDistanceRequestIds.former)
           }
         } else {
           // Reset pending retry values
-          this.currentRetryCount = 0
+          this.currentRetryCount  = 0
+          this.formerRetryCount   = 0
 
-          let res = JSON.parse(response.data.body)
-          console.log(res)
+          let parsed = JSON.parse(response.data.body)
+          this.localDevicesCount = parsed.response.devices_count
         }
       })
     },

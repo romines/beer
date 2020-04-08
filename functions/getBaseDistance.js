@@ -16,7 +16,7 @@ module.exports = functions.https.onRequest((req, res) => {
   let requestBody = {
     "request": {
       "auth":             token, // API access token from Pushwoosh Control Panel
-      "devices_filter":   'A("' + applicationCode + '")'
+      "devices_filter":   'A("' + applicationCode + '") * T("basedistance", LTE, 20000)'
     }
   }
 

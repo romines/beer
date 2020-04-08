@@ -116,19 +116,16 @@ export default {
       })
     },
     setBaseDistanceTagId () {
-      let baseUrl = functionsBaseUrl + '/getTagStats'
+      let baseUrl = functionsBaseUrl + '/getBaseDistance'
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
-      baseUrl += "&tagName=basedistance"
+      // baseUrl += "&tagName=basedistance"
 
       this.axios.get(baseUrl).then((response) => {
-        let body          = JSON.parse(response.data.body)
-        let oldRequestId  = this.pushWooshData.baseDistanceRequestIds.current ? this.pushWooshData.baseDistanceRequestIds.current : body.response.request_id
-
-        // { "status_code": 420, "status_message": "Request is still being processed", "response": null }
-        if (!body.response) return
+        let newRequestId  = response.data
+        let oldRequestId  = this.pushWooshData.baseDistanceRequestIds.current ? this.pushWooshData.baseDistanceRequestIds.current : newRequestId
 
         this.pushWooshData.baseDistanceRequestIds = {
-          current: body.response.request_id,
+          current: newRequestId,
           former: oldRequestId
         }
         // Saves new request_id to "current" slot, bumps old id to "former" slot
