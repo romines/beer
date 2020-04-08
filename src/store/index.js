@@ -40,6 +40,7 @@ const store = {
       preferredCityOptions: [],
       baseDistanceRequestIds: {}
     },
+    webcams: [],
     resortMeta: {},
     contactGroups: [],
     emergencyGroup: {},
@@ -583,6 +584,9 @@ const store = {
     },
     pushWooshData (state) {
       return state.pushWooshData
+    },
+    webcams (state) {
+      return state.webcams
     }
   },
   modules: {

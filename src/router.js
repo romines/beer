@@ -5,6 +5,7 @@ import { promiseTo } from './store/utils.js'
 
 import Home from './components/Home'
 import PushNotifications from './components/PushNotifications'
+import WebcamManager from './components/WebcamManager'
 import Settings from './components/Settings'
 import {
   Archive,
@@ -113,7 +114,21 @@ const routes = [
     },
   },
   {
-    path: '/push-notifications',
+    path: '/webcam-manager',
+    name: 'WebcamManager',
+    component: WebcamManager,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    }
+  },
+  {
+    path: '/pust-notifications',
     name: 'PushNotifications',
     component: PushNotifications,
     meta: {
