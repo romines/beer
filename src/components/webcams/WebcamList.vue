@@ -7,12 +7,30 @@
         <section class="header" @click="showWebcamDetails(webcam)">
           <span class="id">{{webcam.id}}</span>
           <span class="webcam-name">{{ webcam.name }}</span>
-          <span class="created-at">{{webcam.createdAt}}</span>
+          <span class="created-at">{{formatDate(webcam.createdAt, 'll')}}</span>
         </section>
         <section v-if="showWebcam(webcam.name)" class="body">
           <div class="webcam-details">
+            <div class="detail name">
+              <label>Name:</label><span class="created">{{ webcam.name }}</span>
+            </div>
+            <div class="detail short-name">
+              <label>Short Name:</label><span class="created">{{ webcam.shortName }}</span>
+            </div>
+            <div class="detail static-url">
+              <label>Static URL:</label><span class="created">{{ webcam.staticImageUrl }}</span>
+            </div>
+            <div class="detail streaming-url">
+              <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
+            </div>
+            <div class="detail is-web">
+              <label>Is Web?:</label><span class="created">{{ webcam.isWeb }}</span>
+            </div>
             <div class="detail created">
-              <label>Created At:</label><span class="created">{{webcam.createdAt}}</span>
+              <label>Created At:</label><span class="created">{{formatDate(webcam.createdAt, 'lll')}}</span>
+            </div>
+            <div class="detail updated">
+              <label>Last Updated:</label><span class="created">{{formatDate(webcam.updatedAt, 'lll')}}</span>
             </div>
           </div>
         </section>
@@ -30,11 +48,11 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import SiteHeader from '../SiteHeader.vue'
+import moment from 'moment'
 
 export default {
   components: {
-    SiteHeader
+
   },
   data () {
     return {
@@ -59,6 +77,9 @@ export default {
     },
     showWebcam (name) {
       return this.currentWebcamName == name
+    },
+    formatDate (date, format) {
+      return moment(date).local().format(format)
     }
   }
 }
