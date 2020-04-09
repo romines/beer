@@ -1,6 +1,6 @@
 <template>
-  <div class="create-webcam">
-    <h2 class="subtitle">Create Webcam</h2>
+  <div class="webcam-form">
+    <h2 class="subtitle">{{title}}</h2>
 
     <h2>Name:</h2>
     <input v-model="newWebcam.name" class="input name" type="text" name="name">
@@ -23,8 +23,8 @@
     </div>
 
     <div class="cancel-save">
-      <span class="button is-primary new-push-button" :disabled="!webcamIsValid" @click="createWebcam()">Save</span>
-      <span class="button is-light new-push-button" @click="cancelCreateWebcam()">Cancel</span>
+      <span class="button is-primary new-push-button" :disabled="!webcamIsValid" @click="save()">Save</span>
+      <span class="button is-light new-push-button" @click="cancel()">Cancel</span>
     </div>
 
   </div>
@@ -40,9 +40,19 @@ export default {
   components: {
 
   },
+  props: {
+    title: {
+      type:     String,
+      default:  "Create Webcam"
+    },
+    existingWebcam: {
+      type:     Object,
+      default:  () => {}
+    }
+  },
   data () {
     return {
-      newWebcam:          this.setNewWebcamDefaults()
+      newWebcam:        this.initializeWebcamObject()
     }
   },
   computed: {
@@ -55,6 +65,13 @@ export default {
 
   },
   methods: {
+    initializeWebcamObject () {
+      if (this.existingWebcam) {
+        return JSON.parse(JSON.stringify(this.existingWebcam))
+      } else {
+        return this.setNewWebcamDefaults()
+      }
+    },
     setNewWebcamDefaults () {
       return {
         name:             '',
@@ -64,20 +81,13 @@ export default {
         isWeb:            false
       }
     },
-    createWebcam () {
-      this.$store.dispatch('setModalLoadingState', true)
-
-      this.setWebcamDefaults()
-
-      this.$store.dispatch('createWebcamForResort', this.newWebcam).then((webcam) => {
-        this.cancelCreateWebcam()
-        this.$store.dispatch('showSuccessModal', 'Webcam created!')
-        this.$emit('webcamCreated')
-      })
+    save () {
+      if (!this.existingWebcam) this.setWebcamDefaults()
+      this.$emit('save', this.newWebcam)
     },
-    cancelCreateWebcam () {
+    cancel () {
       this.newWebcam = this.setNewWebcamDefaults()
-      this.$emit('closeCreateWebcam')
+      this.$emit('cancel')
     },
     setWebcamDefaults () {
       let createdAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
@@ -93,7 +103,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.create-webcam {
+.webcam-form {
 
   padding:                      1em;
   border:                       1px solid #dfe0e2;

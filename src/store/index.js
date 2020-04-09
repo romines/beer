@@ -202,10 +202,16 @@ const store = {
       })
     },
 
-    createWebcamForResort({ rootState, commit }, webcam) {
+    createWebcamForResort({ rootState, commit, dispatch }, webcam) {
       let webcams = rootState.webcams
       webcams.push(webcam)
 
+      return new Promise((resolve, reject) => {
+        dispatch('saveResortWebcams', webcams).then(() => resolve(webcam)).catch((error) => reject(error))
+      })
+    },
+
+    saveResortWebcams({ rootState, commit }, webcams) {
       return new Promise((resolve, reject) => {
         firestore
           .collection('resorts')
@@ -214,7 +220,7 @@ const store = {
             webcams: webcams,
           })
           .then(() => {
-            resolve(webcam)
+            resolve()
           })
           .catch(error => {
             // The document probably doesn't exist.
@@ -226,8 +232,15 @@ const store = {
     getResortWebcams({ rootState, commit }) {
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
-          commit('SET_WEBCAMS', doc.data().webcams)
-          resolve()
+          if (!doc.data().webcams) {
+            RESORTS_REF.doc(rootState.resortId).update({ webcams: [] }).then((response) => {
+              commit('SET_WEBCAMS', [])
+              resolve()
+            })
+          } else {
+            commit('SET_WEBCAMS', doc.data().webcams)
+            resolve()
+          }
         })
       })
     },

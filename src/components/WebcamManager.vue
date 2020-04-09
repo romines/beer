@@ -5,7 +5,12 @@
     <span class="button is-primary new-webcam-button" @click="showCreateWebcam = !showCreateWebcam">Create Webcam</span>
 
     <transition name="fade">
-      <create-webcam v-if="showCreateWebcam" v-on:closeCreateWebcam="showCreateWebcam = false" v-on:webcamCreated="onWebcamCreated()" class="new-webcam-container" />
+      <WebcamForm
+        v-if="showCreateWebcam"
+        v-on:save="onWebcamSave"
+        v-on:cancel="showCreateWebcam = false"
+        class="new-webcam-container">
+      </WebcamForm>
     </transition>
 
     <webcam-list ref="webcamList" class="webcam-list" />
@@ -18,12 +23,12 @@
 import { mapGetters } from 'vuex'
 import SiteHeader from './SiteHeader.vue'
 import WebcamList from './webcams/WebcamList.vue'
-import CreateWebcam from './webcams/CreateWebcam.vue'
+import WebcamForm from './webcams/WebcamForm.vue'
 
 export default {
   components: {
     SiteHeader,
-    CreateWebcam,
+    WebcamForm,
     WebcamList
   },
   data () {
@@ -38,8 +43,11 @@ export default {
 
   },
   methods: {
-    onWebcamCreated () {
-      console.log("CREATED")
+    onWebcamSave (newWebcam) {
+      this.showCreateWebcam = false
+      this.$store.dispatch('createWebcamForResort', newWebcam).then((webcam) => {
+        this.$store.dispatch('showSuccessModal', 'Webcam created!')
+      })
     }
   }
 }

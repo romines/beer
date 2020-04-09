@@ -9,8 +9,22 @@
           <span class="webcam-name">{{ webcam.name }}</span>
           <span class="created-at">{{formatDate(webcam.createdAt, 'll')}}</span>
         </section>
-        <section v-if="showWebcam(webcam.name)" class="body">
-          <div class="webcam-details">
+        <section v-if="showWebcam(webcam.identifier)" class="body">
+
+          <div v-if="isEditingWebcam" class="edit-webcam">
+            <WebcamForm
+              v-on:save="onWebcamSave"
+              v-on:cancel="isEditingWebcam = false"
+              v-bind:existingWebcam="webcam"
+              title="Edit Webcam"
+              class="edit-webcam-container">
+            </WebcamForm>
+          </div>
+
+          <div v-else class="webcam-details">
+            <span v-on:click="isEditingWebcam = true">
+              <i class="fas fa-edit" />
+            </span>
             <div class="detail name">
               <label>Name:</label><span class="created">{{ webcam.name }}</span>
             </div>
@@ -49,14 +63,17 @@
 
 import { mapGetters } from 'vuex'
 import moment from 'moment'
+import WebcamForm from './WebcamForm.vue'
+import arrayHelper from '../../helpers/arrayHelper'
 
 export default {
   components: {
-
+    WebcamForm
   },
   data () {
     return {
-      currentWebcamName:      {}
+      currentWebcamId:      null,
+      isEditingWebcam:      false
     }
   },
   computed: {
@@ -68,18 +85,25 @@ export default {
   methods: {
     showWebcamDetails (webcam) {
       // Check if opening or closing...
-      if (this.currentWebcamName == webcam.name) {
-        this.currentWebcamName = null
+      if (this.currentWebcamId == webcam.identifier) {
+        this.currentWebcamId = null
         return
       } else {
-        this.currentWebcamName = webcam.name
+        this.currentWebcamId = webcam.identifier
       }
     },
-    showWebcam (name) {
-      return this.currentWebcamName == name
+    showWebcam (identifier) {
+      return this.currentWebcamId == identifier
     },
     formatDate (date, format) {
       return moment(date).local().format(format)
+    },
+    onWebcamSave (webcam) {
+      arrayHelper.replaceObjectByValue(this.webcams, webcam, webcam.identifier, 'identifier')
+      this.$store.dispatch('saveResortWebcams', this.webcams).then(() => {
+        this.$store.dispatch('showSuccessModal', 'Webcam updated!')
+        this.currentWebcamId = null
+      })
     }
   }
 }
@@ -119,6 +143,19 @@ export default {
       padding:                    1.5em 2em;
 
       .webcam-details {
+
+        position:                 relative;
+
+        .fa-edit {
+          position:               absolute;
+          right:                  0;
+          top:                    0;
+
+          &:hover {
+            cursor:               pointer;
+            opacity:              0.8;
+          }
+        }
 
         .detail {
 
