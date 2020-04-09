@@ -68,6 +68,54 @@ export default {
 
 .webcam-list {
 
+  .webcam-container {
+    border:                       1px solid #dfe0e2;
+    border-radius:                0.25em;
+    margin-bottom:                0.88em;
+
+    .header {
+      display:                    flex;
+      align-items:                center;
+      cursor:                     pointer;
+      background:                 #dfe0e2;
+      padding:                    0.88em;
+
+      .webcam-name {
+        margin-left:              3em;
+        text-overflow:            ellipsis;
+        overflow:                 hidden;
+        white-space:              nowrap;
+        max-width:                25em;
+      }
+
+      .created-at {
+        margin-left:              auto;
+      }
+    }
+
+    .body {
+
+      padding:                    1.5em 2em;
+
+      .webcam-details {
+
+        .detail {
+
+          display:                flex;
+
+          > label {
+            font-weight:          bold;
+            width:                20%;
+          }
+
+          > span {
+            width:                80%;
+          }
+        }
+      }
+    }
+  }
+
   .no-webcams {
     font-style:                     italic;
     padding:                        1em;
