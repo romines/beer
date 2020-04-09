@@ -123,8 +123,10 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
 
-      store.commit('SET_LOADING_STATE', false)
-      next()
+      store.dispatch('getResortWebcams').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
     }
   },
   {

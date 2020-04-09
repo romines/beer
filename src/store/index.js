@@ -103,6 +103,9 @@ const store = {
     UPDATE_IMAGE_URL(state, { groupIndex, contactIndex, scaledUrl }) {
       state.contactGroups[groupIndex].list[contactIndex].imageUrl = scaledUrl
     },
+    SET_WEBCAMS(state, webcams) {
+      state.webcams = webcams
+    }
   },
   actions: {
     getUserData({ commit }, user) {
@@ -135,7 +138,6 @@ const store = {
 
     getResorts({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
-        console.log('inside getResorts .then')
         let resorts = []
         snapshot.forEach(doc => {
           resorts.push(doc.data())
@@ -195,6 +197,36 @@ const store = {
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then((response) => {
           commit('SET_PUSHWOOSH_DATA', pushWooshData)
+          resolve()
+        })
+      })
+    },
+
+    createWebcamForResort({ rootState, commit }, webcam) {
+      let webcams = rootState.webcams
+      webcams.push(webcam)
+
+      return new Promise((resolve, reject) => {
+        firestore
+          .collection('resorts')
+          .doc(rootState.resortId)
+          .update({
+            webcams: webcams,
+          })
+          .then(() => {
+            resolve(webcam)
+          })
+          .catch(error => {
+            // The document probably doesn't exist.
+            reject(error)
+          })
+      })
+    },
+
+    getResortWebcams({ rootState, commit }) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
+          commit('SET_WEBCAMS', doc.data().webcams)
           resolve()
         })
       })
