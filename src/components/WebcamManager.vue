@@ -8,7 +8,7 @@
       <create-webcam v-if="showCreateWebcam" v-on:closeCreateWebcam="showCreateWebcam = false" v-on:webcamCreated="onWebcamCreated()" class="new-webcam-container" />
     </transition>
 
-    <webcam-list class="webcam-list" />
+    <webcam-list ref="webcamList" class="webcam-list" />
 
   </div>
 </template>
@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     onWebcamCreated () {
-      console.log("MEOW")
+      console.log("CREATED")
     }
   }
 }

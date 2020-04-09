@@ -33,7 +33,7 @@
     "firebase-functions": "^3.3.0",
     "grpc": "^1.24.2",
     "moment": "^2.22.2",
-    "uuid": "^3.3.2",
+    "uuid": "^3.4.0",
     "v-click-outside": "^1.0.5",
     "v-viewer": "^1.4.0",
     "vue": "^2.6.10",

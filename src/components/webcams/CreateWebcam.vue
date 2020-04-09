@@ -17,7 +17,7 @@
     <div class="toggle-container">
       <span>Is Streaming:</span>
       <label for="no-sort" class="switch">
-        <input v-model="newWebcam.isStreaming" id="no-sort" type="checkbox">
+        <input v-model="newWebcam.isWeb" id="no-sort" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
@@ -33,6 +33,8 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import moment from 'moment'
+import { v4 as uuidv4 } from 'uuid'
 
 export default {
   components: {
@@ -59,18 +61,31 @@ export default {
         shortName:        '',
         staticImageUrl:   '',
         streamingUrl:     '',
-        isStreaming:      false
+        isWeb:            false
       }
     },
     createWebcam () {
       this.$store.dispatch('setModalLoadingState', true)
+
+      this.setWebcamDefaults()
+
       this.$store.dispatch('createWebcamForResort', this.newWebcam).then((webcam) => {
-        console.log(webcam)
+        this.cancelCreateWebcam()
+        this.$store.dispatch('showSuccessModal', 'Webcam created!')
+        this.$emit('webcamCreated')
       })
     },
     cancelCreateWebcam () {
       this.newWebcam = this.setNewWebcamDefaults()
       this.$emit('closeCreateWebcam')
+    },
+    setWebcamDefaults () {
+      let createdAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
+
+      this.newWebcam.createdAt  = createdAt
+      this.newWebcam.updatedAt  = createdAt
+      this.newWebcam.sortOrder  = this.webcams.length     // Make it the last in the list
+      this.newWebcam.identifier = uuidv4()                // Unique Identifier
     }
   }
 }

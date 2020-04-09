@@ -130,7 +130,7 @@ const routes = [
     }
   },
   {
-    path: '/pust-notifications',
+    path: '/push-notifications',
     name: 'PushNotifications',
     component: PushNotifications,
     meta: {
