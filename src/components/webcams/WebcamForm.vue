@@ -41,6 +41,7 @@
 
 import { mapGetters } from 'vuex'
 import moment from 'moment'
+import validationHelper from '../../helpers/validationHelper'
 import { v4 as uuidv4 } from 'uuid'
 
 export default {
@@ -68,8 +69,11 @@ export default {
   },
   computed: {
     ...mapGetters(['webcams']),
+    urlsAreValid () {
+      return validationHelper.url(this.newWebcam.staticImageUrl) || validationHelper.url(this.newWebcam.streamingUrl)
+    },
     webcamIsValid () {
-      return true
+      return this.newWebcam.name.length > 0 && (this.newWebcam.staticImageUrl.length > 0 || this.newWebcam.streamingUrl.length > 0) && this.urlsAreValid
     }
   },
   created () {
@@ -93,6 +97,7 @@ export default {
       }
     },
     save () {
+      // Only set defaults on new webcam
       if (!this.existingWebcam) this.setWebcamDefaults()
       this.$emit('save', this.newWebcam)
     },

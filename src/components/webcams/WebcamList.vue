@@ -121,13 +121,13 @@ export default {
       return this.currentWebcamId == identifier
     },
     formatDate (date, format) {
-      return moment(date).local().format(format)
+      return moment.utc(date).local().format(format)
     },
     onWebcamSave (webcam) {
+      webcam.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
       arrayHelper.replaceObjectByValue(this.webcams, webcam, webcam.identifier, 'identifier')
       this.$store.dispatch('saveResortWebcams', this.webcams).then(() => {
-        this.$store.dispatch('showSuccessModal', 'Webcam updated!')
-        this.currentWebcamId = null
+        this.isEditingWebcam = false
       })
     },
     onWebcamDelete (webcam) {
@@ -135,6 +135,7 @@ export default {
       this.$store.dispatch('saveResortWebcams', this.webcams).then(() => {
         this.$store.dispatch('showSuccessModal', 'Webcam removed!')
         this.currentWebcamId = null
+        this.isEditingWebcam = false
       })
     }
   }
