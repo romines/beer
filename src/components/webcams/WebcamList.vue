@@ -3,8 +3,17 @@
     <h2 class="subtitle">Current Webcams</h2>
 
     <div v-if="webcams.length > 0" class="webcam-list">
-      <div v-for="webcam in webcams" class="webcam-container">
+
+      <draggable
+        class="draggable-group-container"
+        v-model="draggableList"
+        :options="{handle:'.grippy'}"
+        @start="drag=true"
+        @end="drag=false">
+
+      <div v-for="webcam in draggableList" class="webcam-container">
         <section class="header" @click="showWebcamDetails(webcam)">
+          <span class="grippy" />
           <span class="id">{{webcam.id}}</span>
           <span class="webcam-name">{{ webcam.name }}</span>
           <span class="created-at">{{formatDate(webcam.createdAt, 'll')}}</span>
@@ -53,6 +62,8 @@
 
       </div>
 
+    </draggable>
+
     </div>
     <div v-else class="no-webcams">
       No webcams to display. Add a new webcam using the button above.
@@ -67,9 +78,11 @@ import { mapGetters } from 'vuex'
 import moment from 'moment'
 import WebcamForm from './WebcamForm.vue'
 import arrayHelper from '../../helpers/arrayHelper'
+import draggable from 'vuedraggable'
 
 export default {
   components: {
+    draggable,
     WebcamForm
   },
   data () {
@@ -79,7 +92,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['webcams'])
+    ...mapGetters(['webcams']),
+    draggingInfo() {
+      return this.dragging ? "under drag" : "";
+    },
+    draggableList: {
+      get() {
+        return this.$store.state.webcams
+      },
+      set(updatedList) {
+        this.$store.dispatch('saveResortWebcams', updatedList)
+      }
+    }
   },
   created () {
 
@@ -89,7 +113,6 @@ export default {
       // Check if opening or closing...
       if (this.currentWebcamId == webcam.identifier) {
         this.currentWebcamId = null
-        return
       } else {
         this.currentWebcamId = webcam.identifier
       }

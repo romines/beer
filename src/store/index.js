@@ -213,6 +213,7 @@ const store = {
 
     saveResortWebcams({ rootState, commit }, webcams) {
       return new Promise((resolve, reject) => {
+        commit('SET_WEBCAMS', webcams)
         firestore
           .collection('resorts')
           .doc(rootState.resortId)
