@@ -32,28 +32,49 @@ module.exports = functions.https.onRequest((req, res) => {
             "ios_title":        req.body.messageTitle,
             "android_header":   req.body.messageTitle,
             "data": {
-              "message_title":  req.body.messageTitle
+              "title":          req.body.messageTitle
             }
           }
         ]
       }
     }
 
+    let notification = requestBody["request"]["notifications"][0]
+
     // Add silent settings
     if (silentSettings) {
-      requestBody["request"]["notifications"][0]["dataType"]          = -2
-      requestBody["request"]["notifications"][0]["ios_silent"]        = 1
-      requestBody["request"]["notifications"][0]["android_silent"]    = 1
-      requestBody["request"]["notifications"][0]["validMinutes"]      = silentSettings.validMinutes
-      requestBody["request"]["notifications"][0]["repeatInterval"]    = silentSettings.repeatInterval
-      requestBody["request"]["notifications"][0]["repeatLimit"]       = silentSettings.repeatLimit
-      requestBody["request"]["notifications"][0]["priority"]          = silentSettings.isHighPriority ? 0 : 1
-      requestBody["request"]["notifications"][0]["data"]["is_silent"] = true
-    }
-    console.log(requestBody["request"]["notifications"][0])
+      // iOS stuff...
+      notification["ios_ttl"]           = 86400
+      notification["ios_root_params"]   =  {
+        "aps": {
+            "content-available":1,
+            "apns-push-type":"background",
+            "apns-priority":5,
+            "sound":""
+        }
+      }
+
+      // Android stuff...
+      notification["android_gcm_ttl"]             = 86400
+      notification["android_icon"]                = "ic_note"
+      notification["android_priority"]            = 0
+      notification["android_delivery_priority"]   = "normal"
+      notification["android_silent"]              = 1
+
+      // Data stuff...
+      notification["data"]["is_silent"]       = true
+      notification["data"]["dataType"]        = "-2"
+      notification["data"]["message"]         = req.body.messageBody
+      notification["data"]["startTime"]       = "now"
+      notification["data"]["validMinutes"]    = silentSettings.validMinutes
+      notification["data"]["repeatInterval"]  = silentSettings.repeatInterval
+      notification["data"]["repeatLimit"]     = silentSettings.repeatLimit
+      notification["data"]["priority"]        = silentSettings.isHighPriority ? 0 : 1
+    } // end silent if
+
     // Add geozone info
     if (req.body.geoZone.lat) {
-      requestBody["request"]["notifications"][0]["geozone"] = {
+      notification["geozone"] = {
         "lat":    req.body.geoZone.lat,
         "lng":    req.body.geoZone.lng,
         "range":  req.body.geoZone.range
@@ -63,12 +84,13 @@ module.exports = functions.https.onRequest((req, res) => {
     // Add selected cities info
     if (req.body.selectedCities && req.body.selectedCities.length > 0) {
       let array = [ ["City", "IN", req.body.selectedCities ] ]
-      requestBody["request"]["notifications"][0]["conditions"] = array
+      notification["conditions"] = array
     }
 
     // Add message link
     if (req.body.messageLink && req.body.messageLink.length > 0) {
-      requestBody["request"]["notifications"][0]["link"] = req.body.messageLink
+      notification["link"]          = req.body.messageLink
+      notification["minimize_link"] = "0"
     }
 
     httpRequest.post({

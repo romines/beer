@@ -31,7 +31,7 @@ module.exports = functions.https.onRequest((req, res) => {
         "ios_title":        req.body.messageTitle,
         "android_header":   req.body.messageTitle,
         "data": {
-          "message_title":  req.body.messageTitle
+          "title":          req.body.messageTitle
         }
       }
     }

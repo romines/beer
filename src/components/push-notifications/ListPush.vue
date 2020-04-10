@@ -157,7 +157,7 @@ export default {
 
         if (messageDetails.data && messageDetails.data.default) {
           let parsed = JSON.parse(messageDetails.data.default)
-          messageDetails.title    = parsed.message_title
+          messageDetails.title    = parsed.title
           messageDetails.isSilent = parsed.is_silent
         }
 
