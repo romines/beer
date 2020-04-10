@@ -15,6 +15,8 @@
             <WebcamForm
               v-on:save="onWebcamSave"
               v-on:cancel="isEditingWebcam = false"
+              v-on:deleteWebcam="onWebcamDelete"
+              v-bind:showDeleteWebcam="true"
               v-bind:existingWebcam="webcam"
               title="Edit Webcam"
               class="edit-webcam-container">
@@ -102,6 +104,13 @@ export default {
       arrayHelper.replaceObjectByValue(this.webcams, webcam, webcam.identifier, 'identifier')
       this.$store.dispatch('saveResortWebcams', this.webcams).then(() => {
         this.$store.dispatch('showSuccessModal', 'Webcam updated!')
+        this.currentWebcamId = null
+      })
+    },
+    onWebcamDelete (webcam) {
+      arrayHelper.removeObjectByValue(this.webcams, webcam.identifier, 'identifier')
+      this.$store.dispatch('saveResortWebcams', this.webcams).then(() => {
+        this.$store.dispatch('showSuccessModal', 'Webcam removed!')
         this.currentWebcamId = null
       })
     }

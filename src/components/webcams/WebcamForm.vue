@@ -27,6 +27,13 @@
       <span class="button is-light new-push-button" @click="cancel()">Cancel</span>
     </div>
 
+    <div v-if="showDeleteWebcam" @click="showDeleteModal()" class="delete-button button is-danger is-outlined">
+      <span class="">Delete</span>
+      <span class="icon is-small">
+        <i class="fas fa-trash-alt"/>
+      </span>
+    </div>
+
   </div>
 </template>
 
@@ -48,6 +55,10 @@ export default {
     existingWebcam: {
       type:     Object,
       default:  () => {}
+    },
+    showDeleteWebcam: {
+      type:     Boolean,
+      default:  false
     }
   },
   data () {
@@ -96,6 +107,18 @@ export default {
       this.newWebcam.updatedAt  = createdAt
       this.newWebcam.sortOrder  = this.webcams.length     // Make it the last in the list
       this.newWebcam.identifier = uuidv4()                // Unique Identifier
+    },
+    showDeleteModal () {
+
+      const onConfirm = () => {
+        this.$emit('deleteWebcam', this.existingWebcam)
+      }
+
+      this.$store.commit('SHOW_MODAL', {
+        heading:      'Are you sure you want to delete this webcam?',
+        showLoading:  false,
+        onConfirm,
+      })
     }
   }
 }
@@ -124,7 +147,20 @@ export default {
   }
 
   .cancel-save {
-    margin-top:                     2em;
+    margin-top:                 2em;
+    display:                    inline-block;
+  }
+
+  .delete-button {
+
+    margin-top:                 2em;
+    float:                      right;
+    margin-right:               1em;
+
+    .icon {
+      height:                   1.5em;
+      width:                    1.5em;
+    }
   }
 }
 
