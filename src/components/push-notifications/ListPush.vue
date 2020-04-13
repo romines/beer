@@ -21,7 +21,7 @@
               <label>Sent At:</label><span class="send-date">{{currentNotification.sendDate}}</span>
             </div>
             <div class="detail is-silent">
-              <label>Silent Push?:</label><span class="is-silent">{{currentNotification.isSilent ? 'Yes' : 'No'}}</span>
+              <label>In-App?:</label><span class="is-silent">{{currentNotification.isSilent ? 'Yes' : 'No'}}</span>
             </div>
             <div class="detail platforms">
               <label>Platforms:</label><span class="platforms">

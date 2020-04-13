@@ -15,19 +15,10 @@
     <div class="link-container">
       <h2>Link:</h2>
       <input v-model="messageLink" class="input" type="text" name="limit">
-    </div>
-
-    <div class="options-list">
-      <h2>Your Preferred Cities</h2>
-
-      <div v-if="pushWooshData.preferredCityOptions.length > 0" class="options-container">
-        <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="option" v-bind:class="{ selected : isCitySelected(city) }">
-          {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
-        </span>
-      </div>
-      <div v-else class="no-results">
-        You do not have any preferred cities. Please visit the settings page.
-      </div>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Optional URL for web page containing additional information</span>
+      </span>
     </div>
 
     <!-- <div class="geo-zones-list options-list">
@@ -47,46 +38,86 @@
       </div>
     </div> -->
 
-    <div class="silent-push">
-      <input v-model="isSilentPush" type="checkbox">
-      <label>Silent Push</label>
+    <div class="push-choice">
+      <input v-model="isSelectedCitiesPush" type="checkbox">
+      <label>Send to select cities</label>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
-        <span class="tooltiptext top">Enable to pass custom data to the app without having the user informed</span>
+        <span class="tooltiptext top">Sends message to only selected cities</span>
       </span>
 
       <transition name="fade">
-        <div v-if="isSilentPush" class="silent-push-options">
+        <div v-if="isSelectedCitiesPush" class="selected-cities-container options-list">
+          <div v-if="pushWooshData.preferredCityOptions.length > 0" class="options-container">
+            <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityFromSelected(city)" class="option" v-bind:class="{ selected : isCitySelected(city) }">
+              {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
+            </span>
+          </div>
+          <div v-else class="no-results">
+            You do not have any preferred cities. Please visit the settings page.
+          </div>
+        </div>
+      </transition>
+    </div>
+
+
+    <div class="push-choice local-push">
+      <input v-model="isLocalPush" type="checkbox">
+      <label>Local Area</label>
+      <span v-if="localDevicesCount" class="device-count"> ({{localDevicesCount}} devices)</span>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Sends the message only to users within 20km of the resort. The app will receive the message only if it has been allowed to track the user’s location.</span>
+      </span>
+    </div>
+
+    <div class="push-choice">
+      <input v-model="isSilentPush" type="checkbox">
+      <label>In-App Message</label>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Presents the message only when the user brings the app to the foreground</span>
+      </span>
+
+      <transition name="fade">
+        <div v-if="isSilentPush" class="push-choice-options">
           <div class="option">
-            <span>Time Valid (mins):</span><input v-model="silentSettings.validMinutes" class="input" type="number">
+            <span class="option-title">Valid Duration:</span>
+            <input v-model="silentSettings.validMinutes" class="input" type="number"><span>&nbsp;(mins)</span>
+            <span class="tooltip">
+              <i class="fa fa-info-circle"></i>
+              <span class="tooltiptext top">Time for which the message remains valid after it is sent</span>
+            </span>
           </div>
           <div class="option">
-            <span>Repeat Limit:</span><input v-model="silentSettings.repeatLimit" class="input" type="number">
+            <span class="option-title">Repeat Interval:</span><input v-model="silentSettings.repeatInterval" class="input" type="number"><span>&nbsp;(mins)</span>
+            <span class="tooltip">
+              <i class="fa fa-info-circle"></i>
+              <span class="tooltiptext top">Minimum interval between message presentations when the app comes to the foreground</span>
+            </span>
           </div>
           <div class="option">
-            <span>Repeat Interval:</span><input v-model="silentSettings.repeatInterval" class="input" type="number">
+            <span class="option-title">Repeat Limit:</span><input v-model="silentSettings.repeatLimit" class="input" type="number">
+            <span class="tooltip">
+              <i class="fa fa-info-circle"></i>
+              <span class="tooltiptext top">The maximum number of times the message will be shown to the user</span>
+            </span>
           </div>
           <div class="option">
-            <span>High priority:</span>
+            <span class="option-title">High priority:</span>
             <div class="toggle-container">
               <label for="no-sort" class="switch">
                 <input v-model="silentSettings.isHighPriority" id="no-sort" type="checkbox">
                 <span class="slider round"></span>
               </label>
             </div>
+            <span class="tooltip">
+              <i class="fa fa-info-circle"></i>
+              <span class="tooltiptext top">Leaves the message on the screen until the user dismisses it</span>
+            </span>
           </div>
         </div>
       </transition>
-    </div>
-
-    <div class="local-push">
-      <input v-model="isLocalPush" type="checkbox">
-      <label>Local Push</label>
-      <span v-if="localDevicesCount"> ({{localDevicesCount}})</span>
-      <span class="tooltip">
-        <i class="fa fa-info-circle"></i>
-        <span class="tooltiptext top">Will send notification to any user within a 20,000 meter radius of resort.</span>
-      </span>
     </div>
 
     <div class="cancel-save">
@@ -120,6 +151,7 @@ export default {
       geoZonesAreLoading:   false,
       isSilentPush:         false,
       isLocalPush:          false,
+      isSelectedCitiesPush: false,
       localDevicesCount:    null,
       currentRetryCount:    0,
       formerRetryCount:     0,
@@ -298,15 +330,23 @@ export default {
     isLocalPush (val) {
       if (val) {
         // Reset other push options if local push is selected
-        this.isSilentPush   = false
-        this.selectedCities = []
+        this.isSilentPush         = false
+        this.selectedCities       = []
+        this.isSelectedCitiesPush = false
       }
     },
     isSilentPush (val) {
-      if (val) this.isLocalPush = false
+      if (val) {
+        this.isLocalPush          = false
+        this.selectedCities       = []
+        this.isSelectedCitiesPush = false
+      }
     },
-    selectedCities (val) {
-      if (val.length > 0) this.isLocalPush = false
+    isSelectedCitiesPush (val) {
+      if (val) {
+        this.isLocalPush  = false
+        this.isSilentPush = false
+      }
     }
   }
 }
@@ -363,15 +403,15 @@ export default {
 
   .options-list {
 
-    margin-top:                 1.25em;
+    padding:                      0.25em 1em;
 
     > h2 {
-      margin:                   0.5em 0;
-      font-size:                1.15em;
+      margin:                     0.5em 0;
+      font-size:                  1.15em;
     }
 
     .options-container {
-      padding:                  0 0.5em;
+      padding:                    0 0.5em;
     }
 
     .option {
@@ -409,11 +449,18 @@ export default {
     }
   }
 
-  .silent-push {
+  .local-push {
+
+    .device-count {
+      font-style:                   italic;
+    }
+  }
+
+  .push-choice {
     display:                        flex;
     align-items:                    center;
     flex-wrap:                      wrap;
-    margin-top:                     1em;
+    margin:                         0.25em 0;
 
     > input {
       margin-right:                 0.5em;
@@ -425,18 +472,30 @@ export default {
       cursor:                       pointer;
     }
 
-    .silent-push-options {
+    .selected-cities-container {
+      width:                        100%;
+    }
+
+    .push-choice-options {
       display:                      block;
       width:                        100%;
       padding:                      0.25em 1em;
+
+      &.no-results {
+        font-style:                 italic;
+      }
 
       .option {
         display:                    flex;
         align-items:                center;
         margin:                     0.5em 0;
 
-        > span {
+        .option-title {
           width:                    9em;
+        }
+
+        .toggle-container {
+          width:                    auto;
         }
 
         .input {

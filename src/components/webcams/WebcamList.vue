@@ -49,7 +49,7 @@
               <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
             </div>
             <div class="detail is-web">
-              <label>Is Web?:</label><span class="created">{{ webcam.isWeb }}</span>
+              <label>Is Streaming?:</label><span class="created">{{ webcam.isWeb }}</span>
             </div>
             <div class="detail created">
               <label>Created At:</label><span class="created">{{formatDate(webcam.createdAt, 'lll')}}</span>
@@ -193,6 +193,7 @@ export default {
         .detail {
 
           display:                flex;
+          word-wrap:              break-word;
 
           > label {
             font-weight:          bold;

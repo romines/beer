@@ -4,6 +4,10 @@
 
     <div class="preferred-cities-container">
       <h2 class="subtitle">Your Preferred Cities</h2>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Click on a city to remove it from the list</span>
+      </span>
       <div v-if="pushWooshData.preferredCityOptions.length > 0" class="city-options-list">
         <span v-for="city in pushWooshData.preferredCityOptions" v-on:click="addOrRemoveCityOptionFromPreferred(city)" class="city-option preferred">
           {{ findSafeCityData(city, 'cityName') }} - <b>{{ findSafeCityData(city, 'count') }}</b>
@@ -17,8 +21,12 @@
 
     <LoadingSpinner v-if="isResettingSubscribers" isBlack="true"></LoadingSpinner>
     <div v-else>
+      <h2 class="subtitle">Most Popular Cities</h2>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Click on a city to add it to your Preferred Cities</span>
+      </span>
       <div class="city-options-container city-options-list">
-        <h2 class="subtitle">Most Popular Cities</h2>
         <span v-for="key in topCityOptionsKeys" v-on:click="addOrRemoveCityOptionFromPreferred(key)" class="city-option" v-bind:class="{ preferred : isCityPreferredCityOption(key) }">
           {{ findSafeCityData(key, 'cityName') }} - <b>{{ findSafeCityData(key, 'count') }}</b>
         </span>
@@ -118,6 +126,7 @@ export default {
 
   .subtitle {
     margin-top:                     1em;
+    display:                        inline-block;
   }
 
   .city-options-list {
