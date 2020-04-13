@@ -44,7 +44,7 @@ module.exports = functions.https.onRequest((req, res) => {
     // Add silent settings
     if (silentSettings) {
       // iOS stuff...
-      notification["ios_ttl"]           = 86400
+      // notification["ios_ttl"]           = 86400
       notification["ios_root_params"]   =  {
         "aps": {
             "content-available":1,
@@ -55,7 +55,7 @@ module.exports = functions.https.onRequest((req, res) => {
       }
 
       // Android stuff...
-      notification["android_gcm_ttl"]             = 86400
+      // notification["android_gcm_ttl"]             = 86400
       notification["android_icon"]                = "ic_note"
       notification["android_priority"]            = 0
       notification["android_delivery_priority"]   = "normal"
@@ -65,11 +65,11 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["data"]["is_silent"]       = true
       notification["data"]["dataType"]        = "-2"
       notification["data"]["message"]         = req.body.messageBody
-      notification["data"]["startTime"]       = "now"
+      notification["data"]["startTime"]       = req.body.startTime || 'now'
       notification["data"]["validMinutes"]    = silentSettings.validMinutes
       notification["data"]["repeatInterval"]  = silentSettings.repeatInterval
       notification["data"]["repeatLimit"]     = silentSettings.repeatLimit
-      notification["data"]["priority"]        = silentSettings.isHighPriority ? 0 : 1
+      notification["data"]["priority"]        = silentSettings.isHighPriority ? 1 : 0
     } // end silent if
 
     // Add geozone info

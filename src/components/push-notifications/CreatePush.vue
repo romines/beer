@@ -234,6 +234,7 @@ export default {
       this.axios.post(baseUrl, {
         messageBody:      this.messageBody,
         messageTitle:     this.messageTitle,
+        startTime:        moment.utc().format(),
         selectedCities:   this.selectedCityNames,
         geoZone:          this.selectedGeoZone,
         messageLink:      this.messageLink,
