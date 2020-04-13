@@ -63,7 +63,7 @@
 
     <div class="push-choice local-push">
       <input v-model="isLocalPush" type="checkbox">
-      <label>Local Area</label>
+      <label>Send to Local Area</label>
       <span v-if="localDevicesCount" class="device-count"> ({{localDevicesCount}} devices)</span>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
@@ -73,7 +73,7 @@
 
     <div class="push-choice">
       <input v-model="isSilentPush" type="checkbox">
-      <label>In-App Message</label>
+      <label>Send as In-App Message</label>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
         <span class="tooltiptext top">Presents the message only when the user brings the app to the foreground</span>

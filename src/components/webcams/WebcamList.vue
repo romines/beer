@@ -43,7 +43,7 @@
               <label>Short Name:</label><span class="created">{{ webcam.shortName }}</span>
             </div>
             <div class="detail static-url">
-              <label>Static URL:</label><span class="created">{{ webcam.staticImageUrl }}</span>
+              <label>Still URL:</label><span class="created">{{ webcam.staticImageUrl }}</span>
             </div>
             <div class="detail streaming-url">
               <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
