@@ -23,8 +23,11 @@ module.exports = functions.https.onRequest((req, res) => {
 
   RESORTS_REF.doc(resortId).get().then((doc) => {
     let resortData = doc.data()
+    let webcams = resortData.webcams
 
-    res.status(200).send(resortData.webcams)
+    if (!webcams) webcams = {}
+
+    res.status(200).send(webcams)
 
   }).catch((error) => {
     console.log(error)
