@@ -13,13 +13,14 @@ module.exports = functions.https.onRequest((req, res) => {
 
   let requestBody = {
     "request": {
-      "auth":     token,
-      "message":  req.query.messageCode
+      "auth":       token,
+      "message":    req.query.messageCode,
+      "platforms":  [1,3] // [iOS, Android]
     }
   }
 
   let request = {
-    url: 'https://cp.pushwoosh.com/json/1.3/getMsgStats',
+    url: 'https://cp.pushwoosh.com/json/1.3/getMsgPlatformsStats',
     body: JSON.stringify(requestBody),
     headers: {
       'Content-Type': 'application/json'

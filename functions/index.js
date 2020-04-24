@@ -15,6 +15,7 @@ exports.getBaseDistance = require('./getBaseDistance');
 exports.getResults = require('./getResults');
 exports.getGeoZones = require('./getGeoZones');
 exports.getMsgStats = require('./getMsgStats');
+exports.getMsgPlatformsStats = require('./getMsgPlatformsStats');
 exports.getWebcamFeed = require('./getWebcamFeed');
 exports.getSetSubscribers = require('./tasks/getSetSubscribers');
 exports.setApplicationSubscribers = require('./tasks/setApplicationSubscribers');

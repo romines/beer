@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <g id="Close_X" data-name="Close/X" transform="translate(-1049 -4498)">
+    <rect id="Rectangle_1445" data-name="Rectangle 1445" class="cls-1" width="16" height="16" transform="translate(1049 4498)"/>
+    <path id="Path_954" data-name="Path 954" class="cls-2" d="M14-12.6,12.6-14,7-8.4,1.4-14,0-12.6,5.6-7,0-1.4,1.4,0,7-5.6,12.6,0,14-1.4,8.4-7Z" transform="translate(1050 4513)"/>
+  </g>
+</svg>

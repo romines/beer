@@ -24,30 +24,13 @@
               <label>In-App?:</label><span class="is-silent">{{currentNotification.isSilent ? 'Yes' : 'No'}}</span>
             </div>
             <div class="detail platforms">
-              <label>Platforms:</label><span class="platforms">
-                <img v-for="platformId in currentNotification.platforms" v-bind:src="getDeviceImage(platformId)" class="device-image">
+              <label>Platforms:</label>
+              <span class="platforms">
+                <img v-on:click="showMsgStatsModal = true" v-for="platformId in currentNotification.platforms" v-bind:src="getDeviceImage(platformId)" class="device-image">
               </span>
             </div>
             <div class="detail status">
               <label>Status:</label><span class="status-note" v-bind:class="[currentNotification.status]">{{currentNotification.status}}</span>
-            </div>
-            <div class="detail statistic">
-              <label>Sent to:</label>
-              <span v-if="currentPendingRequestId" class="loading">Statistics will be available momentarily</span>
-              <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
-              <span v-else class="stat">{{currentNotification.statistics.conversion.send}}</span>
-            </div>
-            <div class="detail statistic">
-              <label>Delivered to:</label>
-              <span v-if="currentPendingRequestId" class="loading">Please wait a minute and then click refresh</span>
-              <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
-              <span v-else class="stat">{{currentNotification.statistics.conversion.delivery}}</span>
-            </div>
-            <div class="detail statistic">
-              <label>Open Count:</label>
-              <button v-if="currentPendingRequestId" v-on:click="getMsgStatResults(currentPendingRequestId)" class="button is-primary">Refresh</button>
-              <span v-else-if="isLoadingMsgStats" class="loading">loading...</span>
-              <span v-else class="stat">{{currentNotification.statistics.conversion.open}}</span>
             </div>
 
             <div class="detail message-title">
@@ -63,12 +46,58 @@
       </div>
     </div>
 
+
+    <GenericModal
+      v-on:close="showMsgStatsModal = false"
+      v-bind:show="showMsgStatsModal"
+      v-bind:hideCloseMobile="true"
+      class="msg-stats-modal">
+
+      <button v-if="currentPendingRequestId" v-on:click="getMsgStatResults(currentPendingRequestId)" class="button is-primary">Refresh</button>
+
+      <h2>iOS</h2>
+      <div class="detail statistic">
+        <label>Sent to:</label>
+        <span v-if="isLoadingMsgStats" class="loading">loading...</span>
+        <span v-else class="stat">{{notificationPlatformStats['1']['send']}}</span>
+      </div>
+      <div class="detail statistic">
+        <label>Delivered to:</label>
+        <span v-if="isLoadingMsgStats" class="loading">loading...</span>
+        <span v-else class="stat">{{notificationPlatformStats['1']['delivery']}}</span>
+      </div>
+      <div class="detail statistic">
+        <label>Open Count:</label>
+        <span v-if="isLoadingMsgStats" class="loading">loading...</span>
+        <span v-else class="stat">{{notificationPlatformStats['1']['open']}}</span>
+      </div>
+
+      <h2>Android</h2>
+      <div class="detail statistic">
+        <label>Sent to:</label>
+        <span v-if="isLoadingMsgStats" class="loading">loading...</span>
+        <span v-else class="stat">{{notificationPlatformStats['3']['send']}}</span>
+      </div>
+      <div class="detail statistic">
+        <label>Delivered to:</label>
+        <span v-if="isLoadingMsgStats" class="loading">loading...</span>
+        <span v-else class="stat">{{notificationPlatformStats['3']['delivery']}}</span>
+      </div>
+      <div class="detail statistic">
+        <label>Open Count:</label>
+        <span v-if="isLoadingMsgStats" class="loading">loading...</span>
+        <span v-else class="stat">{{notificationPlatformStats['3']['open']}}</span>
+      </div>
+
+    </GenericModal>
+
   </div>
 </template>
 
 <script>
 
 import LoadingSpinner from '../utilities/LoadingSpinner.vue'
+import GenericModal from '../utilities/GenericModal.vue'
 import moment from 'moment'
 import Vue from 'vue'
 import { mapGetters } from 'vuex'
@@ -76,7 +105,8 @@ import { functionsBaseUrl } from '../../firebaseInit.js'
 
 export default {
   components: {
-    LoadingSpinner
+    LoadingSpinner,
+    GenericModal
   },
   data() {
     return {
@@ -85,6 +115,12 @@ export default {
       pushNotifications:          [],
       currentNotificationId:      null,
       currentNotification:        {},
+      notificationPlatformStats:  {
+        1: { 'send': 0, 'delivery': 0, 'open': 0 },
+        2: { 'send': 0, 'delivery': 0, 'open': 0 },
+        3: { 'send': 0, 'delivery': 0, 'open': 0 }
+      },
+      showMsgStatsModal:          false,
       currentRetryCount:          0,
       maxRetryCount:              10,
       currentPendingRequestId:    null,
@@ -166,7 +202,7 @@ export default {
       })
     },
     getPushNotificationStats (notification) {
-      let baseUrl = functionsBaseUrl + '/getMsgStats'
+      let baseUrl = functionsBaseUrl + '/getMsgPlatformsStats'
       baseUrl += '?messageCode=' + notification.code
       this.isLoadingMsgStats = true
       this.currentRetryCount = 0      // Reset retry count on new open
@@ -176,7 +212,6 @@ export default {
         let requestId   = res.response.request_id
         this.getMsgStatResults(requestId)
       })
-
     },
     getMsgStatResults (requestId) {
       let baseUrl = functionsBaseUrl + '/getResults'
@@ -199,12 +234,29 @@ export default {
           this.currentPendingRequestId  = null
 
           let res = JSON.parse(response.data.body)
-          Vue.set(this.currentNotification, 'statistics', res.response)
 
-          // Must go after #set above
+          this.setPlatformStats(res)
+
           this.isLoadingMsgStats = false
         }
       })
+    },
+    setPlatformStats (res) {
+      // Just iOS and Android for now
+      let startObject = {
+        1: { 'send': 0, 'delivery': 0, 'open': 0 },
+        3: { 'send': 0, 'delivery': 0, 'open': 0 }
+      }
+
+      res.response.rows.forEach((row) => {
+        var count = parseInt(row['count'])
+        // Don't care about rows that don't have values > 0, or rows that are not actions we want
+        if (count > 0 && (row['action'] == 'send' || row['action'] == 'delivery' || row['action'] == 'open')) {
+          startObject[row['platformid']][row['action']] += parseInt(row['count'])
+        }
+      })
+
+      Vue.set(this, 'notificationPlatformStats', startObject)
     },
     showNotification (id) {
       return this.currentNotificationId == id
@@ -306,12 +358,8 @@ export default {
               }
             }
 
-            &.statistic {
-
-              .loading {
-                display:              inline-block;
-                font-style:           italic;
-              }
+            &.platforms {
+              cursor:                 pointer;
             }
 
             &.message-title {
@@ -320,6 +368,21 @@ export default {
           }
         }
       }
+    }
+  }
+
+  .msg-stats-modal {
+
+    h2 {
+      background-color:               #dfe0e2;
+      padding:                        0.25em;
+      margin-top:                     1em;
+      margin-bottom:                  0.25em;
+      font-weight:                    bold;
+    }
+
+    .statistic {
+      padding:                        0 0.5em;
     }
   }
 }
