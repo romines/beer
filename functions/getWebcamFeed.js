@@ -27,6 +27,15 @@ module.exports = functions.https.onRequest((req, res) => {
 
     if (!webcams) webcams = {}
 
+    // Do not include streamingUrl if it doesn't exist
+    for (var key in webcams) {
+      if (webcams.hasOwnProperty(key)) {
+        if (!webcams[key]['streamingUrl'] || webcams[key]['streamingUrl'].length === 0) {
+          delete webcams[key]['streamingUrl']
+        }
+      }
+    }
+
     res.status(200).send(webcams)
 
   }).catch((error) => {
