@@ -16,12 +16,20 @@ const baseUrls = {
   testing: 'rta-testing',
 };
 
-// module.exports = admin;
-module.exports = function(environment) {
-  admin.initializeApp({
+module.exports.environments = { ...baseUrls };
+module.exports.getConfig = environment => ({
+  credential: admin.credential.cert(keys[environment]),
+  databaseURL: `https://${baseUrls[environment]}.firebaseio.com`,
+  storageBucket: `${baseUrls[environment]}.appspot.com`,
+});
+
+module.exports.initialize = function(environment) {
+  const config = {
     credential: admin.credential.cert(keys[environment]),
     databaseURL: `https://${baseUrls[environment]}.firebaseio.com`,
     storageBucket: `${baseUrls[environment]}.appspot.com`,
-  });
+  };
+
+  admin.initializeApp(config);
   return admin;
 };

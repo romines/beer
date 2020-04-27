@@ -162,12 +162,13 @@ export default {
 
       const different = !equal(working, state.publishedContacts)
 
-      // if (different) {
-      //   console.log('PUBLISHED: ')
-      //   console.log(JSON.stringify(state.publishedContacts))
-      //   console.log('WORKING: ')
-      //   console.log(JSON.stringify(working))
-      // }
+      if (different) {
+        flatten(state.publishedContacts)
+        console.log('PUBLISHED: ')
+        console.log(JSON.stringify(state.publishedContacts))
+        console.log('WORKING: ')
+        console.log(JSON.stringify(working))
+      }
 
       return different
     },
@@ -177,4 +178,29 @@ export default {
 function rmDescriptionEditor(contact) {
   if (contact.descriptionEditor !== undefined) delete contact.descriptionEditor
   return contact
+}
+
+function flatten(obj) {
+
+  const results = {};
+  let pathSegments = [];
+
+  function doFlatten(obj) {
+    Object.keys(obj).forEach((key) => {
+      pathSegments.push(key);
+      if (typeof obj[key] === 'object') {
+        doFlatten(obj[key])
+      } else {
+        if (!JSON.stringify(obj[key])) {
+          console.log('wtf');
+          console.log(pathSegments.join('.'))
+        }
+        results[pathSegments.join('.')] = obj[key];
+        pathSegments.pop();
+      }
+    });
+  }
+  doFlatten(obj);
+  return results;
+
 }

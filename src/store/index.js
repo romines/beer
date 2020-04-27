@@ -7,6 +7,7 @@ import 'babel-polyfill'
 
 import archives from './archives'
 import maps from './maps'
+import tags from './tags'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 
 // import mayExport from '../../utils/firestore-export.json'
@@ -28,6 +29,11 @@ const defaultModalContents = {
 Vue.use(Vuex)
 
 const store = {
+  modules: {
+    archives,
+    maps,
+    tags,
+  },
   state: {
     user: {},
     resorts: [],
@@ -155,7 +161,9 @@ const store = {
               mapFiles: resortData.mapFiles, // TODO: remove
               maps: resortData.maps,
               name: resortData.name,
+
             })
+            commit('SET_TAGS', resortData.availableTags, { root: true })
             if (resortData.maps) commit('SET_MAPS', resortData.maps.map(forceIntId), { root: true })
             resolve()
           },
@@ -501,10 +509,6 @@ const store = {
       })
       setTimeout(closeModal, 5500)
     },
-  },
-  modules: {
-    archives,
-    maps,
   },
 }
 
