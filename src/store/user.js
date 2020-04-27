@@ -45,6 +45,10 @@ const actions = {
       )
   },
 
+  clearCurrentUser({commit}) {
+    commit('SET_USER', {})
+  },
+
   async createUser({ commit, dispatch }, { email, password, resortId }) {
     const [createError, firebaseUser] = await promiseTo(
       auth.createUserWithEmailAndPassword(email, password)

@@ -2,8 +2,8 @@
   <div class="resorts">
     <div class="links">
       <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
-      <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/maps">Maps</router-link>
-      <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/tags">Tags</router-link>
+      <router-link v-if="$store.state.resortId && currentUser.superAdmin" to="/maps">Maps</router-link>
+      <router-link v-if="$store.state.resortId && currentUser.superAdmin" to="/tags">Tags</router-link>
     </div>
     <site-header title="Contacts" />
     <save-publish />
@@ -15,6 +15,7 @@
 import SiteHeader from './SiteHeader.vue'
 import SavePublish from './SavePublish.vue'
 import Contacts from './Contacts.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -25,7 +26,9 @@ export default {
   data() {
     return {}
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['currentUser'])
+  },
   created() {},
   methods: {},
 }

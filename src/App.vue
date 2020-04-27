@@ -1,8 +1,7 @@
 <template>
   <div id="app">
     <!-- TODO: nav to separate component -->
-    {{currentUser}}
-    <div v-if="$store.state.user && $store.state.user.uid" class="top-nav-container">
+    <div v-if="currentUser && currentUser.uid" class="top-nav-container">
 
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
@@ -11,6 +10,7 @@
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
         <router-link v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
         <router-link v-bind:to="{ name: 'Settings' }">Settings</router-link>
+        <router-link v-if="currentUser.superAdmin" v-bind:to="{ name: 'UserManager' }">Manage Users</router-link>
       </div>
 
       <div class="right-nav">
@@ -40,7 +40,7 @@ export default {
     LoadingSpinner,
   },
   beforeRouteEnter () {
-    if (this.$store.state.user.superAdmin) return next('/resorts')
+    if (this.currentUser.superAdmin) return next('/resorts')
   },
   computed: {
     ...mapGetters(['currentUser'])
@@ -52,7 +52,7 @@ export default {
       })
     },
     goToLandingPage () {
-      if (this.$store.state.user.superAdmin) {
+      if (this.currentUser.superAdmin) {
         this.$router.replace('/resorts')
       } else {
         this.$router.replace('/').catch(() => {})

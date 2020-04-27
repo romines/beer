@@ -5,6 +5,7 @@ import { promiseTo } from './store/utils.js'
 
 import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
+import UserManager from './components/UserManager'
 import Settings from './components/Settings'
 import {
   Archive,
@@ -27,7 +28,7 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       Promise.all([
         store.dispatch('listenToResortRoot'),
@@ -46,7 +47,7 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       Promise.all([
         store.dispatch('listenToArchiveList'),
@@ -111,12 +112,26 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       store.dispatch('getResortWebcams').then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
       })
+    }
+  },
+  {
+    path: '/user-manager',
+    name: 'UserManager',
+    component: UserManager,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+
+      store.commit('SET_LOADING_STATE', false)
+      next()
     }
   },
   {
@@ -127,7 +142,7 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
       store.dispatch('initializePushWooshData').then(() => {
@@ -143,7 +158,7 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
       store.dispatch('initializePushWooshData').then(() => {
@@ -217,7 +232,7 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  if (!store.state.user.authorizedIds) {
+  if (!store.getters.currentUser.authorizedIds) {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
@@ -235,7 +250,7 @@ router.beforeEach(async (to, from, next) => {
    *
    */
 
-  if (store.state.user.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
+  if (store.getters.currentUser.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
     // this is a superAdmin or route does NOT require superAdmin.
     // send user on their way
     next()

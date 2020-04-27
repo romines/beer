@@ -3,10 +3,10 @@
     <div class="right">
       <div class="back" v-if="showBack" @click="$router.go(-1)" title="Go Back">
         <span class="icon back is-small"> <i class="fas fa-arrow-left" /> </span>
-        <span class="resort-name" v-show="$store.state.user.superAdmin">{{
+        <span class="resort-name" v-show="currentUser.superAdmin">{{
           $store.state.resortMeta.name
         }}</span>
-        <span class="resort-name" v-show="!$store.state.user.superAdmin">Back</span>
+        <span class="resort-name" v-show="!currentUser.superAdmin">Back</span>
       </div>
 
       <h1 class="title page-title is-primary">{{ title }}</h1>
@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   components: {},
   props: {
@@ -29,8 +31,9 @@ export default {
     return {}
   },
   computed: {
+    ...mapGetters(['currentUser']),
     showBack() {
-      if (this.$store.state.user.superAdmin) {
+      if (this.currentUser.superAdmin) {
         return this.$route.path !== '/resorts'
       } else {
         return this.$route.path !== '/'

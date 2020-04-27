@@ -69,9 +69,6 @@ const store = {
       console.log('SET(ing)_RESORTS . . .')
       state.resorts = resorts
     },
-    SET_USER(state, user) {
-      state.user = { ...user }
-    },
     SET_RESORT_META(state, resortMeta) {
       state.resortMeta = resortMeta
     },
@@ -253,11 +250,11 @@ const store = {
 
     resetResortState({ commit, dispatch }) {
       commit('SET_RESORT_ID', '')
-      commit('SET_USER', {})
       commit('SET_CONTACT_GROUPS', {})
       commit('SET_RESORT_META', {})
       commit('SET_PUSHWOOSH_DATA', {})
       dispatch('resetArchiveState')
+      dispatch('clearCurrentUser')
     },
 
     logIn({ commit, dispatch }, { email, password, onSuccess }) {
@@ -267,12 +264,12 @@ const store = {
       })
     },
 
-    logOut({ commit }) {
+    logOut({ commit, dispatch }) {
       return new Promise((resolve, reject) => {
         auth.signOut().then(() => {
           commit('SET_RESORT_ID', '')
-          commit('SET_USER', {})
           commit('SET_CONTACT_GROUPS', {})
+          dispatch('clearCurrentUser')
           resolve()
         })
       })
