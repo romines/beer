@@ -48,9 +48,9 @@
             <div class="detail streaming-url">
               <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
             </div>
-            <div class="detail is-web">
+            <!-- <div class="detail is-web">
               <label>Is Streaming?:</label><span class="created">{{ webcam.isWeb }}</span>
-            </div>
+            </div> -->
             <div class="detail created">
               <label>Created At:</label><span class="created">{{formatDate(webcam.createdAt, 'lll')}}</span>
             </div>
