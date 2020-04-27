@@ -6,7 +6,7 @@
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
       <div class="link-nav">
-        <router-link v-bind:to="{ name: 'Home' }">Contacts</router-link>
+        <router-link v-bind:to="{ name: 'Resort' }">Contacts</router-link>
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
         <router-link v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
         <router-link v-bind:to="{ name: 'Settings' }">Settings</router-link>

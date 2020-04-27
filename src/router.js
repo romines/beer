@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 import { auth } from './firebaseInit.js'
 import { promiseTo } from './store/utils.js'
 
-import Home from './components/Home'
 import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
 import Settings from './components/Settings'
@@ -22,8 +21,8 @@ import {
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'Resort',
+    component: Resort,
     meta: {
       requiresAuth: true,
     },
@@ -102,30 +101,6 @@ const routes = [
         store.commit('SET_LOADING_STATE', false)
         next()
       })
-    },
-  },
-  {
-    path: '/resorts/:resortId',
-    name: 'Resort Home',
-    component: Resort,
-    meta: {
-      requiresAuth: true,
-      requiresSuperAdmin: true,
-    },
-    beforeEnter: (to, from, next) => {
-      store
-        .dispatch('getResorts')
-        .then(() => {
-          store.commit('SET_RESORT_ID', to.params.resortId)
-          return Promise.all([
-            store.dispatch('listenToResortRoot'),
-            store.dispatch('listenToPublishedContacts'),
-          ])
-        })
-        .then(() => {
-          store.commit('SET_LOADING_STATE', false)
-          next()
-        })
     },
   },
   {

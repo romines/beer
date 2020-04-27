@@ -39,7 +39,8 @@ export default {
   methods: {
     goToResort(resortId) {
       this.$store.commit('SET_LOADING_STATE', true)
-      this.$router.push(`resorts/${resortId}`)
+      this.$store.commit('SET_RESORT_ID', resortId)
+      this.$router.push('/')
     },
   },
 }

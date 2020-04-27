@@ -2,7 +2,6 @@
   <div class="resorts">
     <div class="links">
       <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
-      <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" :to="`/resorts/${$store.state.resortId}`">Contacts</router-link>
       <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/maps">Maps</router-link>
       <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/tags">Tags</router-link>
     </div>
@@ -39,7 +38,7 @@ export default {
   .links {
     text-align:             right;
 
-    a:last-of-type {
+    a {
       margin-left:          1.5em;
     }
   }
