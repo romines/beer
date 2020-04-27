@@ -221,7 +221,7 @@ router.beforeEach(async (to, from, next) => {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
-    const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))
+    const [err] = await promiseTo(store.dispatch('setCurrentUser', auth.currentUser))
     if (err) {
       store.commit('SET_LOADING_STATE', false)
       console.log(err.message)

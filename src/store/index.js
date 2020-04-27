@@ -8,6 +8,7 @@ import 'babel-polyfill'
 import archives from './archives'
 import maps from './maps'
 import tags from './tags'
+import user from './user'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 import pwConfig from '../static/pwConfig.js'
 
@@ -34,9 +35,9 @@ const store = {
     archives,
     maps,
     tags,
+    user
   },
   state: {
-    user: {},
     resorts: [],
     resortId: '',
     pushWooshData: {
@@ -114,33 +115,6 @@ const store = {
     }
   },
   actions: {
-    getUserData({ commit }, user) {
-      console.log('getUserData dispatched . . .')
-
-      return firestore
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then(
-          doc => {
-            const userData = doc.data()
-            user.authorizedResortIds = userData.authorizedResortIds
-
-            // if not superAdmin set resortId here to first (only) resortId in authorized list
-            if (!userData.superAdmin) commit('SET_RESORT_ID', userData.authorizedResortIds[0])
-
-            commit('SET_USER', {
-              email: user.email,
-              uid: user.uid,
-              superAdmin: !!userData.superAdmin,
-              authorizedResortIds: userData.authorizedResortIds,
-            })
-
-            return Promise.resolve()
-          },
-          err => console.log(err)
-        )
-    },
 
     getResorts({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
@@ -302,45 +276,6 @@ const store = {
           resolve()
         })
       })
-    },
-
-    async createUser({ commit, dispatch }, { email, password, resortId }) {
-      const [createError, firebaseUser] = await promiseTo(
-        auth.createUserWithEmailAndPassword(email, password)
-      )
-
-      if (createError) {
-        commit('SET_LOADING_STATE', false)
-        return dispatch('showErrorModal', createError.message)
-      }
-
-      const uid = firebaseUser.user.uid
-      const user = {
-        email,
-        authorizedResortIds: [resortId],
-      }
-
-      const [rtdbSaveError] = await promiseTo(
-        firestore
-          .collection('users')
-          .doc(uid)
-          .set(user)
-      )
-
-      if (rtdbSaveError) {
-        commit('SET_LOADING_STATE', false)
-        return dispatch('showErrorModal', createError.message)
-      }
-
-      const userForStore = {
-        ...user,
-        uid,
-        superAdmin: false,
-      }
-
-      commit('SET_USER', userForStore)
-
-      return { successfulUserCreation: true }
     },
 
     async triggerPasswordResetEmail({ commit, dispatch }, { email }) {
