@@ -164,10 +164,10 @@ export default {
 
       if (different) {
         flatten(state.publishedContacts)
-        console.log('PUBLISHED: ')
-        console.log(JSON.stringify(state.publishedContacts))
-        console.log('WORKING: ')
-        console.log(JSON.stringify(working))
+        // console.log('PUBLISHED: ')
+        // console.log(JSON.stringify(state.publishedContacts))
+        // console.log('WORKING: ')
+        // console.log(JSON.stringify(working))
       }
 
       return different
