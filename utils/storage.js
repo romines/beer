@@ -1,6 +1,6 @@
 /* eslint-env node */
 const ONE_WEEK = '604800';
-const admin = require('./firebaseAdmin.js');
+const admin = require('./firebaseAdmin.js').initialize;
 const storage = admin.storage();
 
 function processFiles() {

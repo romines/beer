@@ -2,7 +2,9 @@
   <div class="resorts">
     <div class="links">
       <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
-      <router-link v-if="$store.state.resortId" v-show="$store.state.user.superAdmin" to="/maps">Maps</router-link>
+      <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" :to="`/resorts/${$store.state.resortId}`">Contacts</router-link>
+      <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/maps">Maps</router-link>
+      <router-link v-if="$store.state.resortId && $store.state.user.superAdmin" to="/tags">Tags</router-link>
     </div>
     <site-header title="Contacts" />
     <save-publish />
@@ -24,21 +26,9 @@ export default {
   data() {
     return {}
   },
-  computed: {
-    name() {
-      if (!this.$store.state.resortId) return
-      return this.$store.state.resorts.filter(
-        resort => resort.resortId === this.$store.state.resortId
-      )[0].name
-    },
-  },
+  computed: {},
   created() {},
-  methods: {
-    goBack() {
-      this.$store.commit('SET_LOADING_STATE', true)
-      this.$router.push('/resorts')
-    },
-  },
+  methods: {},
 }
 </script>
 
