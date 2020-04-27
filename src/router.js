@@ -128,7 +128,8 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      store.commit('SET_RESORT_ID', 'jackson_hole')
+      // if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
       next()

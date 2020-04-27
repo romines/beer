@@ -2,16 +2,15 @@
   <div class="user-list">
     <h2 class="subtitle">Current Users</h2>
 
-    <div v-if="users.length > 0" class="user-list">
+    <div v-if="resortUsers.length > 0" class="user-list">
 
-      <div v-for="user in users" class="user-container">
+      <div v-for="user in resortUsers" class="user-container">
         <section class="header" @click="showUserDetails(user)">
-          <span class="grippy" />
-          <span class="id">{{user.id}}</span>
+          <span class="id">{{user.email}}</span>
           <span class="user-name">{{ user.name }}</span>
           <span class="created-at">{{formatDate(user.createdAt, 'll')}}</span>
         </section>
-        <section v-if="showUser(user.identifier)" class="body">
+        <section v-if="showUser(user.uid)" class="body">
 
           <div v-if="isEditingUser" class="edit-user">
             <UserForm
@@ -32,24 +31,35 @@
             <div class="detail name">
               <label>Name:</label><span class="created">{{ user.name }}</span>
             </div>
-            <div class="detail short-name">
-              <label>Short Name:</label><span class="created">{{ user.shortName }}</span>
-            </div>
-            <div class="detail static-url">
-              <label>Still URL:</label><span class="created">{{ user.staticImageUrl }}</span>
-            </div>
-            <div class="detail streaming-url">
-              <label>Streaming Url:</label><span class="created">{{ user.streamingUrl }}</span>
-            </div>
-            <!-- <div class="detail is-web">
-              <label>Is Streaming?:</label><span class="created">{{ user.isWeb }}</span>
-            </div> -->
             <div class="detail created">
               <label>Created At:</label><span class="created">{{formatDate(user.createdAt, 'lll')}}</span>
             </div>
             <div class="detail updated">
               <label>Last Updated:</label><span class="created">{{formatDate(user.updatedAt, 'lll')}}</span>
             </div>
+            <section class="permissions">
+              <div class="detail permission">
+                <label>Is Resort Admin:</label><span class="created">{{ user.isResortAdmin }}</span>
+              </div>
+              <div class="detail permission">
+                <label>View Push:</label><span class="created">{{ user.canViewPushNotifications }}</span>
+              </div>
+              <div class="detail permission">
+                <label>Manage Push:</label><span class="created">{{ user.canManagePushNotifications }}</span>
+              </div>
+              <div class="detail permission">
+                <label>View Contacts:</label><span class="created">{{ user.canViewContacts }}</span>
+              </div>
+              <div class="detail permission">
+                <label>Manage Contacts:</label><span class="created">{{ user.canManageContacts }}</span>
+              </div>
+              <div class="detail permission">
+                <label>View Webcams:</label><span class="created">{{ user.canViewWebcams }}</span>
+              </div>
+              <div class="detail permission">
+                <label>Manage Webcams:</label><span class="created">{{ user.canManageWebcams }}</span>
+              </div>
+            </section>
           </div>
         </section>
 
@@ -79,12 +89,11 @@ export default {
   data () {
     return {
       currentUserId:      null,
-      isEditingUser:      false,
-      users:              []
+      isEditingUser:      false
     }
   },
   computed: {
-    // ...mapGetters(['users'])
+    ...mapGetters(['resortUsers'])
   },
   created () {
 
@@ -92,27 +101,27 @@ export default {
   methods: {
     showUserDetails (user) {
       // Check if opening or closing...
-      if (this.currentUserId == user.identifier) {
+      if (this.currentUserId == user.uid) {
         this.currentUserId = null
       } else {
-        this.currentUserId = user.identifier
+        this.currentUserId = user.uid
       }
     },
-    showUser (identifier) {
-      return this.currentUserId == identifier
+    showUser (uid) {
+      return this.currentUserId == uid
     },
     formatDate (date, format) {
       return moment.utc(date).local().format(format)
     },
     onUserSave (user) {
       user.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
-      arrayHelper.replaceObjectByValue(this.users, user, user.identifier, 'identifier')
+      arrayHelper.replaceObjectByValue(this.users, user, user.uid, 'uid')
       this.$store.dispatch('saveResortUsers', this.users).then(() => {
         this.isEditingUser = false
       })
     },
     onUserDelete (user) {
-      arrayHelper.removeObjectByValue(this.users, user.identifier, 'identifier')
+      arrayHelper.removeObjectByValue(this.users, user.uid, 'uid')
       this.$store.dispatch('saveResortUsers', this.users).then(() => {
         this.$store.dispatch('showSuccessModal', 'User removed!')
         this.currentUserId = null
@@ -184,6 +193,10 @@ export default {
           > span {
             width:                80%;
           }
+        }
+
+        .permissions {
+          margin-top:             2em;
         }
       }
     }

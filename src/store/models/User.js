@@ -1,7 +1,7 @@
 export default class User {
 
-  static build (rtUser, googleUser) {
-    return new User(rtUser, googleUser)
+  static build (user, uid) {
+    return new User(user, uid)
   }
 
   // fullName () {
@@ -9,10 +9,11 @@ export default class User {
   // }
 
 
-  constructor (rtUser, googleUser) {
-    this.email                = googleUser.email,
-    this.uid                  = googleUser.uid,
-    this.superAdmin           = !!rtUser.superAdmin,
-    this.authorizedResortIds  = rtUser.authorizedResortIds
+  constructor (user, uid) {
+    this.uid                  = uid,
+    this.email                = user.email,
+    this.superAdmin           = !!user.superAdmin,
+    this.authorizedResortIds  = user.authorizedResortIds
+    this.primaryResortId      = user.primaryResortId
   }
 }

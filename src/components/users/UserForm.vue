@@ -2,28 +2,64 @@
   <div class="user-form">
     <h2 class="subtitle">{{title}}</h2>
 
-    <h2>Name:</h2>
-    <input v-model="newWebcam.name" class="input name" type="text" name="name">
+    <h2>First Name:</h2>
+    <input v-model="newUser.firstName" class="input name" type="text" name="name">
 
-    <h2>Short Name:</h2>
-    <input v-model="newWebcam.shortName" class="input short-name" type="text" name="short-name">
+    <h2>Last Name:</h2>
+    <input v-model="newUser.lastName" class="input name" type="text" name="name">
 
-    <h2>Still Image Url:</h2>
-    <input v-model="newWebcam.staticImageUrl" class="input static-image-url" type="text" name="static-image-url">
-
-    <h2>Video Url:</h2>
-    <input v-model="newWebcam.streamingUrl" class="input streaming-url" type="text" name="streaming-url">
-
-    <!-- <div class="toggle-container">
-      <span>Is Streaming:</span>
-      <label for="no-sort" class="switch">
-        <input v-model="newWebcam.isWeb" id="no-sort" type="checkbox">
+    <div class="toggle-container">
+      <span>Resort Admin:</span>
+      <label for="resort-admin" class="switch">
+        <input v-model="newUser.isResortAdmin" id="resort-admin" type="checkbox">
         <span class="slider round"></span>
       </label>
-    </div> -->
+    </div>
+    <div class="toggle-container">
+      <span>View Push:</span>
+      <label for="view-push" class="switch">
+        <input v-model="newUser.canViewPushNotifications" id="view-push" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="toggle-container">
+      <span>Manage Push:</span>
+      <label for="manage-push" class="switch">
+        <input v-model="newUser.canManagePushNotifications" id="manage-push" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="toggle-container">
+      <span>View Contacts:</span>
+      <label for="view-contacts" class="switch">
+        <input v-model="newUser.canViewContacts" id="view-contacts" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="toggle-container">
+      <span>Manage Contacts:</span>
+      <label for="manage-contacts" class="switch">
+        <input v-model="newUser.canManageContacts" id="manage-contacts" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="toggle-container">
+      <span>View Webcams:</span>
+      <label for="view-webcams" class="switch">
+        <input v-model="newUser.canViewWebcams" id="view-webcams" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="toggle-container">
+      <span>Manage Webcams:</span>
+      <label for="manage-webcams" class="switch">
+        <input v-model="newUser.canManageWebcams" id="manage-webcams" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
 
     <div class="cancel-save">
-      <span class="button is-primary new-push-button" :disabled="!webcamIsValid" @click="save()">Save</span>
+      <span class="button is-primary new-push-button" @click="save()">Save</span>
       <span class="button is-light new-push-button" @click="cancel()">Cancel</span>
     </div>
 
@@ -53,7 +89,7 @@ export default {
       type:     String,
       default:  "Create User"
     },
-    existingWebcam: {
+    existingUser: {
       type:     Object,
       default:  () => {}
     },
@@ -64,58 +100,55 @@ export default {
   },
   data () {
     return {
-      newWebcam:        this.initializeWebcamObject()
+      newUser:        this.initializeUserObject()
     }
   },
   computed: {
-    ...mapGetters(['webcams']),
-    urlsAreValid () {
-      return validationHelper.url(this.newWebcam.staticImageUrl) || validationHelper.url(this.newWebcam.streamingUrl)
-    },
-    webcamIsValid () {
-      return this.newWebcam.name.length > 0 && (this.newWebcam.staticImageUrl.length > 0 || this.newWebcam.streamingUrl.length > 0) && this.urlsAreValid
-    }
+
   },
   created () {
 
   },
   methods: {
-    initializeWebcamObject () {
-      if (this.existingWebcam) {
-        return JSON.parse(JSON.stringify(this.existingWebcam))
+    initializeUserObject () {
+      if (this.existingUser) {
+        return JSON.parse(JSON.stringify(this.existingUser))
       } else {
-        return this.setNewWebcamDefaults()
+        return this.setNewUserDefaults()
       }
     },
-    setNewWebcamDefaults () {
+    setNewUserDefaults () {
       return {
-        name:             '',
-        shortName:        '',
-        staticImageUrl:   '',
-        streamingUrl:     ''
+        firstName:                    '',
+        lastName:                     '',
+        canViewWebcams:               false,
+        canManageWebcams:             false,
+        canViewPushNotifications:     false,
+        canManagePushNotifications:   false,
+        canViewContacts:              false,
+        canManageContacts:            false
       }
     },
     save () {
       // Only set defaults on new user
-      if (!this.existingWebcam) this.setWebcamDefaults()
-      this.$emit('save', this.newWebcam)
+      if (!this.existingUser) this.setWebcamDefaults()
+      this.$emit('save', this.newUser)
     },
     cancel () {
-      this.newWebcam = this.setNewWebcamDefaults()
+      this.newUser = this.setNewUserDefaults()
       this.$emit('cancel')
     },
     setWebcamDefaults () {
       let createdAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
 
-      this.newWebcam.createdAt  = createdAt
-      this.newWebcam.updatedAt  = createdAt
-      this.newWebcam.sortOrder  = this.webcams.length     // Make it the last in the list
-      this.newWebcam.identifier = uuidv4()                // Unique Identifier
+      this.newUser.createdAt  = createdAt
+      this.newUser.updatedAt  = createdAt
+      this.newUser.identifier = uuidv4()                // Unique Identifier
     },
     showDeleteModal () {
 
       const onConfirm = () => {
-        this.$emit('deleteWebcam', this.existingWebcam)
+        this.$emit('deleteWebcam', this.existingUser)
       }
 
       this.$store.commit('SHOW_MODAL', {
@@ -146,7 +179,7 @@ export default {
     align-items:                center;
 
     > span {
-      margin-right:             1em;
+      min-width:                10em;
     }
   }
 

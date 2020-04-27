@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <!-- TODO: nav to separate component -->
+    {{currentUser}}
     <div v-if="currentUser && currentUser.uid" class="top-nav-container">
 
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
@@ -33,6 +34,7 @@
 <script>
 import { LoadingSpinner, Modal } from './components'
 import { mapGetters } from 'vuex'
+
 export default {
   name: 'App',
   components: {
@@ -40,7 +42,7 @@ export default {
     LoadingSpinner,
   },
   beforeRouteEnter () {
-    if (this.currentUser.superAdmin) return next('/resorts')
+    // if (this.currentUser.superAdmin) return next('/resorts')
   },
   computed: {
     ...mapGetters(['currentUser'])

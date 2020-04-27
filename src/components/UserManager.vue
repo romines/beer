@@ -24,6 +24,7 @@ import { mapGetters } from 'vuex'
 import SiteHeader from './SiteHeader.vue'
 import UserList from './users/UserList.vue'
 import UserForm from './users/UserForm.vue'
+import store from '../store'
 
 export default {
   components: {
@@ -36,11 +37,11 @@ export default {
       showCreateUser:     false
     }
   },
-  computed: {
-
-  },
-  created () {
-
+  computed: {},
+  beforeRouteEnter (to, from, next) {
+    store.dispatch('setResortUsers').then(() => {
+      next()
+    })
   },
   methods: {
     onUserSave (newUser) {
