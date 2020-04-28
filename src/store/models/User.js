@@ -13,7 +13,6 @@ export default class User {
     this.uid                  = uid,
     this.email                = user.email,
     this.superAdmin           = !!user.superAdmin,
-    this.authorizedResortIds  = user.authorizedResortIds
     this.primaryResortId      = user.primaryResortId
   }
 }

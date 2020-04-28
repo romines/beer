@@ -46,10 +46,13 @@ export default {
   methods: {
     onUserSave (newUser) {
       this.showCreateUser = false
-      console.log(newUser)
-      // this.$store.dispatch('createWebcamForResort', newUser).then((user) => {
-      //   this.$store.dispatch('showSuccessModal', 'User created!')
-      // })
+      this.$store.dispatch('createUserForResort', newUser).then((user) => {
+        this.$store.dispatch('setResortUsers')
+        this.$store.dispatch('showSuccessModal', 'User created!')
+      }).catch((error) => {
+        debugger
+        dispatch('showErrorModal', error.message)
+      })
     }
   }
 }

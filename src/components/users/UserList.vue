@@ -1,6 +1,6 @@
 <template>
   <div class="user-list">
-    <h2 class="subtitle">Current Users</h2>
+    <h2 class="subtitle">Current Resort Users</h2>
 
     <div v-if="resortUsers.length > 0" class="user-list">
 

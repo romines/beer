@@ -573,6 +573,9 @@ const store = {
     },
     webcams (state) {
       return state.webcams
+    },
+    currentResortId (state) {
+      return state.resortId
     }
   },
 }

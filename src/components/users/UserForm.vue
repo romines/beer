@@ -8,7 +8,14 @@
     <h2>Last Name:</h2>
     <input v-model="newUser.lastName" class="input name" type="text" name="name">
 
-    <div class="toggle-container">
+    <h2>Email Address:</h2>
+    <input v-model="newUser.email" class="input name" type="text" name="name">
+
+    <h2>Password:</h2>
+    <input v-model="newUser.password" class="input name" type="text" name="name">
+
+
+    <div v-if="currentUser.superAdmin" class="toggle-container">
       <span>Resort Admin:</span>
       <label for="resort-admin" class="switch">
         <input v-model="newUser.isResortAdmin" id="resort-admin" type="checkbox">
@@ -104,7 +111,7 @@ export default {
     }
   },
   computed: {
-
+    ...mapGetters(['currentUser'])
   },
   created () {
 
@@ -121,6 +128,10 @@ export default {
       return {
         firstName:                    '',
         lastName:                     '',
+        email:                        '',
+        password:                     Math.random().toString(36).slice(-10),
+        superAdmin:                   false,
+        isResortAdmin:                false,
         canViewWebcams:               false,
         canManageWebcams:             false,
         canViewPushNotifications:     false,
@@ -128,6 +139,14 @@ export default {
         canViewContacts:              false,
         canManageContacts:            false
       }
+    },
+    setAllPermissions (value) {
+      this.$set(this.newUser, 'canViewWebcams', value)
+      this.$set(this.newUser, 'canManageWebcams', value)
+      this.$set(this.newUser, 'canViewPushNotifications', value)
+      this.$set(this.newUser, 'canManagePushNotifications', value)
+      this.$set(this.newUser, 'canViewContacts', value)
+      this.$set(this.newUser, 'canManageContacts', value)
     },
     save () {
       // Only set defaults on new user
@@ -156,6 +175,14 @@ export default {
         showLoading:  false,
         onConfirm,
       })
+    }
+  },
+  watch: {
+    'newUser.isResortAdmin': {
+      handler(val) {
+        this.setAllPermissions(val)
+      },
+      deep: true
     }
   }
 }
