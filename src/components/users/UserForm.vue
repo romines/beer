@@ -15,7 +15,7 @@
       <h2>Password:</h2>
       <input v-model="newUser.password" class="input name" type="text" name="name">
     </div>
-    
+
 
     <div v-if="currentUser.superAdmin" class="toggle-container">
       <span>Resort Admin:</span>
@@ -67,12 +67,17 @@
       </label>
     </div>
 
+    <div v-if="!existingUser">
+      <input v-model="sendPasswordResetEmail" type="checkbox" class="reset-email">
+      <span>Send password reset email</span>
+    </div>
+
     <div class="cancel-save">
       <span class="button is-primary new-push-button" @click="save()">Save</span>
       <span class="button is-light new-push-button" @click="cancel()">Cancel</span>
     </div>
 
-    <div v-if="showDeleteWebcam" @click="showDeleteModal()" class="delete-button button is-danger is-outlined">
+    <div v-if="showDeleteUser" @click="showDeleteModal()" class="delete-button button is-danger is-outlined">
       <span class="">Delete</span>
       <span class="icon is-small">
         <i class="fas fa-trash-alt"/>
@@ -102,14 +107,15 @@ export default {
       type:     Object,
       default:  () => {}
     },
-    showDeleteWebcam: {
+    showDeleteUser: {
       type:     Boolean,
       default:  false
     }
   },
   data () {
     return {
-      newUser:        this.initializeUserObject()
+      newUser:                  this.initializeUserObject(),
+      sendPasswordResetEmail:   true
     }
   },
   computed: {
@@ -153,7 +159,7 @@ export default {
     save () {
       // Only set defaults on new user
       if (!this.existingUser) this.setWebcamDefaults()
-      this.$emit('save', this.newUser)
+      this.$emit('save', this.newUser, this.sendPasswordResetEmail)
     },
     cancel () {
       this.newUser = this.setNewUserDefaults()
@@ -169,7 +175,8 @@ export default {
     showDeleteModal () {
 
       const onConfirm = () => {
-        this.$emit('deleteWebcam', this.existingUser)
+        console.log(this.existingUser)
+        this.$emit('deleteUser', this.existingUser)
       }
 
       this.$store.commit('SHOW_MODAL', {
@@ -200,7 +207,12 @@ export default {
 
   input {
     width:                      80%;
-    margin-bottom:              1em
+    margin-bottom:              1em;
+
+    &.reset-email {
+      width:                    2em;
+      margin-top:               2em;
+    }
   }
 
   .toggle-container {

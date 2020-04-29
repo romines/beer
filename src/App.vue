@@ -11,7 +11,7 @@
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
         <router-link v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
         <router-link v-bind:to="{ name: 'Settings' }">Settings</router-link>
-        <router-link v-if="currentUser.superAdmin" v-bind:to="{ name: 'UserManager' }">Manage Users</router-link>
+        <router-link v-if="currentUser.superAdmin || currentUser.isResortAdmin" v-bind:to="{ name: 'UserManager' }">Manage Users</router-link>
       </div>
 
       <div class="right-nav">

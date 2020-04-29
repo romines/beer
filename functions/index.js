@@ -19,3 +19,4 @@ exports.getMsgPlatformsStats = require('./getMsgPlatformsStats');
 exports.getWebcamFeed = require('./getWebcamFeed');
 exports.getSetSubscribers = require('./tasks/getSetSubscribers');
 exports.setApplicationSubscribers = require('./tasks/setApplicationSubscribers');
+exports.deleteFirebaseUser = require('./deleteFirebaseUser');

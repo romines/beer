@@ -4,7 +4,7 @@
 
     <div v-if="resortUsers.length > 0" class="user-list">
 
-      <div v-for="user in resortUsers" class="user-container">
+      <div v-for="user in sortedResortUsers" class="user-container">
         <section class="header" @click="showUserDetails(user)">
           <span class="name">{{user.fullName()}}</span>
           <span class="email">{{ user.email }}</span>
@@ -95,13 +95,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['resortUsers', 'currentUser'])
+    ...mapGetters(['resortUsers', 'currentUser']),
+    sortedResortUsers () {
+      return this.resortUsers.sort(this.compareDates)
+    }
   },
   created () {
 
   },
   methods: {
     showUserDetails (user) {
+      this.isEditingUser = false // close any open edit panel
       // Check if opening or closing...
       if (this.currentUserId == user.uid) {
         this.currentUserId = null
@@ -117,18 +121,31 @@ export default {
     },
     onUserSave (user) {
       user.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
-      this.$store.dispatch('saveResortUser', user).then((error) => {
+      this.$store.dispatch('saveResortUser', user).then(() => {
         this.currentUserId = null
         this.isEditingUser = false
       })
     },
     onUserDelete (user) {
-      arrayHelper.removeObjectByValue(this.users, user.uid, 'uid')
-      this.$store.dispatch('saveResortUsers', this.users).then(() => {
+      this.$store.commit('SET_LOADING_STATE', true)
+
+      this.$store.dispatch('deleteResortUser', user).then((error) => {
         this.$store.dispatch('showSuccessModal', 'User removed!')
+        this.$store.commit('SET_LOADING_STATE', false)
         this.currentUserId = null
         this.isEditingUser = false
+      }).catch((error) => {
+
       })
+    },
+    compareDates (a, b) {
+      if (a.createdAt < b.createdAt) {
+        return 1
+      }
+      if (a.createdAt > b.createdAt) {
+        return -1
+      }
+      return 0
     }
   }
 }

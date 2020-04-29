@@ -10,9 +10,9 @@ export default class User {
 
 
   constructor (user, uid) {
+    this.uid                          = uid,
     this.firstName                    = user.firstName || '',
     this.lastName                     = user.lastName || '',
-    this.uid                          = uid,
     this.email                        = user.email || '',
     this.superAdmin                   = !!user.superAdmin,
     this.primaryResortId              = user.primaryResortId,
@@ -22,8 +22,9 @@ export default class User {
     this.canViewContacts              = user.canViewContacts || false,
     this.canViewPushNotifications     = user.canViewPushNotifications || false,
     this.canViewWebcams               = user.canViewWebcams || false,
-    this.createdAt                    = user.createdAt,
-    this.identifier                   = user.identifier,
-    this.isResortAdmin                = user.isResortAdmin
+    this.updatedAt                    = user.updatedAt || '',
+    this.createdAt                    = user.createdAt || '',
+    this.identifier                   = user.identifier || '',
+    this.isResortAdmin                = user.isResortAdmin || false
   }
 }

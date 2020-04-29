@@ -44,15 +44,17 @@ export default {
     })
   },
   methods: {
-    onUserSave (newUser) {
+    onUserSave (newUser, sendPasswordResetEmail) {
       this.showCreateUser = false
-      this.$store.dispatch('createUserForResort', newUser).then((user) => {
+      this.$store.commit('SET_LOADING_STATE', true)
+      this.$store.dispatch('createUserForResort', { user: newUser, sendPasswordResetEmail: sendPasswordResetEmail }).then((user) => {
         if (user) {
           this.$store.dispatch('setResortUsers')
           this.$store.dispatch('showSuccessModal', 'User created!')
         }
+        this.$store.commit('SET_LOADING_STATE', false)
       }).catch((error) => {
-        dispatch('showErrorModal', error.message)
+        this.$store.dispatch('showErrorModal', error.message)
       })
     }
   }

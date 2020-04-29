@@ -3,12 +3,15 @@ import { auth, firestore, database } from '../firebaseInit.js'
 import { secondaryAuth } from '../firebaseInitBackup.js'
 import { promiseTo } from './utils.js'
 import arrayHelper from '../helpers/arrayHelper.js'
-
+import VueAxios from 'vue-axios'
+import axios from '../api/vue-axios/axios.js'
+import { functionsBaseUrl } from '../firebaseInit.js'
 
 const USERS_REF = firestore.collection('users')
 
 const state = {
-  user: {}
+  user: {},
+  resortUsers: []
 }
 
 const mutations = {
@@ -20,6 +23,12 @@ const mutations = {
   },
   REPLACE_RESORT_USER (state, user) {
     arrayHelper.replaceObjectByValue(state.resortUsers, user, user.uid, 'uid')
+  },
+  DELETE_RESORT_USER (state, user) {
+    arrayHelper.removeObjectByValue(state.resortUsers, user.uid, 'uid')
+  },
+  ADD_RESORT_USER (state, user) {
+    state.resortUsers.push(user)
   }
 }
 
@@ -102,12 +111,12 @@ const actions = {
   },
 
 
-  async createUserForResort({ commit, dispatch, rootState }, newUser) {
+  async createUserForResort({ commit, dispatch, rootState }, payload) {
     // This is annoying, but we have to create a new auth instance, because google's default behavior is to set the currentUser to the new user.
     // We don't want that.
     // See this SO: https://stackoverflow.com/questions/37517208/firebase-kicks-out-current-user/38013551#38013551
     const [createError, firebaseUser] = await promiseTo(
-      secondaryAuth.createUserWithEmailAndPassword(newUser.email, newUser.password)
+      secondaryAuth.createUserWithEmailAndPassword(payload.user.email, payload.user.password)
     )
 
     if (createError) {
@@ -115,25 +124,27 @@ const actions = {
       return dispatch('showErrorModal', createError.message)
     }
 
+    if (payload.sendPasswordResetEmail) {
+      secondaryAuth.sendPasswordResetEmail(payload.user.email).then(() => {
+      }).catch((error) => {
+        console.log('EMAIL NOT SENT')
+        console.log(error)
+      })
+    }
+
     const uid = firebaseUser.user.uid
 
-    delete newUser['password']
-    newUser['primaryResortId'] = rootState.resortId
+    delete payload.user['password']
+    payload.user['primaryResortId'] = rootState.resortId
 
-    const [rtdbSaveError] = await promiseTo(
-      USERS_REF
-        .doc(uid)
-        .set(newUser)
-    )
-
-
-    if (rtdbSaveError) {
+    return USERS_REF.doc(uid).set(payload.user).then(() => {
+      commit('ADD_RESORT_USER', User.build(payload.user, uid))
+      return payload.user
+    }).catch((error) => {
       commit('SET_LOADING_STATE', false)
       throw new Error(createError.message)
       return false
-    } else {
-      return newUser
-    }
+    })
   },
 
 
@@ -157,6 +168,24 @@ const actions = {
       let newUser = User.build(user, user.uid)
       if (error) dispatch('showErrorModal', 'User update failed. Please try again')
       else commit('REPLACE_RESORT_USER', newUser)
+    })
+  },
+
+  async deleteResortUser({ commit, rootState }, user) {
+    let baseUrl = functionsBaseUrl + '/deleteFirebaseUser/' + user.uid
+
+    // Delete both the auth user and the RT custom user
+    // return Promise.all([
+    //   USERS_REF.doc(user.uid).delete(),
+    //   axios.delete(baseUrl)
+    // ])
+
+    // For some reason the functions call returns error, even though user is deleted. Going with this for now... 4/29/2020
+    axios.delete(baseUrl).then(() => {}).catch((error) => {
+      console.log(error.response.data)
+    })
+    return USERS_REF.doc(user.uid).delete().then(() => {
+      commit('DELETE_RESORT_USER', user)
     })
   }
 
