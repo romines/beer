@@ -26,7 +26,7 @@
           </div>
 
           <div v-else class="user-details">
-            <!-- Only superAdmins can edit resortAdmins --> 
+            <!-- Only superAdmins can edit resortAdmins -->
             <span v-if="currentUser.superAdmin || !user.isResortAdmin" v-on:click="isEditingUser = true">
               <i class="fas fa-edit" />
             </span>

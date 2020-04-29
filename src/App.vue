@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- TODO: nav to separate component -->
-    {{currentUser}}
+
     <div v-if="currentUser && currentUser.uid" class="top-nav-container">
 
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>

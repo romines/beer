@@ -10,18 +10,18 @@ export default class User {
 
 
   constructor (user, uid) {
-    this.firstName                    = user.firstName,
-    this.lastName                     = user.lastName,
+    this.firstName                    = user.firstName || '',
+    this.lastName                     = user.lastName || '',
     this.uid                          = uid,
-    this.email                        = user.email,
+    this.email                        = user.email || '',
     this.superAdmin                   = !!user.superAdmin,
-    this.primaryResortId              = user.primaryResortId
-    this.canManageContacts            = user.canManageContacts,
-    this.canManagePushNotifications   = user.canManagePushNotifications,
-    this.canManageWebcams             = user.canManageWebcams,
-    this.canViewContacts              = user.canViewContacts,
-    this.canViewPushNotifications     = user.canViewPushNotifications,
-    this.canViewWebcams               = user.canViewWebcams,
+    this.primaryResortId              = user.primaryResortId,
+    this.canManageContacts            = user.canManageContacts || false,
+    this.canManagePushNotifications   = user.canManagePushNotifications || false,
+    this.canManageWebcams             = user.canManageWebcams || false,
+    this.canViewContacts              = user.canViewContacts || false,
+    this.canViewPushNotifications     = user.canViewPushNotifications || false,
+    this.canViewWebcams               = user.canViewWebcams || false,
     this.createdAt                    = user.createdAt,
     this.identifier                   = user.identifier,
     this.isResortAdmin                = user.isResortAdmin

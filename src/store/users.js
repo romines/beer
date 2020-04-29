@@ -136,13 +136,14 @@ const actions = {
   },
 
 
-  async setResortUsers({ commit, rootState }) {
+  async setResortUsers({ commit, rootState, getters }) {
     let users     = []
     let snapshots = await USERS_REF.get()
 
     snapshots.docs.forEach((userSnapshot) => {
       // Filter users to be those whose primaryResortId is the current resort
-      if (userSnapshot.data().primaryResortId === rootState.resortId && !userSnapshot.data().superAdmin) {
+      let userData = userSnapshot.data()
+      if (userData.primaryResortId === rootState.resortId && !userData.superAdmin && userData.uid !== getters.currentUser.uid) {
         users.push(User.build(userSnapshot.data(), userSnapshot.id))
       }
     })
