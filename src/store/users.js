@@ -129,7 +129,8 @@ const actions = {
 
     if (rtdbSaveError) {
       commit('SET_LOADING_STATE', false)
-      throw new Error(createError.message);
+      throw new Error(createError.message)
+      return false
     } else {
       return newUser
     }

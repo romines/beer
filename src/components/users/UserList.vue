@@ -41,25 +41,25 @@
             </div>
             <section class="permissions">
               <div class="detail permission">
-                <label>Is Resort Admin:</label><span class="created">{{ user.isResortAdmin }}</span>
+                <label>Is Resort Admin:</label><span class="created">{{ user.isResortAdmin ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>View Push:</label><span class="created">{{ user.canViewPushNotifications }}</span>
+                <label>View Push:</label><span class="created">{{ user.canViewPushNotifications ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>Manage Push:</label><span class="created">{{ user.canManagePushNotifications }}</span>
+                <label>Manage Push:</label><span class="created">{{ user.canManagePushNotifications ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>View Contacts:</label><span class="created">{{ user.canViewContacts }}</span>
+                <label>View Contacts:</label><span class="created">{{ user.canViewContacts ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>Manage Contacts:</label><span class="created">{{ user.canManageContacts }}</span>
+                <label>Manage Contacts:</label><span class="created">{{ user.canManageContacts ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>View Webcams:</label><span class="created">{{ user.canViewWebcams }}</span>
+                <label>View Webcams:</label><span class="created">{{ user.canViewWebcams ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>Manage Webcams:</label><span class="created">{{ user.canManageWebcams }}</span>
+                <label>Manage Webcams:</label><span class="created">{{ user.canManageWebcams ? 'Yes' : 'No' }}</span>
               </div>
             </section>
           </div>

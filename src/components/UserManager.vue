@@ -47,8 +47,10 @@ export default {
     onUserSave (newUser) {
       this.showCreateUser = false
       this.$store.dispatch('createUserForResort', newUser).then((user) => {
-        this.$store.dispatch('setResortUsers')
-        this.$store.dispatch('showSuccessModal', 'User created!')
+        if (user) {
+          this.$store.dispatch('setResortUsers')
+          this.$store.dispatch('showSuccessModal', 'User created!')
+        }
       }).catch((error) => {
         dispatch('showErrorModal', error.message)
       })
