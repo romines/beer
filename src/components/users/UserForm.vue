@@ -11,9 +11,11 @@
     <h2>Email Address:</h2>
     <input v-model="newUser.email" class="input name" type="text" name="name">
 
-    <h2>Password:</h2>
-    <input v-model="newUser.password" class="input name" type="text" name="name">
-
+    <div v-if="!existingUser">
+      <h2>Password:</h2>
+      <input v-model="newUser.password" class="input name" type="text" name="name">
+    </div>
+    
 
     <div v-if="currentUser.superAdmin" class="toggle-container">
       <span>Resort Admin:</span>

@@ -50,7 +50,6 @@ export default {
         this.$store.dispatch('setResortUsers')
         this.$store.dispatch('showSuccessModal', 'User created!')
       }).catch((error) => {
-        debugger
         dispatch('showErrorModal', error.message)
       })
     }

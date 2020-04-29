@@ -6,8 +6,9 @@
 
       <div v-for="user in resortUsers" class="user-container">
         <section class="header" @click="showUserDetails(user)">
-          <span class="id">{{user.email}}</span>
-          <span class="user-name">{{ user.name }}</span>
+          <span class="name">{{user.fullName()}}</span>
+          <span class="email">{{ user.email }}</span>
+          <span v-if="user.isResortAdmin" class="resort-admin">Admin</span>
           <span class="created-at">{{formatDate(user.createdAt, 'll')}}</span>
         </section>
         <section v-if="showUser(user.uid)" class="body">
@@ -25,11 +26,12 @@
           </div>
 
           <div v-else class="user-details">
-            <span v-on:click="isEditingUser = true">
+            <!-- Only superAdmins can edit resortAdmins --> 
+            <span v-if="currentUser.superAdmin || !user.isResortAdmin" v-on:click="isEditingUser = true">
               <i class="fas fa-edit" />
             </span>
             <div class="detail name">
-              <label>Name:</label><span class="created">{{ user.name }}</span>
+              <label>Name:</label><span class="created">{{ user.fullName() }}</span>
             </div>
             <div class="detail created">
               <label>Created At:</label><span class="created">{{formatDate(user.createdAt, 'lll')}}</span>
@@ -93,7 +95,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['resortUsers'])
+    ...mapGetters(['resortUsers', 'currentUser'])
   },
   created () {
 
@@ -115,8 +117,8 @@ export default {
     },
     onUserSave (user) {
       user.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
-      arrayHelper.replaceObjectByValue(this.users, user, user.uid, 'uid')
-      this.$store.dispatch('saveResortUsers', this.users).then(() => {
+      this.$store.dispatch('saveResortUser', user).then((error) => {
+        this.currentUserId = null
         this.isEditingUser = false
       })
     },
@@ -148,16 +150,33 @@ export default {
       background:                 #dfe0e2;
       padding:                    0.88em;
 
-      .user-name {
-        margin-left:              3em;
+      > span {
         text-overflow:            ellipsis;
         overflow:                 hidden;
         white-space:              nowrap;
-        max-width:                25em;
+      }
+
+      .name {
+        width:                    8em
+      }
+
+      .email {
+        margin-left:              1em;
+        width:                    15em;
+        font-style:               italic;
+      }
+
+      .resort-admin {
+        margin-left:              auto;
+        background:               black;
+        color:                    white;
+        padding:                  0.25em;
+        border-radius:            0.5em;
       }
 
       .created-at {
         margin-left:              auto;
+        padding:                  0.25em;
       }
     }
 
@@ -187,11 +206,11 @@ export default {
 
           > label {
             font-weight:          bold;
-            width:                20%;
+            width:                25%;
           }
 
           > span {
-            width:                80%;
+            width:                75%;
           }
         }
 

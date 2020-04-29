@@ -1,7 +1,8 @@
 import User from './models/User'
-import { auth, firestore } from '../firebaseInit.js'
+import { auth, firestore, database } from '../firebaseInit.js'
 import { secondaryAuth } from '../firebaseInitBackup.js'
 import { promiseTo } from './utils.js'
+import arrayHelper from '../helpers/arrayHelper.js'
 
 
 const USERS_REF = firestore.collection('users')
@@ -16,6 +17,9 @@ const mutations = {
   },
   SET_RESORT_USERS (state, users) {
     state.resortUsers = users
+  },
+  REPLACE_RESORT_USER (state, user) {
+    arrayHelper.replaceObjectByValue(state.resortUsers, user, user.uid, 'uid')
   }
 }
 
@@ -138,10 +142,20 @@ const actions = {
 
     snapshots.docs.forEach((userSnapshot) => {
       // Filter users to be those whose primaryResortId is the current resort
-      if (userSnapshot.data().primaryResortId === rootState.resortId && !userSnapshot.data().superAdmin) users.push(User.build(userSnapshot.data(), userSnapshot.id))
+      if (userSnapshot.data().primaryResortId === rootState.resortId && !userSnapshot.data().superAdmin) {
+        users.push(User.build(userSnapshot.data(), userSnapshot.id))
+      }
     })
 
     commit('SET_RESORT_USERS', users)
+  },
+
+  async saveResortUser({ commit, rootState }, user) {
+    return USERS_REF.doc(user.uid).update(user).then((error) => {
+      let newUser = User.build(user, user.uid)
+      if (error) dispatch('showErrorModal', 'User update failed. Please try again')
+      else commit('REPLACE_RESORT_USER', newUser)
+    })
   }
 
 }
