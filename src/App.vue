@@ -7,9 +7,9 @@
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
       <div class="link-nav">
-        <router-link v-bind:to="{ name: 'Resort' }">Contacts</router-link>
-        <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
-        <router-link v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
+        <router-link v-if="currentUser.canViewContacts || currentUser.canManageContacts" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
+        <router-link v-if="currentUser.canViewPushNotifications || currentUser.canManagePushNotifications" v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
+        <router-link v-if="currentUser.canViewWebcams || currentUser.canManageWebcams" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
         <router-link v-bind:to="{ name: 'Settings' }">Settings</router-link>
         <router-link v-if="currentUser.superAdmin || currentUser.isResortAdmin" v-bind:to="{ name: 'UserManager' }">Manage Users</router-link>
       </div>

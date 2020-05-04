@@ -175,7 +175,6 @@ export default {
     showDeleteModal () {
 
       const onConfirm = () => {
-        console.log(this.existingUser)
         this.$emit('deleteUser', this.existingUser)
       }
 
