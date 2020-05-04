@@ -6,6 +6,7 @@ import { promiseTo } from './store/utils.js'
 import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
 import UserManager from './components/UserManager'
+import Profile from './components/Profile'
 import Settings from './components/Settings'
 import {
   Archive,
@@ -16,7 +17,7 @@ import {
   Tags,
   Resorts,
   Resort,
-  SignUp,
+  SignUp
 } from './components'
 
 const routes = [
@@ -169,6 +170,18 @@ const routes = [
       store.dispatch('initializePushWooshData').then(() => {
         next()
       })
+    }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
     }
   },
   {

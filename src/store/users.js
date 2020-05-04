@@ -187,7 +187,18 @@ const actions = {
     return USERS_REF.doc(user.uid).delete().then(() => {
       commit('DELETE_RESORT_USER', user)
     })
-  }
+  },
+
+
+  setUserPassword({ commit, rootState }, payload) {
+    return new Promise((resolve, reject) => {
+      auth.signInWithEmailAndPassword(auth.currentUser.email, payload.currentPassword).then(() => {
+        resolve()
+      }).catch((error) => {
+        reject(error)
+      })
+    })
+  },
 
 }
 
