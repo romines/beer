@@ -2,7 +2,7 @@
   <div class="webcam-manager">
     <site-header title="Webcam Management" />
 
-    <span class="button is-primary new-webcam-button" @click="showCreateWebcam = !showCreateWebcam">Create Webcam</span>
+    <span v-if="currentUser.canManageWebcams" class="button is-primary new-webcam-button" @click="showCreateWebcam = !showCreateWebcam">Create Webcam</span>
 
     <transition name="fade">
       <WebcamForm
@@ -37,7 +37,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['webcams'])
+    ...mapGetters(['webcams', 'currentUser'])
   },
   created () {
 

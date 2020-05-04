@@ -29,6 +29,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentUser.canAccessContacts()) return next('/')
 
       Promise.all([
         store.dispatch('listenToResortRoot'),
@@ -113,6 +114,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentUser.canAccessWebcams()) return next('/')
 
       store.dispatch('getResortWebcams').then(() => {
         store.commit('SET_LOADING_STATE', false)
@@ -129,7 +131,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       store.commit('SET_RESORT_ID', 'jackson_hole')
-      // if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
       next()
@@ -144,6 +146,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentUser.canAccessPush()) return next('/')
 
       store.commit('SET_LOADING_STATE', false)
       store.dispatch('initializePushWooshData').then(() => {
@@ -160,6 +163,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentUser.canAccessSettings()) return next('/')
 
       store.commit('SET_LOADING_STATE', false)
       store.dispatch('initializePushWooshData').then(() => {

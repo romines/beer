@@ -8,6 +8,24 @@ export default class User {
     return this.firstName + ' ' + this.lastName
   }
 
+  canAccessWebcams () {
+    return this.canManageWebcams || this.canViewWebcams || this.superAdmin
+  }
+
+  canAccessPush () {
+    return this.canManagePushNotifications || this.canViewPushNotifications || this.superAdmin
+  }
+
+  canAccessSettings () {
+    // TODO
+    // Fix this up so it's more relevant
+    return this.canManagePushNotifications || this.canViewPushNotifications || this.superAdmin
+  }
+
+  canAccessContacts () {
+    return this.canManageContacts || this.canViewContacts || this.superAdmin
+  }
+
 
   constructor (user, uid) {
     this.uid                          = uid,

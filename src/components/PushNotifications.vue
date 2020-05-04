@@ -2,7 +2,7 @@
   <div class="push-notifications">
     <site-header title="Push Notifications" />
 
-    <span v-if="!pwMissingAppIdWarning" class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
+    <span v-if="!pwMissingAppIdWarning && currentUser.canManagePushNotifications" class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
 
     <transition name="fade">
       <create-push v-if="showCreatePush" v-on:closeCreatePush="showCreatePush = false" v-on:pushCreated="onPushCreated()" class="new-push-container" />
@@ -36,7 +36,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['pushWooshData']),
+    ...mapGetters(['pushWooshData', 'currentUser']),
   },
   created() {
     if (!this.pushWooshData || !this.pushWooshData.appId) this.pwMissingAppIdWarning = 'Missing application id. Please contact Resorts Tapped for assistance.'
