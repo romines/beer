@@ -10,7 +10,7 @@ import { functionsBaseUrl } from '../firebaseInit.js'
 const USERS_REF = firestore.collection('users')
 
 const state = {
-  user: {},
+  user: null,
   resortUsers: []
 }
 

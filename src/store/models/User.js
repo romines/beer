@@ -19,7 +19,7 @@ export default class User {
   canAccessSettings () {
     // TODO
     // Fix this up so it's more relevant
-    return this.canManagePushNotifications || this.canViewPushNotifications || this.superAdmin
+    return this.isResortAdmin || this.superAdmin
   }
 
   canAccessContacts () {

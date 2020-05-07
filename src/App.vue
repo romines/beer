@@ -2,7 +2,7 @@
   <div id="app">
     <!-- TODO: nav to separate component -->
 
-    <div v-if="currentUser && currentUser.uid" class="top-nav-container">
+    <div v-if="currentUser && currentUser.uid && currentResortId" class="top-nav-container">
 
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
@@ -10,8 +10,6 @@
         <router-link v-if="currentUser.canAccessContacts()" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
         <router-link v-if="currentUser.canAccessPush()" v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
         <router-link v-if="currentUser.canAccessWebcams()" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
-        <router-link v-if="currentUser.canAccessSettings()" v-bind:to="{ name: 'Settings' }">Settings</router-link>
-        <router-link v-if="currentUser.superAdmin || currentUser.isResortAdmin" v-bind:to="{ name: 'UserManager' }">Manage Users</router-link>
       </div>
 
       <div class="right-nav">
@@ -23,6 +21,9 @@
 
 
         <div v-if="showUserMenu" class="user-menu">
+          <span class="menu-item" @click="goToSettings()">
+            Settings
+          </span>
           <span class="menu-item" @click="goToProfile()">
             Profile
           </span>
@@ -63,6 +64,7 @@ export default {
     }
   },
   created () {
+    // Closes the user menu on any click outside of it
     document.addEventListener('click', (event) => {
       if (!event.target.closest('.header') || event.target.className === 'header') {
         this.showUserMenu = false
@@ -70,7 +72,7 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['currentUser'])
+    ...mapGetters(['currentUser', 'currentResortId'])
   },
   methods: {
     logOut() {
@@ -80,6 +82,9 @@ export default {
     },
     goToProfile () {
       this.$router.replace('/profile')
+    },
+    goToSettings () {
+      this.$router.replace('/settings/push')
     },
     goToLandingPage () {
       if (this.currentUser.superAdmin) {
@@ -158,9 +163,9 @@ export default {
       position:               absolute;
       top:                    0;
       right:                  0;
-      width:                  100%;
+      width:                  10em;
       background:             white;
-      border:                 1px solid lightgray;
+      border:                 2px solid lightgray;
       border-top:             none;
       top:                    40px;
 

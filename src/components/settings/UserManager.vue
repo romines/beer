@@ -1,6 +1,7 @@
 <template>
   <div class="user-manager">
-    <site-header title="User Management" />
+
+    <h1 class="setting-title">Users</h1>
 
     <span class="button is-primary new-user-button" @click="showCreateUser = !showCreateUser">Create User</span>
 
@@ -21,14 +22,12 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import SiteHeader from './SiteHeader.vue'
-import UserList from './users/UserList.vue'
-import UserForm from './users/UserForm.vue'
-import store from '../store'
+import UserList from '../users/UserList.vue'
+import UserForm from '../users/UserForm.vue'
+import store from '../../store'
 
 export default {
   components: {
-    SiteHeader,
     UserForm,
     UserList
   },
@@ -69,7 +68,7 @@ export default {
 
   .new-user-button {
     position:                 absolute;
-    top:                      3.5em;
+    top:                      -0.25em;
     right:                    0.5em;
   }
 

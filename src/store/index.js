@@ -254,7 +254,6 @@ const store = {
       commit('SET_RESORT_META', {})
       commit('SET_PUSHWOOSH_DATA', {})
       dispatch('resetArchiveState')
-      dispatch('clearCurrentUser')
     },
 
     logIn({ commit, dispatch }, { email, password, onSuccess }) {

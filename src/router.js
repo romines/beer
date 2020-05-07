@@ -5,9 +5,12 @@ import { promiseTo } from './store/utils.js'
 
 import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
-import UserManager from './components/UserManager'
 import Profile from './components/Profile'
 import Settings from './components/Settings'
+import UserManager from './components/settings/UserManager'
+import ResortManager from './components/settings/ResortManager'
+import PushSettings from './components/settings/PushSettings'
+
 import {
   Archive,
   ExportJson,
@@ -124,21 +127,6 @@ const routes = [
     }
   },
   {
-    path: '/user-manager',
-    name: 'UserManager',
-    component: UserManager,
-    meta: {
-      requiresAuth: true
-    },
-    beforeEnter: (to, from, next) => {
-      store.commit('SET_RESORT_ID', 'jackson_hole')
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
-
-      store.commit('SET_LOADING_STATE', false)
-      next()
-    }
-  },
-  {
     path: '/push-notifications',
     name: 'PushNotifications',
     component: PushNotifications,
@@ -170,7 +158,42 @@ const routes = [
       store.dispatch('initializePushWooshData').then(() => {
         next()
       })
-    }
+    },
+    children: [
+      {
+        path: 'push',
+        name: 'PushSettings',
+        component: PushSettings
+      },
+      {
+        path: 'users',
+        name: 'UserManager',
+        component: UserManager,
+        meta: {
+          requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+          if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+
+          store.commit('SET_LOADING_STATE', false)
+          next()
+        }
+      },
+      {
+        path: 'resorts',
+        name: 'ResortManager',
+        component: ResortManager,
+        meta: {
+          requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+          if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+
+          store.commit('SET_LOADING_STATE', false)
+          next()
+        }
+      }
+    ]
   },
   {
     path: '/profile',
@@ -250,7 +273,8 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  if (!store.getters.currentUser.authorizedIds) {
+
+  if (!store.getters.currentUser) {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
