@@ -172,6 +172,13 @@ const store = {
       })
     },
 
+    setLastPublishedDate({ commit, dispatch, rootState }) {
+      var date = new Date
+      RESORTS_REF.doc(rootState.resortId).update({
+        lastPublishedDate: date.toUTCString(),
+      })
+    },
+
     resetResortState({ commit, dispatch }) {
       commit('SET_RESORT_ID', '')
       commit('SET_USER', {})
