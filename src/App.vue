@@ -15,10 +15,23 @@
       </div>
 
       <div class="right-nav">
-        <span class="text-and-icon" @click="logOut">
-          <span class="log-out">Logout</span>
-          <span class="icon is-small"><i class="fas fa-power-off"/></span> &nbsp;
-        </span>
+        <div v-on:click="showUserMenu = !showUserMenu" class="header">
+          <span class="current-user">{{currentUser.email}}</span>
+          <i v-if="showUserMenu" class='toggler fas fa-angle-up'></i>
+          <i v-else class='toggler fas fa-angle-down'></i>
+        </div>
+
+
+        <div v-if="showUserMenu" class="user-menu">
+          <span class="menu-item" @click="goToProfile()">
+            Profile
+          </span>
+          <span class="menu-item" @click="logOut()">
+            Logout
+          </span>
+        </div>
+
+
       </div>
     </div>
 
@@ -44,6 +57,18 @@ export default {
   beforeRouteEnter () {
     // if (this.currentUser.superAdmin) return next('/resorts')
   },
+  data () {
+    return {
+      showUserMenu:           false
+    }
+  },
+  created () {
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.header') || event.target.className === 'header') {
+        this.showUserMenu = false
+      }
+    })
+  },
   computed: {
     ...mapGetters(['currentUser'])
   },
@@ -52,6 +77,9 @@ export default {
       this.$store.dispatch('logOut').then(() => {
         this.$router.replace('/login')
       })
+    },
+    goToProfile () {
+      this.$router.replace('/profile')
     },
     goToLandingPage () {
       if (this.currentUser.superAdmin) {
@@ -110,30 +138,40 @@ export default {
 
   .right-nav {
     margin-left:              auto;
-    color:                    blue !important;
+    position:                 relative;
+    cursor:                   pointer;
 
-    a {
-      color:                  blue !important;
-    }
+    .header {
+      display:                flex;
+      align-items:            center;
 
-    & > * {
-      margin-right:           0.3em;
-      &:not(.text-and-icon) {
-        text-decoration:      underline;
+      .current-user {
+        margin-right:         1em;
+      }
+
+      .toggler {
+        font-size:            24px;
       }
     }
 
-    .text-and-icon {
-      cursor:                 pointer;
-      position:               relative;
-      .log-out {
-        text-decoration:      underline;
-      }
+    .user-menu {
+      position:               absolute;
+      top:                    0;
+      right:                  0;
+      width:                  100%;
+      background:             white;
+      border:                 1px solid lightgray;
+      border-top:             none;
+      top:                    40px;
 
-      .icon {
-        position:             relative;
-        top:                  0.2em;
-        left:                 0.2em;
+      .menu-item {
+        display:              block;
+        padding:              0.5em 1em;
+
+        &:hover {
+          background-color:   darkgray;
+          color:              white;
+        }
       }
     }
   }

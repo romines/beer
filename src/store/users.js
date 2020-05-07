@@ -192,6 +192,7 @@ const actions = {
 
   setUserPassword({ commit, rootState }, payload) {
     return new Promise((resolve, reject) => {
+      // This method is not ideal but reauthenticateWithCredential would not work :(
       auth.signInWithEmailAndPassword(auth.currentUser.email, payload.currentPassword).then(() => {
         resolve()
       }).catch((error) => {
