@@ -43,7 +43,7 @@ const getters = {
 
 
 const actions = {
-  setCurrentUser({ commit }, user) {
+  setCurrentUser({ commit, dispatch }, user) {
     console.log('setCurrentUser dispatched . . .')
 
     return USERS_REF
@@ -60,6 +60,7 @@ const actions = {
           let newUser = User.build(userData, user.uid)
 
           commit('SET_USER', newUser)
+          dispatch('getResortPermissions')
 
           return Promise.resolve(newUser)
         },
@@ -194,7 +195,12 @@ const actions = {
     return new Promise((resolve, reject) => {
       // This method is not ideal but reauthenticateWithCredential would not work :(
       auth.signInWithEmailAndPassword(auth.currentUser.email, payload.currentPassword).then(() => {
-        resolve()
+        auth.currentUser.updatePassword(payload.newPassword).then(function() {
+          // Update successful.
+          resolve()
+        }).catch((error) => {
+          reject(error)
+        });
       }).catch((error) => {
         reject(error)
       })

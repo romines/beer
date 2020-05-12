@@ -138,8 +138,9 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
-      store.commit('SET_LOADING_STATE', false)
+      store.commit('SET_LOADING_STATE', true)
       store.dispatch('initializePushWooshData').then(() => {
+        store.commit('SET_LOADING_STATE', false)
         next()
       })
     }
@@ -155,8 +156,8 @@ const routes = [
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
       if (!store.getters.currentUser.canAccessSettings()) return next('/')
 
-      store.commit('SET_LOADING_STATE', false)
       store.dispatch('initializePushWooshData').then(() => {
+        store.commit('SET_LOADING_STATE', false)
         next()
       })
     },
@@ -277,7 +278,8 @@ router.beforeEach(async (to, from, next) => {
   }
 
 
-  if (!store.getters.currentUser) {
+  // CurrentUser can sometimes be an empty object, check for email.
+  if (!store.getters.currentUser || !store.getters.currentUser.email) {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
@@ -289,14 +291,13 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // Get resort permissions every time
-  store.dispatch('getResortPermissions')
 
   /**
    *
    * check user, route for superAdmin privileges
    *
    */
+
   if (store.getters.currentUser.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
     // this is a superAdmin or route does NOT require superAdmin.
     // send user on their way

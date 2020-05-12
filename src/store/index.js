@@ -100,8 +100,6 @@ const store = {
       state.modal.showLoading = boolean
     },
     SET_LOADING_STATE(state, loading) {
-      console.log('SET_LOADING_STATE . . .')
-
       state.loading = loading
     },
     SET_CONTACT_DIRTY_STATE(state, isDirty) {
@@ -120,8 +118,8 @@ const store = {
       if (permissions) state.resortPermissions = permissions
     }
   },
-  actions: {
 
+  actions: {
     getResorts({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
         let resorts = []

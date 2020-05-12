@@ -94,7 +94,8 @@ export default {
   computed: {
     ...mapGetters(['resortUsers', 'currentUser', 'resortPermissions']),
     sortedResortUsers () {
-      return this.resortUsers.sort(this.compareDates)
+      // Need slice here to prevent render loop
+      return this.resortUsers.slice().sort(this.compareDates)
     }
   },
   created () {

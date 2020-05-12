@@ -30,7 +30,6 @@ export default {
   },
   beforeRouteEnter (to, from, next) {
     if (to.path === '/settings') {
-      debugger
       next('/settings/push')
     } else {
       next()
