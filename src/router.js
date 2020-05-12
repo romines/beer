@@ -174,6 +174,7 @@ const routes = [
         },
         beforeEnter: (to, from, next) => {
           if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+          if (!store.getters.currentUser.superAdmin || !store.getters.currentUser.isResortAdmin) return next('/')
 
           store.commit('SET_LOADING_STATE', false)
           next()
@@ -188,6 +189,7 @@ const routes = [
         },
         beforeEnter: (to, from, next) => {
           if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+          if (!store.getters.currentUser.superAdmin) return next('/')
 
           store.commit('SET_LOADING_STATE', false)
           next()

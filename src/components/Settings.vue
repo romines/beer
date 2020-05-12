@@ -7,7 +7,7 @@
     <div class="click-tabs">
       <router-link class="tablinks" v-bind:to="{ name: 'PushSettings' }">Push Notifications</router-link>
       <router-link v-if="currentUser.superAdmin || currentUser.isResortAdmin" class="tablinks" v-bind:to="{ name: 'UserManager' }">Users</router-link>
-      <router-link v-if="currentUser.superAdmin" class="tablinks" v-bind:to="{ name: 'ResortManager' }">Resorts</router-link>
+      <router-link v-if="currentUser.superAdmin" class="tablinks" v-bind:to="{ name: 'ResortManager' }">Resort</router-link>
     </div>
 
     <router-view />

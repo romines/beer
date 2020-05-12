@@ -47,6 +47,12 @@ const store = {
       preferredCityOptions: [],
       baseDistanceRequestIds: {}
     },
+    resortPermissions: {
+      // These act as defaults if value is not in Firestore
+      canManageWebcams: false,
+      canManagePushNotifications: true,
+      canManageContacts: false
+    },
     webcams: [],
     resortMeta: {},
     contactGroups: [],
@@ -109,6 +115,9 @@ const store = {
     },
     SET_WEBCAMS(state, webcams) {
       state.webcams = webcams
+    },
+    SET_RESORT_PERMISSIONS(state, permissions) {
+      if (permissions) state.resortPermissions = permissions
     }
   },
   actions: {
@@ -174,6 +183,25 @@ const store = {
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then((response) => {
           commit('SET_PUSHWOOSH_DATA', pushWooshData)
+          resolve()
+        })
+      })
+    },
+
+    getResortPermissions({ rootState, commit }) {
+      return new Promise((resolve, reject) => {
+
+        RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
+          const resortData = doc.data()
+          commit('SET_RESORT_PERMISSIONS', resortData.resortPermissions)
+        })
+      })
+    },
+
+    updateResortPermissions({ rootState, commit }, permissions) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.resortId).update({ resortPermissions: permissions }).then((response) => {
+          commit('SET_RESORT_PERMISSIONS', permissions)
           resolve()
         })
       })
@@ -575,6 +603,12 @@ const store = {
     },
     currentResortId (state) {
       return state.resortId
+    },
+    resorts (state) {
+      return state.resorts
+    },
+    resortPermissions (state) {
+      return state.resortPermissions
     }
   },
 }
