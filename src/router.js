@@ -25,7 +25,7 @@ import {
 
 const routes = [
   {
-    path: '/',
+    path: '/contacts',
     name: 'Resort',
     component: Resort,
     meta: {
@@ -34,6 +34,7 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
       if (!store.getters.currentUser.canAccessContacts()) return next('/')
+      if (!store.getters.resortPermissions.canManageContacts) return next('/')
 
       Promise.all([
         store.dispatch('listenToResortRoot'),
@@ -119,6 +120,7 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
       if (!store.getters.currentUser.canAccessWebcams()) return next('/')
+      if (!store.getters.resortPermissions.canManageWebcams) return next('/')
 
       store.dispatch('getResortWebcams').then(() => {
         store.commit('SET_LOADING_STATE', false)
@@ -127,7 +129,7 @@ const routes = [
     }
   },
   {
-    path: '/push-notifications',
+    path: '/',
     name: 'PushNotifications',
     component: PushNotifications,
     meta: {
@@ -135,7 +137,6 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
-      if (!store.getters.currentUser.canAccessPush()) return next('/')
 
       store.commit('SET_LOADING_STATE', false)
       store.dispatch('initializePushWooshData').then(() => {
@@ -174,7 +175,7 @@ const routes = [
         },
         beforeEnter: (to, from, next) => {
           if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
-          if (!store.getters.currentUser.superAdmin || !store.getters.currentUser.isResortAdmin) return next('/')
+          if (!store.getters.currentUser.superAdmin && !store.getters.currentUser.isResortAdmin) return next('/')
 
           store.commit('SET_LOADING_STATE', false)
           next()
@@ -288,12 +289,14 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
+  // Get resort permissions every time
+  store.dispatch('getResortPermissions')
+
   /**
    *
    * check user, route for superAdmin privileges
    *
    */
-
   if (store.getters.currentUser.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
     // this is a superAdmin or route does NOT require superAdmin.
     // send user on their way

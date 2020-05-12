@@ -44,21 +44,18 @@
                 <label>Is Resort Admin:</label><span class="created">{{ user.isResortAdmin ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>View Push:</label><span class="created">{{ user.canViewPushNotifications ? 'Yes' : 'No' }}</span>
-              </div>
-              <div class="detail permission">
                 <label>Manage Push:</label><span class="created">{{ user.canManagePushNotifications ? 'Yes' : 'No' }}</span>
               </div>
-              <div class="detail permission">
+              <div v-if="resortPermissions.canManageContacts" class="detail permission">
                 <label>View Contacts:</label><span class="created">{{ user.canViewContacts ? 'Yes' : 'No' }}</span>
               </div>
-              <div class="detail permission">
+              <div v-if="resortPermissions.canManageContacts" class="detail permission">
                 <label>Manage Contacts:</label><span class="created">{{ user.canManageContacts ? 'Yes' : 'No' }}</span>
               </div>
-              <div class="detail permission">
+              <div v-if="resortPermissions.canManageWebcams" class="detail permission">
                 <label>View Webcams:</label><span class="created">{{ user.canViewWebcams ? 'Yes' : 'No' }}</span>
               </div>
-              <div class="detail permission">
+              <div v-if="resortPermissions.canManageWebcams" class="detail permission">
                 <label>Manage Webcams:</label><span class="created">{{ user.canManageWebcams ? 'Yes' : 'No' }}</span>
               </div>
             </section>
@@ -95,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['resortUsers', 'currentUser']),
+    ...mapGetters(['resortUsers', 'currentUser', 'resortPermissions']),
     sortedResortUsers () {
       return this.resortUsers.sort(this.compareDates)
     }

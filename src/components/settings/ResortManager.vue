@@ -37,9 +37,6 @@ export default {
 
     }
   },
-  created () {
-    this.$store.dispatch('getResortPermissions')
-  },
   computed: {
     ...mapGetters(['resortPermissions'])
   },

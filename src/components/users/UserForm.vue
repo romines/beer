@@ -16,18 +16,10 @@
       <input v-model="newUser.password" class="input name" type="text" name="name">
     </div>
 
-
     <div v-if="currentUser.superAdmin" class="toggle-container">
       <span>Resort Admin:</span>
       <label for="resort-admin" class="switch">
         <input v-model="newUser.isResortAdmin" id="resort-admin" type="checkbox">
-        <span class="slider round"></span>
-      </label>
-    </div>
-    <div class="toggle-container">
-      <span>View Push:</span>
-      <label for="view-push" class="switch">
-        <input v-model="newUser.canViewPushNotifications" id="view-push" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
@@ -38,28 +30,28 @@
         <span class="slider round"></span>
       </label>
     </div>
-    <div class="toggle-container">
+    <div v-if="resortPermissions.canManageContacts" class="toggle-container">
       <span>View Contacts:</span>
       <label for="view-contacts" class="switch">
         <input v-model="newUser.canViewContacts" id="view-contacts" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div class="toggle-container">
+    <div v-if="resortPermissions.canManageContacts" class="toggle-container">
       <span>Manage Contacts:</span>
       <label for="manage-contacts" class="switch">
         <input v-model="newUser.canManageContacts" id="manage-contacts" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div class="toggle-container">
+    <div v-if="resortPermissions.canManageWebcams" class="toggle-container">
       <span>View Webcams:</span>
       <label for="view-webcams" class="switch">
         <input v-model="newUser.canViewWebcams" id="view-webcams" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div class="toggle-container">
+    <div v-if="resortPermissions.canManageWebcams" class="toggle-container">
       <span>Manage Webcams:</span>
       <label for="manage-webcams" class="switch">
         <input v-model="newUser.canManageWebcams" id="manage-webcams" type="checkbox">
@@ -119,7 +111,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentUser'])
+    ...mapGetters(['currentUser', 'resortPermissions'])
   },
   created () {
 

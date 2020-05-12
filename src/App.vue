@@ -7,9 +7,9 @@
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
       <div class="link-nav">
-        <router-link v-if="currentUser.canAccessContacts()" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
-        <router-link v-if="currentUser.canAccessPush()" v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
-        <router-link v-if="currentUser.canAccessWebcams()" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
+        <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
+        <router-link v-if="showContacts" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
+        <router-link v-if="showWebcams" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
       </div>
 
       <div class="right-nav">
@@ -72,7 +72,15 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['currentUser', 'currentResortId'])
+    ...mapGetters(['currentUser', 'currentResortId', 'resortPermissions']),
+    showContacts () {
+      if (this.currentUser.superAdmin) return true
+      else return this.currentUser.canAccessContacts() && this.resortPermissions.canManageContacts
+    },
+    showWebcams () {
+      if (this.currentUser.superAdmin) return true
+      else return this.currentUser.canAccessWebcams() && this.resortPermissions.canManageWebcams
+    }
   },
   methods: {
     logOut() {
