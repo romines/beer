@@ -138,7 +138,6 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
 
-      store.commit('SET_LOADING_STATE', true)
       store.dispatch('initializePushWooshData').then(() => {
         store.commit('SET_LOADING_STATE', false)
         next()
@@ -217,6 +216,10 @@ const routes = [
     component: Login,
     meta: {
       blockedForUsers: true,
+    },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
     }
   },
   {
@@ -259,7 +262,6 @@ router.beforeEach(async (to, from, next) => {
 
   if (!to.matched.some(record => record.meta.requiresAuth)) {
     // route is open to unauthenticated users
-    store.commit('SET_LOADING_STATE', false)
     return next()
   }
 

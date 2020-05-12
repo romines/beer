@@ -178,6 +178,7 @@ const store = {
     },
 
     updatePushWooshData({ rootState, commit }, pushWooshData) {
+      if (!rootState.resortId) return // quick bug fix
       return new Promise((resolve, reject) => {
         RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then((response) => {
           commit('SET_PUSHWOOSH_DATA', pushWooshData)
