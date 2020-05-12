@@ -172,10 +172,10 @@ const store = {
       })
     },
 
-    setLastPublishedDate({ commit, dispatch, rootState }) {
-      var date = new Date
-      RESORTS_REF.doc(rootState.resortId).update({
-        lastPublishedDate: date.toUTCString(),
+    setLastPublishedDate({ commit, dispatch, rootState }, date) {
+      // 2020-05-09 11:51:25
+      return RESORTS_REF.doc(rootState.resortId).update({
+        lastPublishedDate: date,
       })
     },
 

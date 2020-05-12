@@ -2,7 +2,6 @@ const Firestore       = require('@google-cloud/firestore');
 const httpRequest     = require('request');
 const functions       = require('firebase-functions');
 const config          = JSON.parse(process.env.FIREBASE_CONFIG);
-const token           = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.development;
 const projectId       = config.projectId;
 const pushWooshEnv    = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
 const firestore       = new Firestore({ projectId: projectId, timestampsInSnapshots: true });
@@ -25,7 +24,8 @@ module.exports = functions.https.onRequest((req, res) => {
     let resortData = doc.data()
     let lastPublishedDate = resortData.lastPublishedDate
 
-    res.status(200).send({ lastPublished: lastPublishedDate })
+    if (lastPublishedDate) res.status(200).send({ lastPublished: lastPublishedDate })
+    else res.status(200).send({ lastPublished: null })
 
   }).catch((error) => {
     res.status(200).send(error)
