@@ -1,12 +1,12 @@
 <template>
   <div class="resorts">
     <div class="links">
-      <router-link v-if="$store.state.resortId" to="/history">Revision History</router-link>
+      <router-link v-if="$store.state.resortId && currentUser.canEditContacts()" to="/history">Revision History</router-link>
       <router-link v-if="$store.state.resortId && currentUser.superAdmin" to="/maps">Maps</router-link>
       <router-link v-if="$store.state.resortId && currentUser.superAdmin" to="/tags">Tags</router-link>
     </div>
     <site-header title="Contacts" />
-    <save-publish />
+    <save-publish v-if="currentUser.canEditContacts()" />
     <contacts />
   </div>
 </template>
