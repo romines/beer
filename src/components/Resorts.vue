@@ -40,6 +40,7 @@ export default {
     goToResort(resortId) {
       this.$store.commit('SET_LOADING_STATE', true)
       this.$store.commit('SET_RESORT_ID', resortId)
+      this.$store.dispatch('getResortPermissions')
       this.$router.push('/')
     },
   },

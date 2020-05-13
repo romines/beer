@@ -190,9 +190,17 @@ const store = {
     getResortPermissions({ rootState, commit }) {
       return new Promise((resolve, reject) => {
 
+        if (!rootState.resortId) {
+          resolve()
+          return
+        }
+
         RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
           const resortData = doc.data()
           commit('SET_RESORT_PERMISSIONS', resortData.resortPermissions)
+          resolve()
+        }).catch((e) => {
+          reject(e)
         })
       })
     },
