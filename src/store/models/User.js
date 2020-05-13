@@ -9,7 +9,11 @@ export default class User {
   }
 
   canAccessWebcams () {
-    return this.canManageWebcams || this.canViewWebcams || this.superAdmin
+    return this.canViewWebcams || this.canEditWebcams()
+  }
+
+  canEditWebcams () {
+    return this.canManageWebcams || this.superAdmin || this.isResortAdmin
   }
 
   canAccessPush () {
@@ -23,7 +27,7 @@ export default class User {
   }
 
   canAccessContacts () {
-    return this.canManageContacts || this.canViewContacts || this.superAdmin
+    return this.canManageContacts || this.canViewContacts || this.superAdmin || this.isResortAdmin
   }
 
 

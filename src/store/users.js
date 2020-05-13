@@ -60,7 +60,6 @@ const actions = {
           let newUser = User.build(userData, user.uid)
 
           commit('SET_USER', newUser)
-          dispatch('getResortPermissions')
 
           return Promise.resolve(newUser)
         },

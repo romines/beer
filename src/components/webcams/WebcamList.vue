@@ -5,7 +5,7 @@
     <div v-if="webcams.length > 0" class="webcam-list">
 
       <draggable
-        v-if="currentUser.canManageWebcams"
+        v-if="currentUser.canEditWebcams()"
         class="draggable-group-container"
         v-model="draggableList"
         :options="{handle:'.grippy'}"
@@ -13,12 +13,20 @@
         @end="drag=false">
 
         <div v-for="webcam in draggableList" class="webcam-container">
-          <section class="header" @click="showWebcamDetails(webcam)">
+
+          <section class="header" @click="showWebcamDetails(webcam, $event)">
             <span class="grippy" />
-            <span class="id">{{webcam.id}}</span>
             <span class="webcam-name">{{ webcam.name }}</span>
+            <div class="toggle-container">
+              <span>{{ webcam.isActive ? 'Active' : 'Inactive' }}</span>
+              <label v-bind:for="'webcam' + webcam.identifier" class="switch">
+                <input v-on:click="onActiveToggle(webcam)" v-model="webcam.isActive" v-bind:id="'webcam' + webcam.identifier" type="checkbox">
+                <span class="slider round"></span>
+              </label>
+            </div>
             <span class="created-at">{{formatDate(webcam.createdAt, 'll')}}</span>
           </section>
+
           <section v-if="showWebcam(webcam.identifier)" class="body">
 
             <div v-if="isEditingWebcam" class="edit-webcam">
@@ -49,9 +57,9 @@
               <div class="detail streaming-url">
                 <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
               </div>
-              <!-- <div class="detail is-web">
-                <label>Is Streaming?:</label><span class="created">{{ webcam.isWeb }}</span>
-              </div> -->
+              <div class="detail is-active">
+                <label>Is Active?:</label><span class="created">{{ webcam.isActive ? 'Yes' : 'No' }}</span>
+              </div>
               <div class="detail created">
                 <label>Created At:</label><span class="created">{{formatDate(webcam.createdAt, 'lll')}}</span>
               </div>
@@ -65,13 +73,17 @@
 
       </draggable>
 
+
       <div v-else>
+
         <div v-for="webcam in draggableList" class="webcam-container">
+
           <section class="header" @click="showWebcamDetails(webcam)">
             <span class="id">{{webcam.id}}</span>
             <span class="webcam-name">{{ webcam.name }}</span>
             <span class="created-at">{{formatDate(webcam.createdAt, 'll')}}</span>
           </section>
+
           <section v-if="showWebcam(webcam.identifier)" class="body">
 
             <div class="webcam-details">
@@ -87,9 +99,9 @@
               <div class="detail streaming-url">
                 <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
               </div>
-              <!-- <div class="detail is-web">
-                <label>Is Streaming?:</label><span class="created">{{ webcam.isWeb }}</span>
-              </div> -->
+              <div class="detail is-active">
+                <label>Is Active?:</label><span class="created">{{ webcam.isActive ? 'Yes' : 'No' }}</span>
+              </div>
               <div class="detail created">
                 <label>Created At:</label><span class="created">{{formatDate(webcam.createdAt, 'lll')}}</span>
               </div>
@@ -148,7 +160,8 @@ export default {
 
   },
   methods: {
-    showWebcamDetails (webcam) {
+    showWebcamDetails (webcam, event) {
+      if (event.target.className.includes('slider') || event.target.type === 'checkbox') return
       // Check if opening or closing...
       if (this.currentWebcamId == webcam.identifier) {
         this.currentWebcamId = null
@@ -161,6 +174,11 @@ export default {
     },
     formatDate (date, format) {
       return moment.utc(date).local().format(format)
+    },
+    onActiveToggle (webcam) {
+      // Weird situation where slider does not update model on click. Need to manually update.
+      webcam.isActive = !webcam.isActive
+      this.onWebcamSave(webcam)
     },
     onWebcamSave (webcam) {
       webcam.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
@@ -177,7 +195,14 @@ export default {
         this.isEditingWebcam = false
       })
     }
-  }
+  },
+  // watch: {
+  //   'webcam.isActive': {
+  //     handler: (val) => {
+  //       debugger
+  //     }
+  //   }
+  // }
 }
 </script>
 
@@ -198,11 +223,22 @@ export default {
       padding:                    0.88em;
 
       .webcam-name {
-        margin-left:              3em;
+        margin-left:              1em;
         text-overflow:            ellipsis;
         overflow:                 hidden;
         white-space:              nowrap;
-        max-width:                25em;
+        width:                    10em;
+      }
+
+      .toggle-container {
+        display:                  flex;
+        align-items:              center;
+        margin-left:              auto;
+        width:                    8em;
+
+        > span {
+          margin-right:           1em;
+        }
       }
 
       .created-at {

@@ -291,8 +291,9 @@ router.beforeEach(async (to, from, next) => {
       console.log(err.message)
       return store.dispatch('showErrorModal', err)
     }
-  }
 
+    const [err2] = await promiseTo(store.dispatch('getResortPermissions'))
+  }
 
   /**
    *

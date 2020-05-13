@@ -14,13 +14,13 @@
     <h2>Video Url:</h2>
     <input v-model="newWebcam.streamingUrl" class="input streaming-url" type="text" name="streaming-url">
 
-    <!-- <div class="toggle-container">
-      <span>Is Streaming:</span>
-      <label for="no-sort" class="switch">
-        <input v-model="newWebcam.isWeb" id="no-sort" type="checkbox">
+    <div class="toggle-container">
+      <span>Is Active:</span>
+      <label for="active" class="switch">
+        <input v-model="newWebcam.isActive" id="active" type="checkbox">
         <span class="slider round"></span>
       </label>
-    </div> -->
+    </div>
 
     <div class="cancel-save">
       <span class="button is-primary new-push-button" :disabled="!webcamIsValid" @click="save()">Save</span>
@@ -92,7 +92,8 @@ export default {
         name:             '',
         shortName:        '',
         staticImageUrl:   '',
-        streamingUrl:     ''
+        streamingUrl:     '',
+        isActive:         true
       }
     },
     save () {

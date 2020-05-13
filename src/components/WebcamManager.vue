@@ -2,7 +2,7 @@
   <div class="webcam-manager">
     <site-header title="Webcam Management" />
 
-    <span v-if="currentUser.canManageWebcams" class="button is-primary new-webcam-button" @click="showCreateWebcam = !showCreateWebcam">Create Webcam</span>
+    <span v-if="currentUser.canEditWebcams()" class="button is-primary new-webcam-button" @click="showCreateWebcam = !showCreateWebcam">Create Webcam</span>
 
     <transition name="fade">
       <WebcamForm
