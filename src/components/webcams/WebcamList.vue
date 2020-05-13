@@ -78,9 +78,12 @@
 
         <div v-for="webcam in draggableList" class="webcam-container">
 
-          <section class="header" @click="showWebcamDetails(webcam)">
+          <section class="header" @click="showWebcamDetails(webcam, $event)">
             <span class="id">{{webcam.id}}</span>
             <span class="webcam-name">{{ webcam.name }}</span>
+            <div class="toggle-container">
+              <span>{{ webcam.isActive ? 'Active' : 'Inactive' }}</span>
+            </div>
             <span class="created-at">{{formatDate(webcam.createdAt, 'll')}}</span>
           </section>
 
@@ -243,6 +246,7 @@ export default {
 
       .created-at {
         margin-left:              auto;
+        width:                    7em;
       }
     }
 

@@ -75,11 +75,11 @@ export default {
     ...mapGetters(['currentUser', 'currentResortId', 'resortPermissions']),
     showContacts () {
       if (this.currentUser.superAdmin) return true
-      else return this.currentUser.canAccessContacts() && this.resortPermissions.canManageContacts
+      else return this.currentUser.canAccessContacts()
     },
     showWebcams () {
       if (this.currentUser.superAdmin) return true
-      else return this.currentUser.canAccessWebcams() && this.resortPermissions.canManageWebcams
+      else return this.currentUser.canAccessWebcams()
     }
   },
   methods: {
