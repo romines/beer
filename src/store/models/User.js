@@ -16,18 +16,16 @@ export default class User {
     return this.canManageWebcams || this.superAdmin || this.isResortAdmin
   }
 
-  canAccessPush () {
-    return this.canManagePushNotifications || this.canViewPushNotifications || this.superAdmin
-  }
-
   canAccessSettings () {
-    // TODO
-    // Fix this up so it's more relevant
-    return this.isResortAdmin || this.superAdmin
+    return this.isResortAdmin || this.superAdmin || this.canManagePushNotifications
   }
 
   canAccessContacts () {
-    return this.canManageContacts || this.canViewContacts || this.superAdmin || this.isResortAdmin
+    return this.canViewContacts || this.canEditContacts()
+  }
+
+  canEditContacts () {
+    return this.canManageContacts || this.superAdmin || this.isResortAdmin
   }
 
 

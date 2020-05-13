@@ -21,7 +21,7 @@
 
 
         <div v-if="showUserMenu" class="user-menu">
-          <span class="menu-item" @click="goToSettings()">
+          <span v-if="currentUser.canAccessSettings()" class="menu-item" @click="goToSettings()">
             Settings
           </span>
           <span class="menu-item" @click="goToProfile()">
