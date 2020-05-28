@@ -22,7 +22,7 @@
   },
   "private": true,
   "engines": {
-    "node": "8"
+    "node": "10"
   },
   "devDependencies": {
     "eslint-plugin-prettier": "^3.1.0",

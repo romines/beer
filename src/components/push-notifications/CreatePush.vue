@@ -64,7 +64,7 @@
     <div class="push-choice local-push">
       <input v-model="isLocalPush" type="checkbox">
       <label>Send to Local Area</label>
-      <span v-if="localDevicesCount" class="device-count"> ({{localDevicesCount}} devices)</span>
+      <span v-if="localDevicesCount" class="device-count">&nbsp;({{localDevicesCount}} devices)</span>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
         <span class="tooltiptext top">Sends the message only to users within 20km of the resort. The app will receive the message only if it has been allowed to track the user’s location.</span>
@@ -120,6 +120,15 @@
       </transition>
     </div>
 
+    <div class="push-choice home-tile">
+      <input v-model="isTilePush" type="checkbox">
+      <label>Send as Home Screen Tile</label>
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">Display the message in a tile on the Home screen. Remains on display until replaced with an empty message or a new message.</span>
+      </span>
+    </div>
+
     <div class="cancel-save">
       <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">{{sendMessageText}}</span>
       <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
@@ -151,6 +160,7 @@ export default {
       geoZonesAreLoading:   false,
       isSilentPush:         false,
       isLocalPush:          false,
+      isTilePush:           false,
       isSelectedCitiesPush: false,
       localDevicesCount:    null,
       currentRetryCount:    0,
@@ -167,7 +177,7 @@ export default {
   computed: {
     ...mapGetters(['pushWooshData']),
     messageIsValid () {
-      return this.messageBody.length > 0
+      return this.messageBody.length > 0 || this.isTilePush
     },
     sendMessageText () {
       if (Object.keys(this.selectedGeoZone).length > 0) return 'Send to all users in zone'
@@ -270,7 +280,8 @@ export default {
         selectedCities:   this.selectedCityNames,
         geoZone:          this.selectedGeoZone,
         messageLink:      this.messageLink,
-        silentSettings:   this.isSilentPush ? this.silentSettings : undefined     // only send if active
+        silentSettings:   this.isSilentPush ? this.silentSettings : undefined,     // only send if active
+        isTilePush:       this.isTilePush
       }).then((response) => {
         this.onMessageSuccess()
       }).catch((response) => {
@@ -333,6 +344,7 @@ export default {
         this.isSilentPush         = false
         this.selectedCities       = []
         this.isSelectedCitiesPush = false
+        this.isTilePush           = false
       }
     },
     isSilentPush (val) {
@@ -340,12 +352,22 @@ export default {
         this.isLocalPush          = false
         this.selectedCities       = []
         this.isSelectedCitiesPush = false
+        this.isTilePush           = false
       }
     },
     isSelectedCitiesPush (val) {
       if (val) {
         this.isLocalPush  = false
         this.isSilentPush = false
+        this.isTilePush   = false
+      }
+    },
+    isTilePush (val) {
+      if (val) {
+        this.isLocalPush          = false
+        this.selectedCities       = []
+        this.isSelectedCitiesPush = false
+        this.isSilentPush         = false
       }
     }
   }

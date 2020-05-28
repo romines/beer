@@ -18,7 +18,7 @@ module.exports = functions.https.onRequest((req, res) => {
   let silentSettings  = req.body.silentSettings
 
   if (!req.body.messageBody) {
-    res.send('WTF');
+    res.send('Message body is required.');
   } else {
 
     let requestBody = {
@@ -44,7 +44,6 @@ module.exports = functions.https.onRequest((req, res) => {
     // Add silent settings
     if (silentSettings) {
       // iOS stuff...
-      // notification["ios_ttl"]           = 86400
       notification["ios_root_params"]   =  {
         "aps": {
             "content-available":1,
@@ -55,7 +54,6 @@ module.exports = functions.https.onRequest((req, res) => {
       }
 
       // Android stuff...
-      // notification["android_gcm_ttl"]             = 86400
       notification["android_icon"]                = "ic_note"
       notification["android_priority"]            = 0
       notification["android_delivery_priority"]   = "normal"
@@ -69,8 +67,14 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["data"]["validMinutes"]    = silentSettings.validMinutes
       notification["data"]["repeatInterval"]  = silentSettings.repeatInterval
       notification["data"]["repeatLimit"]     = silentSettings.repeatLimit
-      notification["data"]["priority"]        = silentSettings.isHighPriority ? 1 : 0
+      notification["data"]["priority"]        = silentSettings.isHighPriority ? -1 : 0
     } // end silent if
+
+
+    // Set priority for tile push
+    if (req.body.isTilePush) {
+      notification["data"]["priority"] = 1
+    }
 
     // Add geozone info
     if (req.body.geoZone.lat) {
@@ -92,6 +96,7 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["link"]          = req.body.messageLink
       notification["minimize_link"] = "0"
     }
+
 
     httpRequest.post({
       url: 'https://cp.pushwoosh.com/json/1.3/createMessage',
