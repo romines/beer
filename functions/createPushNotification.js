@@ -53,6 +53,9 @@ module.exports = functions.https.onRequest((req, res) => {
         }
       }
 
+      // Omit content field from notifications
+      delete notification['content']
+
       // Android stuff...
       notification["android_icon"]                = "ic_note"
       notification["android_priority"]            = 0
