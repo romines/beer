@@ -1,3 +1,5 @@
+import store from '../../store'
+
 export default class User {
 
   static build (user, uid) {
@@ -8,7 +10,17 @@ export default class User {
     return this.firstName + ' ' + this.lastName
   }
 
+  canAccessSettings () {
+    return this.isResortAdmin || this.superAdmin || this.canManagePushNotifications
+  }
+
+  canEditPushNotifications () {
+    return this.superAdmin || this.isResortAdmin || this.canManagePushNotifications
+  }
+
   canAccessWebcams () {
+    if (this.superAdmin) return true
+    if (!store.getters.resortPermissions.canManageWebcams) return false
     return this.canViewWebcams || this.canEditWebcams()
   }
 
@@ -16,11 +28,9 @@ export default class User {
     return this.canManageWebcams || this.superAdmin || this.isResortAdmin
   }
 
-  canAccessSettings () {
-    return this.isResortAdmin || this.superAdmin || this.canManagePushNotifications
-  }
-
   canAccessContacts () {
+    if (this.superAdmin) return true
+    if (!store.getters.resortPermissions.canManageContacts) return false
     return this.canViewContacts || this.canEditContacts()
   }
 

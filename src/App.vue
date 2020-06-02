@@ -2,7 +2,7 @@
   <div id="app">
     <!-- TODO: nav to separate component -->
 
-    <div v-if="currentUser && currentUser.uid && currentResortId" class="top-nav-container">
+    <div v-if="currentUser && currentUser.uid && currentResort.id" class="top-nav-container">
 
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
@@ -13,6 +13,7 @@
       </div>
 
       <div class="right-nav">
+        <div class="current-resort">{{currentResort.name}}</div>
         <div v-on:click="showUserMenu = !showUserMenu" class="header">
           <span class="current-user">{{currentUser.email}}</span>
           <i v-if="showUserMenu" class='toggler fas fa-angle-up'></i>
@@ -72,14 +73,12 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['currentUser', 'currentResortId', 'resortPermissions']),
+    ...mapGetters(['currentUser', 'currentResort', 'resortPermissions']),
     showContacts () {
-      if (this.currentUser.superAdmin) return true
-      else return this.currentUser.canAccessContacts()
+      return this.currentUser.canAccessContacts()
     },
     showWebcams () {
-      if (this.currentUser.superAdmin) return true
-      else return this.currentUser.canAccessWebcams()
+      return this.currentUser.canAccessWebcams()
     }
   },
   methods: {
@@ -175,7 +174,7 @@ export default {
       background:             white;
       border:                 2px solid lightgray;
       border-top:             none;
-      top:                    40px;
+      top:                    57px;
 
       .menu-item {
         display:              block;

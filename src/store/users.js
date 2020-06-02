@@ -55,7 +55,7 @@ const actions = {
 
           // if not superAdmin set resortId here to user's primary resort
           if (!userData.primaryResortId) console.log('PRIMARY RESORT ID MISSING')
-          if (!userData.superAdmin) commit('SET_RESORT_ID', userData.primaryResortId)
+          if (!userData.superAdmin) dispatch('setCurrentResort', userData.primaryResortId)
 
           let newUser = User.build(userData, user.uid)
 

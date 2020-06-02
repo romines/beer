@@ -34,7 +34,6 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
       if (!store.getters.currentUser.canAccessContacts()) return next('/')
-      if (!store.getters.resortPermissions.canManageContacts) return next('/')
 
       Promise.all([
         store.dispatch('listenToResortRoot'),
@@ -120,7 +119,6 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
       if (!store.getters.currentUser.canAccessWebcams()) return next('/')
-      if (!store.getters.resortPermissions.canManageWebcams) return next('/')
 
       store.dispatch('getResortWebcams').then(() => {
         store.commit('SET_LOADING_STATE', false)
@@ -285,13 +283,17 @@ router.beforeEach(async (to, from, next) => {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
-    const [err] = await promiseTo(store.dispatch('setCurrentUser', auth.currentUser))
+    const [err, user] = await promiseTo(store.dispatch('setCurrentUser', auth.currentUser))
     if (err) {
       store.commit('SET_LOADING_STATE', false)
       console.log(err.message)
       return store.dispatch('showErrorModal', err)
     }
 
+    if (!user.superAdmin) {
+      const [err3] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResortId))
+    }
+    // Must go after setCurrentResort
     const [err2] = await promiseTo(store.dispatch('getResortPermissions'))
   }
 

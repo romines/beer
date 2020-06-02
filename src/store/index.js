@@ -40,6 +40,7 @@ const store = {
   state: {
     resorts: [],
     resortId: '',
+    currentResort: {},
     pushWooshData: {
       appId: '',
       exportSubscribers: {},
@@ -68,8 +69,12 @@ const store = {
     uploadBufferUrl: '',
   },
   mutations: {
-    SET_RESORT_ID(state, resortId) {
-      state.resortId = resortId
+    SET_CURRENT_RESORT(state, payload) {
+      state.resortId = payload.id   // TODO this should be deprecated, just use currentResort.id
+      state.currentResort = {
+        id:   payload.id,
+        name: payload.name
+      }
     },
     SET_RESORTS(state, resorts) {
       console.log('SET(ing)_RESORTS . . .')
@@ -120,6 +125,21 @@ const store = {
   },
 
   actions: {
+    setCurrentResort({ commit, dispatch }, resortId) {
+      return new Promise((resolve, reject) => {
+        if (!resortId) {
+          commit('SET_CURRENT_RESORT', {})
+          resolve()
+        } else {
+          RESORTS_REF.doc(resortId).get().then((doc) => {
+            let data = doc.data()
+            commit('SET_CURRENT_RESORT', { id: resortId, name: data.name })
+            resolve()
+          })
+        }
+      })
+    },
+
     getResorts({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
         let resorts = []
@@ -147,7 +167,6 @@ const store = {
 
     initializePushWooshData({ rootState, commit, dispatch }) {
       return new Promise((resolve, reject) => {
-
         RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
           const resortData = doc.data()
           // If there is no PW data object in firestore, create one
@@ -284,7 +303,7 @@ const store = {
     },
 
     resetResortState({ commit, dispatch }) {
-      commit('SET_RESORT_ID', '')
+      dispatch('setCurrentResort', null)
       commit('SET_CONTACT_GROUPS', {})
       commit('SET_RESORT_META', {})
       commit('SET_PUSHWOOSH_DATA', {})
@@ -301,7 +320,7 @@ const store = {
     logOut({ commit, dispatch }) {
       return new Promise((resolve, reject) => {
         auth.signOut().then(() => {
-          commit('SET_RESORT_ID', '')
+          dispatch('setCurrentResort', null)
           commit('SET_CONTACT_GROUPS', {})
           dispatch('clearCurrentUser')
           resolve()
@@ -608,8 +627,8 @@ const store = {
     webcams (state) {
       return state.webcams
     },
-    currentResortId (state) {
-      return state.resortId
+    currentResort (state) {
+      return state.currentResort
     },
     resorts (state) {
       return state.resorts
