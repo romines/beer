@@ -97,8 +97,7 @@ const routes = [
     name: 'Resorts',
     component: Resorts,
     meta: {
-      requiresAuth: true,
-      requiresSuperAdmin: true,
+      requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
       store.commit('SET_LOADING_STATE', true)
@@ -290,11 +289,19 @@ router.beforeEach(async (to, from, next) => {
       return store.dispatch('showErrorModal', err)
     }
 
-    if (!user.superAdmin) {
-      const [err3] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResortId))
+    // If not a superAdmin, and more than one authorizedResort, we do not want to call setCurrentUser
+    if (!user.superAdmin && user.authorizedResortCount() === 1) {
+      const [err2] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResort()))
+      // Must go after setCurrentResort
+      const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
+    } else {
+      next('/resorts')
     }
-    // Must go after setCurrentResort
-    const [err2] = await promiseTo(store.dispatch('getResortPermissions'))
+
+  }
+
+  if (!store.getters.currentResort.id) {
+
   }
 
   /**

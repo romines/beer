@@ -11,31 +11,48 @@ export default class User {
   }
 
   canAccessSettings () {
-    return this.isResortAdmin || this.superAdmin || this.canManagePushNotifications
+    return this.currentResortPermissions().isResortAdmin || this.superAdmin || this.currentResortPermissions().canManagePushNotifications
   }
 
   canEditPushNotifications () {
-    return this.superAdmin || this.isResortAdmin || this.canManagePushNotifications
+    return this.superAdmin || this.currentResortPermissions().isResortAdmin || this.currentResortPermissions().canManagePushNotifications
   }
 
   canAccessWebcams () {
     if (this.superAdmin) return true
     if (!store.getters.resortPermissions.canManageWebcams) return false
-    return this.canViewWebcams || this.canEditWebcams()
+    return this.currentResortPermissions().canViewWebcams || this.canEditWebcams()
   }
 
   canEditWebcams () {
-    return this.canManageWebcams || this.superAdmin || this.isResortAdmin
+    return this.currentResortPermissions().canManageWebcams || this.superAdmin || this.currentResortPermissions().isResortAdmin
   }
 
   canAccessContacts () {
     if (this.superAdmin) return true
     if (!store.getters.resortPermissions.canManageContacts) return false
-    return this.canViewContacts || this.canEditContacts()
+    return this.currentResortPermissions().canViewContacts || this.canEditContacts()
   }
 
   canEditContacts () {
-    return this.canManageContacts || this.superAdmin || this.isResortAdmin
+    return this.currentResortPermissions().canManageContacts || this.superAdmin || this.currentResortPermissions().isResortAdmin
+  }
+
+  currentResortPermissions () {
+    if (this.superAdmin) return {}
+    return this.authorizedResorts[store.getters.currentResort.id]
+  }
+
+  authorizedResortCount () {
+    return Object.keys(this.authorizedResorts).length
+  }
+
+  authorizedResortIds () {
+    return Object.keys(this.authorizedResorts)
+  }
+
+  primaryResort () {
+    return Object.keys(this.authorizedResorts)[0]
   }
 
 
@@ -46,15 +63,16 @@ export default class User {
     this.email                        = user.email || '',
     this.superAdmin                   = !!user.superAdmin,
     this.primaryResortId              = user.primaryResortId,
-    this.canManageContacts            = user.canManageContacts || false,
-    this.canManagePushNotifications   = user.canManagePushNotifications || false,
-    this.canManageWebcams             = user.canManageWebcams || false,
-    this.canViewContacts              = user.canViewContacts || false,
-    this.canViewPushNotifications     = user.canViewPushNotifications || false,
-    this.canViewWebcams               = user.canViewWebcams || false,
     this.updatedAt                    = user.updatedAt || '',
     this.createdAt                    = user.createdAt || '',
-    this.identifier                   = user.identifier || '',
-    this.isResortAdmin                = user.isResortAdmin || false
+    this.authorizedResorts            = user.authorizedResorts
+
+    // this.canManageContacts            = user.canManageContacts || false,
+    // this.canManagePushNotifications   = user.canManagePushNotifications || false,
+    // this.canManageWebcams             = user.canManageWebcams || false,
+    // this.canViewContacts              = user.canViewContacts || false,
+    // this.canViewPushNotifications     = user.canViewPushNotifications || false,
+    // this.canViewWebcams               = user.canViewWebcams || false,
+    // this.isResortAdmin                = user.isResortAdmin || false
   }
 }

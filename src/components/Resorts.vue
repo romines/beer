@@ -2,19 +2,26 @@
   <div class="resorts">
     <site-header title="Resorts" />
 
-    <ul>
+    <ul v-if="currentUser.superAdmin">
       <li class="resort box" v-for="resort in resorts" @click="goToResort(resort.resortId)">
         <span class="name">{{ resort.name }}</span>
       </li>
     </ul>
+    <ul v-else>
+      <li class="resort box" v-for="resort in userResorts" @click="goToResort(resort.resortId)">
+        <span class="name">{{ resort.name }}</span>
+      </li>
+    </ul>
 
-    <new-resort />
+    <new-resort v-if="currentUser.superAdmin" />
   </div>
 </template>
 
 <script>
 import SiteHeader from './SiteHeader.vue'
 import NewResort from './NewResort.vue'
+import { mapGetters } from 'vuex'
+
 export default {
   components: {
     SiteHeader,
@@ -24,7 +31,8 @@ export default {
     return {}
   },
   computed: {
-    resorts() {
+    ...mapGetters(['currentUser']),
+    resorts () {
       return this.$store.state.resorts.slice().sort((a, b) => {
         if (a.name < b.name) {
           return -1
@@ -35,12 +43,17 @@ export default {
         return 0
       })
     },
+    userResorts () {
+      return this.$store.state.resorts.filter((resort) => {
+        return this.currentUser.authorizedResortIds().includes(resort.resortId)
+      })
+    }
   },
   methods: {
     goToResort(resortId) {
       this.$store.commit('SET_LOADING_STATE', true)
       this.$store.dispatch('setCurrentResort', resortId).then(() => {
-        this.$store.dispatch('getResortPermissions')
+        this.$store.dispatch('getCurrentResortPermissions')
         this.$router.push('/')
       })
     },

@@ -32,8 +32,6 @@
             Logout
           </span>
         </div>
-
-
       </div>
     </div>
 

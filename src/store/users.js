@@ -51,13 +51,8 @@ const actions = {
       .get()
       .then(
         doc => {
-          const userData = doc.data()
-
-          // if not superAdmin set resortId here to user's primary resort
-          if (!userData.primaryResortId) console.log('PRIMARY RESORT ID MISSING')
-          if (!userData.superAdmin) dispatch('setCurrentResort', userData.primaryResortId)
-
-          let newUser = User.build(userData, user.uid)
+          const userData  = doc.data()
+          let newUser     = User.build(userData, user.uid)
 
           commit('SET_USER', newUser)
 

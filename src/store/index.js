@@ -206,7 +206,7 @@ const store = {
       })
     },
 
-    getResortPermissions({ rootState, commit }) {
+    getCurrentResortPermissions({ rootState, commit }) {
       return new Promise((resolve, reject) => {
 
         if (!rootState.resortId) {
