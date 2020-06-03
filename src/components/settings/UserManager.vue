@@ -36,24 +36,50 @@ export default {
       showCreateUser:     false
     }
   },
-  computed: {},
+  computed: {
+    ...mapGetters(['currentResort'])
+  },
   beforeRouteEnter (to, from, next) {
     store.dispatch('setResortUsers').then(() => {
       next()
     })
   },
   methods: {
-    onUserSave (newUser, sendPasswordResetEmail) {
+    onUserSave (newUser, newUserPermissions, sendPasswordResetEmail) {
       this.showCreateUser = false
       this.$store.commit('SET_LOADING_STATE', true)
-      this.$store.dispatch('createUserForResort', { user: newUser, sendPasswordResetEmail: sendPasswordResetEmail }).then((user) => {
-        if (user) {
-          this.$store.dispatch('setResortUsers')
-          this.$store.dispatch('showSuccessModal', 'User created!')
+
+      // Check to see if user already exists...
+      this.$store.dispatch('lookupUserByEmailAddress', newUser.email).then((existingUser) => {
+        if (existingUser) {
+          // User exists for this resort already... show error
+          if (existingUser["authorizedResorts"][this.currentResort.id]) {
+            this.$store.commit('SET_LOADING_STATE', false)
+            this.$store.dispatch('showErrorModal', 'User already exists for this resort.')
+          } else {
+            // If user exists for another resort, set new authorizedResorts and permissions
+            if (!existingUser['authorizedResorts']) existingUser['authorizedResorts'] = {}
+            existingUser['authorizedResorts'][this.currentResort.id] = newUserPermissions
+            this.$store.dispatch('saveUserForCurrentResort', existingUser).then((user) => {
+              this.$store.dispatch('showSuccessModal', 'User added!')
+            })
+          }
+        } else {
+          // User does not exist. Create!
+          this.$store.dispatch('createUserForResort', {
+            user:                     newUser,
+            permissions:              newUserPermissions,
+            sendPasswordResetEmail:   sendPasswordResetEmail
+          }).then((user) => {
+            if (user) {
+              this.$store.dispatch('setResortUsers')
+              this.$store.dispatch('showSuccessModal', 'User created!')
+            }
+            this.$store.commit('SET_LOADING_STATE', false)
+          }).catch((error) => {
+            this.$store.dispatch('showErrorModal', error.message)
+          })
         }
-        this.$store.commit('SET_LOADING_STATE', false)
-      }).catch((error) => {
-        this.$store.dispatch('showErrorModal', error.message)
       })
     }
   }

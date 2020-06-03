@@ -22,7 +22,7 @@
 
 
         <div v-if="showUserMenu" class="user-menu">
-          <span v-if="currentUser.hasManyResorts()" class="menu-item" @click="goToResorts()">
+          <span v-if="currentUser.canAccessResorts()" class="menu-item" @click="goToResorts()">
             Resorts
           </span>
           <span v-if="currentUser.canAccessSettings()" class="menu-item" @click="goToSettings()">

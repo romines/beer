@@ -19,42 +19,42 @@
     <div v-if="currentUser.superAdmin" class="toggle-container">
       <span>Resort Admin:</span>
       <label for="resort-admin" class="switch">
-        <input v-model="newUser.isResortAdmin" id="resort-admin" type="checkbox">
+        <input v-model="newUserPermissions.isResortAdmin" id="resort-admin" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
     <div class="toggle-container">
       <span>Manage Push:</span>
       <label for="manage-push" class="switch">
-        <input v-model="newUser.canManagePushNotifications" id="manage-push" type="checkbox">
+        <input v-model="newUserPermissions.canManagePushNotifications" id="manage-push" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div v-if="resortPermissions.canManageContacts" class="toggle-container">
+    <div v-if="currentUser.canAccessContacts()" class="toggle-container">
       <span>View Contacts:</span>
       <label for="view-contacts" class="switch">
-        <input v-model="newUser.canViewContacts" id="view-contacts" type="checkbox">
+        <input v-model="newUserPermissions.canViewContacts" id="view-contacts" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div v-if="resortPermissions.canManageContacts" class="toggle-container">
+    <div v-if="currentUser.canAccessContacts()" class="toggle-container">
       <span>Manage Contacts:</span>
       <label for="manage-contacts" class="switch">
-        <input v-model="newUser.canManageContacts" id="manage-contacts" type="checkbox">
+        <input v-model="newUserPermissions.canManageContacts" id="manage-contacts" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div v-if="resortPermissions.canManageWebcams" class="toggle-container">
+    <div v-if="currentUser.canAccessWebcams()" class="toggle-container">
       <span>View Webcams:</span>
       <label for="view-webcams" class="switch">
-        <input v-model="newUser.canViewWebcams" id="view-webcams" type="checkbox">
+        <input v-model="newUserPermissions.canViewWebcams" id="view-webcams" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
-    <div v-if="resortPermissions.canManageWebcams" class="toggle-container">
+    <div v-if="currentUser.canAccessWebcams()" class="toggle-container">
       <span>Manage Webcams:</span>
       <label for="manage-webcams" class="switch">
-        <input v-model="newUser.canManageWebcams" id="manage-webcams" type="checkbox">
+        <input v-model="newUserPermissions.canManageWebcams" id="manage-webcams" type="checkbox">
         <span class="slider round"></span>
       </label>
     </div>
@@ -107,6 +107,7 @@ export default {
   data () {
     return {
       newUser:                  this.initializeUserObject(),
+      newUserPermissions:       this.initializeUserPermissions(),
       sendPasswordResetEmail:   true
     }
   },
@@ -124,13 +125,25 @@ export default {
         return this.setNewUserDefaults()
       }
     },
+    initializeUserPermissions () {
+      if (this.existingUser) {
+        let permissions = this.existingUser.currentUserResortPermissions()
+        return JSON.parse(JSON.stringify(permissions))
+      } else {
+        return this.setNewUserPermissionsDefaults()
+      }
+    },
     setNewUserDefaults () {
       return {
         firstName:                    '',
         lastName:                     '',
         email:                        '',
         password:                     Math.random().toString(36).slice(-10),
-        superAdmin:                   false,
+        superAdmin:                   false
+      }
+    },
+    setNewUserPermissionsDefaults () {
+      return {
         isResortAdmin:                false,
         canViewWebcams:               false,
         canManageWebcams:             false,
@@ -141,17 +154,17 @@ export default {
       }
     },
     setAllPermissions (value) {
-      this.$set(this.newUser, 'canViewWebcams', value)
-      this.$set(this.newUser, 'canManageWebcams', value)
-      this.$set(this.newUser, 'canViewPushNotifications', value)
-      this.$set(this.newUser, 'canManagePushNotifications', value)
-      this.$set(this.newUser, 'canViewContacts', value)
-      this.$set(this.newUser, 'canManageContacts', value)
+      this.$set(this.newUserPermissions, 'canViewWebcams', value)
+      this.$set(this.newUserPermissions, 'canManageWebcams', value)
+      this.$set(this.newUserPermissions, 'canViewPushNotifications', value)
+      this.$set(this.newUserPermissions, 'canManagePushNotifications', value)
+      this.$set(this.newUserPermissions, 'canViewContacts', value)
+      this.$set(this.newUserPermissions, 'canManageContacts', value)
     },
     save () {
       // Only set defaults on new user
       if (!this.existingUser) this.setWebcamDefaults()
-      this.$emit('save', this.newUser, this.sendPasswordResetEmail)
+      this.$emit('save', this.newUser, this.newUserPermissions, this.sendPasswordResetEmail)
     },
     cancel () {
       this.newUser = this.setNewUserDefaults()
@@ -178,7 +191,7 @@ export default {
     }
   },
   watch: {
-    'newUser.isResortAdmin': {
+    'newUserPermissions.isResortAdmin': {
       handler(val) {
         this.setAllPermissions(val)
       },

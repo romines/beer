@@ -11,41 +11,45 @@ export default class User {
   }
 
   canAccessSettings () {
-    return this.isResortAdmin() || this.superAdmin || this.currentResortPermissions().canManagePushNotifications
+    return this.isResortAdmin() || this.superAdmin || this.currentUserResortPermissions().canManagePushNotifications
   }
 
   canEditPushNotifications () {
-    return this.superAdmin || this.isResortAdmin() || this.currentResortPermissions().canManagePushNotifications
+    return this.superAdmin || this.isResortAdmin() || this.currentUserResortPermissions().canManagePushNotifications
   }
 
   canAccessWebcams () {
     if (this.superAdmin) return true
     if (!store.getters.resortPermissions.canManageWebcams) return false
-    return this.currentResortPermissions().canViewWebcams || this.canEditWebcams()
+    return this.currentUserResortPermissions().canViewWebcams || this.canEditWebcams()
   }
 
   canEditWebcams () {
-    return this.currentResortPermissions().canManageWebcams || this.superAdmin || this.isResortAdmin()
+    return this.currentUserResortPermissions().canManageWebcams || this.superAdmin || this.isResortAdmin()
   }
 
   canAccessContacts () {
     if (this.superAdmin) return true
     if (!store.getters.resortPermissions.canManageContacts) return false
-    return this.currentResortPermissions().canViewContacts || this.canEditContacts()
+    return this.currentUserResortPermissions().canViewContacts || this.canEditContacts()
   }
 
   canEditContacts () {
-    return this.currentResortPermissions().canManageContacts || this.superAdmin || this.isResortAdmin()
+    return this.currentUserResortPermissions().canManageContacts || this.superAdmin || this.isResortAdmin()
   }
 
-  currentResortPermissions () {
+  canAccessResorts () {
+    return this.superAdmin || this.hasManyResorts()
+  }
+
+  currentUserResortPermissions () {
     if (this.superAdmin) return {}
     if (!store.getters.currentResort || !store.getters.currentResort.id) return {}
     return this.authorizedResorts[store.getters.currentResort.id]
   }
 
   isResortAdmin () {
-    return this.currentResortPermissions().isResortAdmin
+    return this.currentUserResortPermissions().isResortAdmin
   }
 
   authorizedResortCount () {
@@ -64,6 +68,12 @@ export default class User {
     return Object.keys(this.authorizedResorts)[0]
   }
 
+  canEditUser (user) {
+    if (this.superAdmin) return true
+    if (this.isResortAdmin() && !user.isResortAdmin()) return true
+    return false
+  }
+
 
   constructor (user, uid) {
     this.uid                          = uid,
@@ -71,7 +81,6 @@ export default class User {
     this.lastName                     = user.lastName || '',
     this.email                        = user.email || '',
     this.superAdmin                   = !!user.superAdmin,
-    this.primaryResortId              = user.primaryResortId,
     this.updatedAt                    = user.updatedAt || '',
     this.createdAt                    = user.createdAt || '',
     this.authorizedResorts            = user.authorizedResorts

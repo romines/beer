@@ -62,9 +62,11 @@ const actions = {
       )
   },
 
+
   clearCurrentUser({commit}) {
     commit('SET_USER', {})
   },
+
 
   async createUser({ commit, dispatch }, { email, password, resortId }) {
     const [createError, firebaseUser] = await promiseTo(
@@ -78,10 +80,7 @@ const actions = {
 
     const uid = firebaseUser.user.uid
 
-    const user = {
-      email:                email,
-      primaryResortId:      resortId,
-    }
+    const user = { email: email }
 
     const [rtdbSaveError] = await promiseTo(
       USERS_REF
@@ -106,6 +105,22 @@ const actions = {
   },
 
 
+  async lookupUserByEmailAddress({commit, dispatch}, emailAddress) {
+    return new Promise((resolve, reject) => {
+      var user
+      USERS_REF.get().then((snapshot) => {
+        snapshot.forEach(userSnapshot => {
+          let userData = userSnapshot.data()
+          if (userData.email === emailAddress) {
+            user = userSnapshot.data()
+          }
+        })
+        resolve(user)
+      })
+    })
+  },
+
+
   async createUserForResort({ commit, dispatch, rootState }, payload) {
     // This is annoying, but we have to create a new auth instance, because google's default behavior is to set the currentUser to the new user.
     // We don't want that.
@@ -116,7 +131,8 @@ const actions = {
 
     if (createError) {
       commit('SET_LOADING_STATE', false)
-      return dispatch('showErrorModal', createError.message)
+      dispatch('showErrorModal', createError.message)
+      return
     }
 
     if (payload.sendPasswordResetEmail) {
@@ -128,17 +144,29 @@ const actions = {
     }
 
     const uid = firebaseUser.user.uid
+    payload.user['uid'] = uid
+    delete payload.user['password'] // don't want to save password on RT user object
 
-    delete payload.user['password']
-    payload.user['primaryResortId'] = rootState.currentResort.id
+    payload.user['superAdmin'] = false
+    payload.user['authorizedResorts'] = {}
+    payload.user['authorizedResorts'][rootState.currentResort.id] = payload.permissions
 
-    return USERS_REF.doc(uid).set(payload.user).then(() => {
-      commit('ADD_RESORT_USER', User.build(payload.user, uid))
-      return payload.user
-    }).catch((error) => {
-      commit('SET_LOADING_STATE', false)
-      throw new Error(createError.message)
-      return false
+    return dispatch('saveUserForCurrentResort', payload.user)
+  },
+
+
+  saveUserForCurrentResort({ commit, rootState }, user) {
+    return new Promise((resolve, reject) => {
+      USERS_REF.doc(user.uid).set(user).then(() => {
+        commit('ADD_RESORT_USER', User.build(user, user.uid))
+        commit('SET_LOADING_STATE', false)
+        resolve(user)
+      }).catch((error) => {
+        commit('SET_LOADING_STATE', false)
+        throw new Error(error.message)
+        console.log(error)
+        reject(error)
+      })
     })
   },
 
@@ -148,7 +176,7 @@ const actions = {
     let snapshots = await USERS_REF.get()
 
     snapshots.docs.forEach((userSnapshot) => {
-      // Filter users to be those whose primaryResortId is the current resort
+      // Filter users to be those who have currentResort in their authorizedResorts
       let userData = userSnapshot.data()
       if (!userData.authorizedResorts) return
       if (Object.keys(userData.authorizedResorts).includes(rootState.currentResort.id) && !userData.superAdmin && userData.uid !== getters.currentUser.uid) {
@@ -159,6 +187,7 @@ const actions = {
     commit('SET_RESORT_USERS', users)
   },
 
+
   async saveResortUser({ commit, rootState }, user) {
     return USERS_REF.doc(user.uid).update(user).then((error) => {
       let newUser = User.build(user, user.uid)
@@ -166,6 +195,7 @@ const actions = {
       else commit('REPLACE_RESORT_USER', newUser)
     })
   },
+
 
   async deleteResortUser({ commit, rootState }, user) {
     let baseUrl = functionsBaseUrl + '/deleteFirebaseUser/' + user.uid

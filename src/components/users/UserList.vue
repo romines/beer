@@ -8,7 +8,7 @@
         <section class="header" @click="showUserDetails(user)">
           <span class="name">{{user.fullName()}}</span>
           <span class="email">{{ user.email }}</span>
-          <span v-if="user.isResortAdmin" class="resort-admin">Admin</span>
+          <span v-if="user.currentUserResortPermissions().isResortAdmin" class="resort-admin">Admin</span>
           <span class="created-at">{{formatDate(user.createdAt, 'll')}}</span>
         </section>
         <section v-if="showUser(user.uid)" class="body">
@@ -27,7 +27,7 @@
 
           <div v-else class="user-details">
             <!-- Only superAdmins can edit resortAdmins -->
-            <span v-if="currentUser.superAdmin || !user.isResortAdmin" v-on:click="isEditingUser = true">
+            <span v-if="currentUser.canEditUser(user)" v-on:click="isEditingUser = true">
               <i class="fas fa-edit" />
             </span>
             <div class="detail name">
@@ -41,22 +41,22 @@
             </div>
             <section class="permissions">
               <div class="detail permission">
-                <label>Is Resort Admin:</label><span class="created">{{ user.isResortAdmin ? 'Yes' : 'No' }}</span>
+                <label>Is Resort Admin:</label><span class="created">{{ user.currentUserResortPermissions().isResortAdmin ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>Manage Push:</label><span class="created">{{ user.canManagePushNotifications ? 'Yes' : 'No' }}</span>
+                <label>Manage Push:</label><span class="created">{{ user.currentUserResortPermissions().canManagePushNotifications ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageContacts" class="detail permission">
-                <label>View Contacts:</label><span class="created">{{ user.canViewContacts ? 'Yes' : 'No' }}</span>
+                <label>View Contacts:</label><span class="created">{{ user.currentUserResortPermissions().canViewContacts ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageContacts" class="detail permission">
-                <label>Manage Contacts:</label><span class="created">{{ user.canManageContacts ? 'Yes' : 'No' }}</span>
+                <label>Manage Contacts:</label><span class="created">{{ user.currentUserResortPermissions().canManageContacts ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageWebcams" class="detail permission">
-                <label>View Webcams:</label><span class="created">{{ user.canViewWebcams ? 'Yes' : 'No' }}</span>
+                <label>View Webcams:</label><span class="created">{{ user.currentUserResortPermissions().canViewWebcams ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageWebcams" class="detail permission">
-                <label>Manage Webcams:</label><span class="created">{{ user.canManageWebcams ? 'Yes' : 'No' }}</span>
+                <label>Manage Webcams:</label><span class="created">{{ user.currentUserResortPermissions().canManageWebcams ? 'Yes' : 'No' }}</span>
               </div>
             </section>
           </div>
@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['resortUsers', 'currentUser', 'resortPermissions']),
+    ...mapGetters(['resortUsers', 'currentUser', 'resortPermissions', 'currentResort']),
     sortedResortUsers () {
       // Need slice here to prevent render loop
       return this.resortUsers.slice().sort(this.compareDates)
@@ -117,11 +117,15 @@ export default {
     formatDate (date, format) {
       return moment.utc(date).local().format(format)
     },
-    onUserSave (user) {
+    onUserSave (user, userPermissions) {
       user.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
+      user.authorizedResorts[this.currentResort.id] = userPermissions   // reset permissions
+      this.$store.commit('SET_LOADING_STATE', true)
       this.$store.dispatch('saveResortUser', user).then(() => {
         this.currentUserId = null
         this.isEditingUser = false
+        this.$store.commit('SET_LOADING_STATE', false)
+        this.$store.dispatch('showSuccessModal', 'User updated!')
       })
     },
     onUserDelete (user) {
