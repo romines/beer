@@ -34,7 +34,7 @@ export default {
     },
     listenToPublishedContacts({ rootState, commit }) {
       console.log('listen[ing]ToPublished . . .')
-      const resortRef = database.ref(rootState.resortId)
+      const resortRef = database.ref(rootState.currentResort.id)
 
       return new Promise((resolve, reject) => {
         resortRef.child('published').on('value', snap => {
@@ -58,14 +58,14 @@ export default {
     },
     listenToArchiveList({ rootState, commit }) {
       return new Promise((resolve, reject) => {
-        database.ref(`${rootState.resortId}/archiveList`).on('value', snap => {
+        database.ref(`${rootState.currentResort.id}/archiveList`).on('value', snap => {
           commit('SET_ARCHIVE_LIST', snap.val())
           resolve()
         })
       })
     },
     archive({ rootState }, { name, description, publish }) {
-      const resortRoot = database.ref(rootState.resortId)
+      const resortRoot = database.ref(rootState.currentResort.id)
       const archiveListRef = resortRoot.child('archiveList').push()
       const archiveKey = archiveListRef.key
       const now = moment()
@@ -102,21 +102,21 @@ export default {
       return resortRoot.update(updates)
     },
     deleteArchive({ rootState }, archiveKey) {
-      const resortRoot = database.ref(rootState.resortId)
+      const resortRoot = database.ref(rootState.currentResort.id)
       const updates = {}
       updates[`/archiveList/${archiveKey}`] = null
       updates[`/archiveData/${archiveKey}`] = null
       return resortRoot.update(updates)
     },
     toggleArchiveStar({ rootState }, { key, starred }) {
-      database.ref(`${rootState.resortId}/archiveList/${key}/starred/`).set(!starred)
+      database.ref(`${rootState.currentResort.id}/archiveList/${key}/starred/`).set(!starred)
     },
     saveArchiveName({ rootState }, { key, name }) {
       const updates = { name }
-      return database.ref(`${rootState.resortId}/archiveList/${key}`).update(updates)
+      return database.ref(`${rootState.currentResort.id}/archiveList/${key}`).update(updates)
     },
     restoreArchive({ rootState }, { key }) {
-      const resortRef = database.ref(rootState.resortId)
+      const resortRef = database.ref(rootState.currentResort.id)
 
       return new Promise((resolve, reject) => {
         resortRef.child(`archiveData/${key}`).on('value', snap => {
@@ -124,7 +124,7 @@ export default {
 
           firestore
             .collection('resorts')
-            .doc(rootState.resortId)
+            .doc(rootState.currentResort.id)
             .update({
               contactGroups: archiveData.contactGroups,
               emergencyGroup: archiveData.emergencyGroup,
@@ -134,7 +134,7 @@ export default {
       })
     },
     restoreAndPublish({ rootState, dispatch }, { key }) {
-      const resortRoot = database.ref(rootState.resortId)
+      const resortRoot = database.ref(rootState.currentResort.id)
       const updates = {}
       updates[`/archiveList/${key}/date`] = moment().valueOf()
       updates['published'] = key
@@ -144,14 +144,14 @@ export default {
     discardChanges({ state, rootState }) {
       return firestore
         .collection('resorts')
-        .doc(rootState.resortId)
+        .doc(rootState.currentResort.id)
         .update(state.publishedContacts)
     },
   },
 
   getters: {
     dirty: (state, getters, rootState) => {
-      if (!rootState.resortId) return false
+      if (!rootState.currentResort.id) return false
       if (!(rootState.contactGroups && rootState.contactGroups.length)) return false
       if (Object.keys(state.publishedContacts).length === 0) return false
 

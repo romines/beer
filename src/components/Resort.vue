@@ -1,9 +1,9 @@
 <template>
   <div class="resorts">
     <div class="links">
-      <router-link v-if="$store.state.resortId && currentUser.canEditContacts()" to="/history">Revision History</router-link>
-      <router-link v-if="$store.state.resortId && currentUser.superAdmin" to="/maps">Maps</router-link>
-      <router-link v-if="$store.state.resortId && currentUser.superAdmin" to="/tags">Tags</router-link>
+      <router-link v-if="currentResort.id && currentUser.canEditContacts()" to="/history">Revision History</router-link>
+      <router-link v-if="currentResort.id && currentUser.superAdmin" to="/maps">Maps</router-link>
+      <router-link v-if="currentResort.id && currentUser.superAdmin" to="/tags">Tags</router-link>
     </div>
     <site-header title="Contacts" />
     <save-publish v-if="currentUser.canEditContacts()" />
@@ -27,7 +27,7 @@ export default {
     return {}
   },
   computed: {
-    ...mapGetters(['currentUser'])
+    ...mapGetters(['currentUser', 'currentResort'])
   },
   created() {},
   methods: {},

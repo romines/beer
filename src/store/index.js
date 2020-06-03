@@ -70,7 +70,6 @@ const store = {
   },
   mutations: {
     SET_CURRENT_RESORT(state, payload) {
-      state.resortId = payload.id   // TODO this should be deprecated, just use currentResort.id
       state.currentResort = {
         id:   payload.id,
         name: payload.name

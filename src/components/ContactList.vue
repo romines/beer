@@ -36,7 +36,7 @@
               class="tag winter"
               :class="{ 'is-active': deriveTagState(contact, 'winter') }"
               @click.stop="toggleTag(contact, 'winter')"
-              v-show="$store.state.resortId !== 'russell_lands'"
+              v-show="currentResort.id !== 'russell_lands'"
             >
               <span class="icon is-small"> <i class="fas fa-snowflake" /> </span> Winter
             </span>
@@ -44,7 +44,7 @@
               class="tag summer"
               :class="{ 'is-active': deriveTagState(contact, 'summer') }"
               @click.stop="toggleTag(contact, 'summer')"
-              v-show="$store.state.resortId !== 'russell_lands'"
+              v-show="currentResort.id !== 'russell_lands'"
             >
               <span class="icon is-small"> <i class="fas fa-umbrella-beach" /> </span> Summer
             </span>
@@ -84,6 +84,7 @@
 <script>
 import draggable from 'vuedraggable'
 import EditContact from './EditContact'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -109,6 +110,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['currentResort']),
     draggableList: {
       get() {
         if (this.$store.state.contactGroups[this.groupIndex].list === undefined) return []

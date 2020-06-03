@@ -92,7 +92,7 @@
         </div>
       </div>
 
-      <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'" @click.stop>
+      <div class="active-toggles box" v-show="currentResort.id !== 'russell_lands'" @click.stop>
         <div class="title is-6">Contact Active</div>
         <div class="field is-horizontal toggle">
           <div class="field-label is-normal">
@@ -160,6 +160,7 @@ import mixins from './mixins'
 import Cleave from 'vue-cleave'
 import uuid from 'uuid/v4'
 import 'cleave.js/dist/addons/cleave-phone.i18n.js'
+import { mapGetters } from 'vuex'
 
 export default {
 
@@ -187,6 +188,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['currentResort']),
     groupIsDirty () {
       return JSON.stringify(this.localState.emergencyGroup) !== JSON.stringify(this.groupAtInitialization)
     },

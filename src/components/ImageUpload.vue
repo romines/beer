@@ -23,6 +23,7 @@
 
 <script>
 import { storage } from '../firebaseInit.js'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ImageUpload',
@@ -45,6 +46,9 @@ export default {
       uploadProgress: 0,
     }
   },
+  computed: {
+    ...mapGetters(['currentResort']),
+  },
   methods: {
     onFileAdded(e) {
       this.uploading = true
@@ -52,7 +56,7 @@ export default {
       const metadata = {
         contentType: 'image/jpeg',
         customMetadata: {
-          resortId: this.$store.state.resortId,
+          resortId: this.currentResort.id,
         },
       }
       const extension = file.name.split('.')[file.name.split('.').length - 1]
