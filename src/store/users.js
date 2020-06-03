@@ -150,7 +150,8 @@ const actions = {
     snapshots.docs.forEach((userSnapshot) => {
       // Filter users to be those whose primaryResortId is the current resort
       let userData = userSnapshot.data()
-      if (userData.primaryResortId === rootState.currentResort.id && !userData.superAdmin && userData.uid !== getters.currentUser.uid) {
+      if (!userData.authorizedResorts) return
+      if (Object.keys(userData.authorizedResorts).includes(rootState.currentResort.id) && !userData.superAdmin && userData.uid !== getters.currentUser.uid) {
         users.push(User.build(userSnapshot.data(), userSnapshot.id))
       }
     })
