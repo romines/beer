@@ -24,7 +24,7 @@ export default {
         ...state.maps,
         map
       ]
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         maps,
       })
     },
@@ -35,12 +35,12 @@ export default {
         ...maps[index],
         ...updatedMap
       }
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         maps,
       })
     },
     deleteMap({ state, rootState }, mapId) {
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         maps: state.maps.filter(map => map.id !== mapId)
       })
     },

@@ -167,13 +167,13 @@ const store = {
 
     initializePushWooshData({ rootState, commit, dispatch }) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
           const resortData = doc.data()
           // If there is no PW data object in firestore, create one
           if (!resortData.pushWooshData || !resortData.pushWooshData.appId) {
             console.log('MISSING PW DATA... SETTING...')
             let pushWooshEnv = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
-            let pwId = pwConfig[pushWooshEnv][rootState.resortId]
+            let pwId = pwConfig[pushWooshEnv][rootState.currentResort.id]
             if (!pwId) console.log('MISSING PW ID IN PWCONFIG FILE. PLEASE SET!')
             rootState.pushWooshData.appId = pwId
             dispatch('updatePushWooshData', rootState.pushWooshData).then(() => {
@@ -189,7 +189,7 @@ const store = {
 
     clearPushWooshData({ rootState, commit }) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: {} }).then((response) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({ pushWooshData: {} }).then((response) => {
           commit('SET_PUSHWOOSH_DATA', {})
           resolve()
         })
@@ -197,9 +197,9 @@ const store = {
     },
 
     updatePushWooshData({ rootState, commit }, pushWooshData) {
-      if (!rootState.resortId) return // quick bug fix
+      if (!rootState.currentResort.id) return // quick bug fix
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).update({ pushWooshData: pushWooshData }).then((response) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({ pushWooshData: pushWooshData }).then((response) => {
           commit('SET_PUSHWOOSH_DATA', pushWooshData)
           resolve()
         })
@@ -209,12 +209,12 @@ const store = {
     getCurrentResortPermissions({ rootState, commit }) {
       return new Promise((resolve, reject) => {
 
-        if (!rootState.resortId) {
+        if (!rootState.currentResort.id) {
           resolve()
           return
         }
 
-        RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
           const resortData = doc.data()
           commit('SET_RESORT_PERMISSIONS', resortData.resortPermissions)
           resolve()
@@ -226,7 +226,7 @@ const store = {
 
     updateResortPermissions({ rootState, commit }, permissions) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).update({ resortPermissions: permissions }).then((response) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({ resortPermissions: permissions }).then((response) => {
           commit('SET_RESORT_PERMISSIONS', permissions)
           resolve()
         })
@@ -247,7 +247,7 @@ const store = {
         commit('SET_WEBCAMS', webcams)
         firestore
           .collection('resorts')
-          .doc(rootState.resortId)
+          .doc(rootState.currentResort.id)
           .update({
             webcams: webcams,
           })
@@ -263,9 +263,9 @@ const store = {
 
     getResortWebcams({ rootState, commit }) {
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).get().then((doc) => {
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
           if (!doc.data().webcams) {
-            RESORTS_REF.doc(rootState.resortId).update({ webcams: [] }).then((response) => {
+            RESORTS_REF.doc(rootState.currentResort.id).update({ webcams: [] }).then((response) => {
               commit('SET_WEBCAMS', [])
               resolve()
             })
@@ -281,7 +281,7 @@ const store = {
       console.log('listen[ing]ToResortRoot . . .')
 
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).onSnapshot(
+        RESORTS_REF.doc(rootState.currentResort.id).onSnapshot(
           doc => {
             const resortData = doc.data()
 
@@ -352,7 +352,7 @@ const store = {
       return new Promise((resolve, reject) => {
         firestore
           .collection('resorts')
-          .doc(rootState.resortId)
+          .doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
           })
@@ -369,7 +369,7 @@ const store = {
     saveContactGroupName({ rootState }, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
@@ -380,7 +380,7 @@ const store = {
       // let groups = rootState.contactGroups.slice()
 
       // groups[groupIndex] = updatedEmergencyGroup
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         emergencyGroup: updatedEmergencyGroup,
       })
     },
@@ -388,14 +388,14 @@ const store = {
     deleteContactGroup({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups.splice(groupIndex, 1)
-      return RESORTS_REF.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
 
     saveContactGroupList({ rootState }, { updatedList }) {
       // currently unused, but could DRY out contact mutation methods below
-      return RESORTS_REF.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: updatedList,
       })
     },
@@ -403,7 +403,7 @@ const store = {
     toggleSortable({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].noSort = !rootState.contactGroups[groupIndex].noSort
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
@@ -424,7 +424,7 @@ const store = {
         // existing contact
         groups[groupIndex].list[contactIndex] = updatedContact
       }
-      return RESORTS_REF.doc(rootState.resortId)
+      return RESORTS_REF.doc(rootState.currentResort.id)
         .update({
           contactGroups: groups,
         })
@@ -441,11 +441,11 @@ const store = {
       const contact = groups[groupIndex].list.splice(contactIndex, 1)[0]
 
       if (!contact.imageUrl) {
-        return RESORTS_REF.doc(rootState.resortId).update({
+        return RESORTS_REF.doc(rootState.currentResort.id).update({
           contactGroups: groups,
         })
       } else {
-        return RESORTS_REF.doc(rootState.resortId)
+        return RESORTS_REF.doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
           })
@@ -473,7 +473,7 @@ const store = {
       groups[groupIndex].list.splice(contactIndex + 1, 0, newContact)
 
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId)
+        RESORTS_REF.doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
           })
@@ -498,7 +498,7 @@ const store = {
       const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const groups = rootState.contactGroups.slice()
       groups[groupIndex].list = updatedList
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
@@ -529,7 +529,7 @@ const store = {
 
     listenForScaledImage({ rootState, commit }, { fileName, url }) {
       console.log('Listening for scaled image . . .')
-      RESORTS_REF.doc(rootState.resortId)
+      RESORTS_REF.doc(rootState.currentResort.id)
         .collection('scaledImages')
         .doc(fileName.split('.')[0])
         .onSnapshot(() => {

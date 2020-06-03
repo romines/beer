@@ -32,7 +32,7 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
       if (!store.getters.currentUser.canAccessContacts()) return next('/')
 
       Promise.all([
@@ -52,7 +52,7 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
 
       Promise.all([
         store.dispatch('listenToArchiveList'),
@@ -73,7 +73,7 @@ const routes = [
       requiresSuperAdmin: true,
     },
     beforeEnter: async (to, from, next) => {
-      if (!store.state.resortId) return next('/')
+      if (!store.getters.currentResort.id) return next('/')
       await store.dispatch('listenToResortRoot')
       next()
     },
@@ -87,7 +87,7 @@ const routes = [
       requiresSuperAdmin: true,
     },
     beforeEnter: async (to, from, next) => {
-      if (!store.state.resortId) return next('/')
+      if (!store.getters.currentResort.id) return next('/')
       await store.dispatch('listenToResortRoot')
       next()
     },
@@ -116,7 +116,7 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
       if (!store.getters.currentUser.canAccessWebcams()) return next('/')
 
       store.dispatch('getResortWebcams').then(() => {
@@ -133,7 +133,7 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
 
       store.dispatch('initializePushWooshData').then(() => {
         store.commit('SET_LOADING_STATE', false)
@@ -149,7 +149,7 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
       if (!store.getters.currentUser.canAccessSettings()) return next('/')
 
       store.dispatch('initializePushWooshData').then(() => {
@@ -171,8 +171,8 @@ const routes = [
           requiresAuth: true
         },
         beforeEnter: (to, from, next) => {
-          if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
-          if (!store.getters.currentUser.superAdmin && !store.getters.currentUser.isResortAdmin) return next('/')
+          if (!store.getters.currentResort.id) return next('/resorts')
+          if (!store.getters.currentUser.superAdmin && !store.getters.currentUser.isResortAdmin()) return next('/')
 
           store.commit('SET_LOADING_STATE', false)
           next()
@@ -186,7 +186,7 @@ const routes = [
           requiresAuth: true
         },
         beforeEnter: (to, from, next) => {
-          if (!store.state.resortId && store.getters.currentUser.superAdmin) return next('/resorts')
+          if (!store.getters.currentResort.id) return next('/resorts')
           if (!store.getters.currentUser.superAdmin) return next('/')
 
           store.commit('SET_LOADING_STATE', false)
@@ -237,7 +237,7 @@ const routes = [
     path: '/json',
     component: ExportJson,
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId) return next('/')
+      if (!store.getters.currentResort.id) return next('/')
       next()
     },
   },
@@ -289,7 +289,7 @@ router.beforeEach(async (to, from, next) => {
       return store.dispatch('showErrorModal', err)
     }
 
-    // If not a superAdmin, and more than one authorizedResort, we do not want to call setCurrentUser
+    // If user is not a superAdmin, and has more than one authorizedResort, we want to send them to /resorts
     if (!user.superAdmin && user.authorizedResortCount() === 1) {
       const [err2] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResort()))
       // Must go after setCurrentResort
@@ -300,9 +300,6 @@ router.beforeEach(async (to, from, next) => {
 
   }
 
-  if (!store.getters.currentResort.id) {
-
-  }
 
   /**
    *

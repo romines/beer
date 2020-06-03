@@ -130,7 +130,7 @@ const actions = {
     const uid = firebaseUser.user.uid
 
     delete payload.user['password']
-    payload.user['primaryResortId'] = rootState.resortId
+    payload.user['primaryResortId'] = rootState.currentResort.id
 
     return USERS_REF.doc(uid).set(payload.user).then(() => {
       commit('ADD_RESORT_USER', User.build(payload.user, uid))
@@ -150,7 +150,7 @@ const actions = {
     snapshots.docs.forEach((userSnapshot) => {
       // Filter users to be those whose primaryResortId is the current resort
       let userData = userSnapshot.data()
-      if (userData.primaryResortId === rootState.resortId && !userData.superAdmin && userData.uid !== getters.currentUser.uid) {
+      if (userData.primaryResortId === rootState.currentResort.id && !userData.superAdmin && userData.uid !== getters.currentUser.uid) {
         users.push(User.build(userSnapshot.data(), userSnapshot.id))
       }
     })
