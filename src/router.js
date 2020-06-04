@@ -290,7 +290,7 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // User does not have access to any resorts. Log them out and show error
-    if (user.authorizedResortCount() === 0) {
+    if (!user.superAdmin && user.authorizedResortCount() === 0) {
       store.dispatch('logOut').then(() => {
         store.commit('SET_LOADING_STATE', false)
         store.dispatch('showErrorModal', 'You do not have access to view any resorts. Please contact your administrator for assistance.')
