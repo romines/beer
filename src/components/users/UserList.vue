@@ -9,7 +9,7 @@
           <span class="name">{{user.fullName()}}</span>
           <span class="email">{{ user.email }}</span>
           <span v-if="user.currentResortSettings().isResortAdmin" class="resort-admin">Admin</span>
-          <span class="created-at">{{formatDate(user.createdAt, 'll')}}</span>
+          <span class="created-at">{{formatDate(user.currentResortSettings().createdAt, 'll')}}</span>
         </section>
         <section v-if="showUser(user.uid)" class="body">
 
@@ -34,10 +34,10 @@
               <label>Name:</label><span class="created">{{ user.fullName() }}</span>
             </div>
             <div class="detail created">
-              <label>Created At:</label><span class="created">{{formatDate(user.createdAt, 'lll')}}</span>
+              <label>Created At:</label><span class="created">{{formatDate(user.currentResortSettings().createdAt, 'lll')}}</span>
             </div>
             <div class="detail updated">
-              <label>Last Updated:</label><span class="created">{{formatDate(user.updatedAt, 'lll')}}</span>
+              <label>Last Updated:</label><span class="created">{{formatDate(user.currentResortSettings().updatedAt, 'lll')}}</span>
             </div>
             <section class="permissions">
               <div class="detail permission">
@@ -118,7 +118,7 @@ export default {
       return moment.utc(date).local().format(format)
     },
     onUserSave (user, userPermissions) {
-      user.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
+      userPermissions.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
       user.authorizedResorts[this.currentResort.id] = userPermissions   // reset permissions
       this.$store.commit('SET_LOADING_STATE', true)
 
@@ -138,8 +138,6 @@ export default {
         this.$store.commit('SET_LOADING_STATE', false)
         this.currentUserId = null
         this.isEditingUser = false
-      }).catch((error) => {
-
       })
     },
     compareDates (a, b) {
