@@ -9,7 +9,7 @@
     <input v-model="newUser.lastName" class="input name" type="text" name="name">
 
     <h2>Email Address:</h2>
-    <input v-model="newUser.email" class="input name" type="text" name="name">
+    <input v-model="newUser.email" class="input name" v-bind:class="{ 'is-danger': !emailIsValid(newUser.email) }" type="text" name="name">
 
     <div v-if="!existingUser">
       <h2>Password:</h2>
@@ -59,13 +59,18 @@
       </label>
     </div>
 
-    <div v-if="!existingUser">
+    <div v-if="!existingUser" class="password-email">
       <input v-model="sendPasswordResetEmail" type="checkbox" class="reset-email">
       <span>Send password reset email</span>
     </div>
 
+    <div class="error-container">
+      <div v-if="emailError">{{emailError}}</div>
+      <div v-if="passwordError">{{passwordError}}</div>
+    </div>
+
     <div class="cancel-save">
-      <span class="button is-primary new-push-button" @click="save()">Save</span>
+      <button class="button is-primary new-push-button" @click="save()" v-bind:disabled="!formIsValid">Save</button>
       <span class="button is-light new-push-button" @click="cancel()">Cancel</span>
     </div>
 
@@ -84,12 +89,14 @@
 import { mapGetters } from 'vuex'
 import moment from 'moment'
 import validationHelper from '../../helpers/validationHelper'
+import mixins from '../mixins'
 import { v4 as uuidv4 } from 'uuid'
 
 export default {
   components: {
 
   },
+  mixins: [mixins],
   props: {
     title: {
       type:     String,
@@ -112,7 +119,25 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentUser', 'resortPermissions'])
+    ...mapGetters(['currentUser', 'resortPermissions']),
+    formIsValid () {
+      return this.emailIsValid(this.newUser.email) && this.emailIsPresent && this.passwordIsValid
+    },
+    emailIsPresent () {
+      return this.newUser.email.length > 0
+    },
+    emailError () {
+      if (this.emailIsPresent && this.emailIsValid(this.newUser.email)) return false
+      if (this.emailIsPresent) return 'Email is invalid'
+      return 'Email is required'
+    },
+    passwordIsValid () {
+      return this.newUser.password.length > 8
+    },
+    passwordError () {
+      if (this.passwordIsValid) return false
+      return 'Password must be at least 8 characters'
+    }
   },
   created () {
 
@@ -163,19 +188,18 @@ export default {
     },
     save () {
       // Only set defaults on new user
-      if (!this.existingUser) this.setWebcamDefaults()
+      if (!this.existingUser) this.setUserDefaults()
       this.$emit('save', this.newUser, this.newUserPermissions, this.sendPasswordResetEmail)
     },
     cancel () {
       this.newUser = this.setNewUserDefaults()
       this.$emit('cancel')
     },
-    setWebcamDefaults () {
+    setUserDefaults () {
       let createdAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
 
       this.newUser.createdAt  = createdAt
       this.newUser.updatedAt  = createdAt
-      this.newUser.identifier = uuidv4()                // Unique Identifier
     },
     showDeleteModal () {
 
@@ -229,8 +253,13 @@ export default {
   }
 
   .cancel-save {
-    margin-top:                 2em;
+    margin-top:                 1em;
     display:                    inline-block;
+  }
+
+  .error-container {
+    color:                      red;
+    font-size:                  0.9em;
   }
 
   .delete-button {
