@@ -53,6 +53,7 @@ export default class User {
   }
 
   authorizedResortCount () {
+    if (!this.authorizedResorts) return 0
     return Object.keys(this.authorizedResorts).length
   }
 

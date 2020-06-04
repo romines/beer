@@ -289,16 +289,26 @@ router.beforeEach(async (to, from, next) => {
       return store.dispatch('showErrorModal', err)
     }
 
+    // User does not have access to any resorts. Log them out and show error
+    if (user.authorizedResortCount() === 0) {
+      store.dispatch('logOut').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        store.dispatch('showErrorModal', 'You do not have access to view any resorts. Please contact your administrator for assistance.')
+        next('/login')
+      })
+      return
+    }
+
     // If user is not a superAdmin, and has more than one authorizedResort, we want to send them to /resorts
     if (!user.superAdmin && user.authorizedResortCount() === 1) {
       const [err2] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResort()))
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
-      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
-      const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
-      next('/settings/users')
-      // next('/resorts')
+      // const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
+      // const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
+      // next('/settings/users')
+      next('/resorts')
     }
 
   }
