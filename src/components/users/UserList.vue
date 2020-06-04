@@ -141,15 +141,6 @@ export default {
       }).catch((error) => {
 
       })
-
-      // this.$store.dispatch('deleteResortUser', user).then((error) => {
-      //   this.$store.dispatch('showSuccessModal', 'User removed!')
-      //   this.$store.commit('SET_LOADING_STATE', false)
-      //   this.currentUserId = null
-      //   this.isEditingUser = false
-      // }).catch((error) => {
-      //
-      // })
     },
     compareDates (a, b) {
       if (a.createdAt < b.createdAt) {
