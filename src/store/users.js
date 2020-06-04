@@ -188,30 +188,63 @@ const actions = {
   },
 
 
-  async saveResortUser({ commit, rootState }, user) {
-    return USERS_REF.doc(user.uid).update(user).then((error) => {
-      let newUser = User.build(user, user.uid)
-      if (error) dispatch('showErrorModal', 'User update failed. Please try again')
-      else commit('REPLACE_RESORT_USER', newUser)
+  saveResortUser({ commit, rootState }, user) {
+    return new Promise((resolve, reject) => {
+      USERS_REF.doc(user.uid).update(user).then((error) => {
+        let newUser = User.build(user, user.uid)
+        if (error) {
+          dispatch('showErrorModal', 'User update failed. Please try again')
+          reject(error)
+        } else {
+          resolve(newUser)
+        }
+      }).catch((err) => {
+        reject(err)
+      })
     })
   },
 
 
-  async deleteResortUser({ commit, rootState }, user) {
-    let baseUrl = functionsBaseUrl + '/deleteFirebaseUser/' + user.uid
+  deleteResortUser({ commit, rootState }, user) {
+    return new Promise((resolve, reject) => {
+      let baseUrl = functionsBaseUrl + '/deleteFirebaseUser/' + user.uid
 
-    // Delete both the auth user and the RT custom user
-    // return Promise.all([
-    //   USERS_REF.doc(user.uid).delete(),
-    //   axios.delete(baseUrl)
-    // ])
-
-    // For some reason the functions call returns error, even though user is deleted. Going with this for now... 4/29/2020
-    axios.delete(baseUrl).then(() => {}).catch((error) => {
-      console.log(error.response.data)
+      // Delete both the auth user and the RT custom user
+      // return Promise.all([
+      //   USERS_REF.doc(user.uid).delete(),
+      //   axios.delete(baseUrl)
+      // ])
+      // For some reason the functions call returns error, even though user is deleted. Going with this for now... 4/29/2020
+      axios.delete(baseUrl).then(() => {}).catch((error) => {
+        console.log(error.response.data)
+      })
+      USERS_REF.doc(user.uid).delete().then(() => {
+        commit('DELETE_RESORT_USER', user)
+        resolve()
+      }).catch((err) => {
+        reject(err)
+      })
     })
-    return USERS_REF.doc(user.uid).delete().then(() => {
-      commit('DELETE_RESORT_USER', user)
+  },
+
+
+  removeResortFromUser({ commit, rootState, dispatch }, user) {
+    return new Promise((resolve, reject) => {
+      // Delete resort from authorizedResorts list
+      delete user.authorizedResorts[rootState.currentResort.id]
+
+      if (user.authorizedResortCount() === 0) {
+        // delete user completely
+        return dispatch('deleteResortUser', user).then(() => {
+          resolve()
+        })
+      } else {
+        // Save user's current state. Cannot be a custom User object, so parse and stringify
+        return dispatch('saveResortUser', JSON.parse(JSON.stringify(user))).then((user) => {
+          commit('DELETE_RESORT_USER', user) // Remove user from current
+          resolve(user)
+        })
+      }
     })
   },
 

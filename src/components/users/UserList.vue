@@ -8,7 +8,7 @@
         <section class="header" @click="showUserDetails(user)">
           <span class="name">{{user.fullName()}}</span>
           <span class="email">{{ user.email }}</span>
-          <span v-if="user.currentUserResortPermissions().isResortAdmin" class="resort-admin">Admin</span>
+          <span v-if="user.currentResortSettings().isResortAdmin" class="resort-admin">Admin</span>
           <span class="created-at">{{formatDate(user.createdAt, 'll')}}</span>
         </section>
         <section v-if="showUser(user.uid)" class="body">
@@ -41,22 +41,22 @@
             </div>
             <section class="permissions">
               <div class="detail permission">
-                <label>Is Resort Admin:</label><span class="created">{{ user.currentUserResortPermissions().isResortAdmin ? 'Yes' : 'No' }}</span>
+                <label>Is Resort Admin:</label><span class="created">{{ user.currentResortSettings().isResortAdmin ? 'Yes' : 'No' }}</span>
               </div>
               <div class="detail permission">
-                <label>Manage Push:</label><span class="created">{{ user.currentUserResortPermissions().canManagePushNotifications ? 'Yes' : 'No' }}</span>
+                <label>Manage Push:</label><span class="created">{{ user.currentResortSettings().canManagePushNotifications ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageContacts" class="detail permission">
-                <label>View Contacts:</label><span class="created">{{ user.currentUserResortPermissions().canViewContacts ? 'Yes' : 'No' }}</span>
+                <label>View Contacts:</label><span class="created">{{ user.currentResortSettings().canViewContacts ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageContacts" class="detail permission">
-                <label>Manage Contacts:</label><span class="created">{{ user.currentUserResortPermissions().canManageContacts ? 'Yes' : 'No' }}</span>
+                <label>Manage Contacts:</label><span class="created">{{ user.currentResortSettings().canManageContacts ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageWebcams" class="detail permission">
-                <label>View Webcams:</label><span class="created">{{ user.currentUserResortPermissions().canViewWebcams ? 'Yes' : 'No' }}</span>
+                <label>View Webcams:</label><span class="created">{{ user.currentResortSettings().canViewWebcams ? 'Yes' : 'No' }}</span>
               </div>
               <div v-if="resortPermissions.canManageWebcams" class="detail permission">
-                <label>Manage Webcams:</label><span class="created">{{ user.currentUserResortPermissions().canManageWebcams ? 'Yes' : 'No' }}</span>
+                <label>Manage Webcams:</label><span class="created">{{ user.currentResortSettings().canManageWebcams ? 'Yes' : 'No' }}</span>
               </div>
             </section>
           </div>
@@ -121,7 +121,9 @@ export default {
       user.updatedAt = moment.utc().format('YYYY-MM-DD HH:mm:ss')
       user.authorizedResorts[this.currentResort.id] = userPermissions   // reset permissions
       this.$store.commit('SET_LOADING_STATE', true)
-      this.$store.dispatch('saveResortUser', user).then(() => {
+
+      this.$store.dispatch('saveResortUser', user).then((user) => {
+        this.$store.commit('REPLACE_RESORT_USER', user)
         this.currentUserId = null
         this.isEditingUser = false
         this.$store.commit('SET_LOADING_STATE', false)
@@ -131,7 +133,7 @@ export default {
     onUserDelete (user) {
       this.$store.commit('SET_LOADING_STATE', true)
 
-      this.$store.dispatch('deleteResortUser', user).then((error) => {
+      this.$store.dispatch('removeResortFromUser', user).then((user) => {
         this.$store.dispatch('showSuccessModal', 'User removed!')
         this.$store.commit('SET_LOADING_STATE', false)
         this.currentUserId = null
@@ -139,6 +141,15 @@ export default {
       }).catch((error) => {
 
       })
+
+      // this.$store.dispatch('deleteResortUser', user).then((error) => {
+      //   this.$store.dispatch('showSuccessModal', 'User removed!')
+      //   this.$store.commit('SET_LOADING_STATE', false)
+      //   this.currentUserId = null
+      //   this.isEditingUser = false
+      // }).catch((error) => {
+      //
+      // })
     },
     compareDates (a, b) {
       if (a.createdAt < b.createdAt) {
