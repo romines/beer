@@ -132,9 +132,11 @@ export default {
       return 'Email is required'
     },
     passwordIsValid () {
+      if (this.existingUser) return true
       return this.newUser.password.length > 8
     },
     passwordError () {
+      if (this.existingUser) return false
       if (this.passwordIsValid) return false
       return 'Password must be at least 8 characters'
     }
@@ -264,7 +266,7 @@ export default {
 
   .delete-button {
 
-    margin-top:                 2em;
+    margin-top:                 1em;
     float:                      right;
     margin-right:               1em;
 
