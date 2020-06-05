@@ -9,10 +9,24 @@
     <input v-model="newWebcam.shortName" class="input short-name" type="text" name="short-name">
 
     <h2>Still Image Url:</h2>
-    <input v-model="newWebcam.staticImageUrl" class="input static-image-url" type="text" name="static-image-url">
+    <div class="url-container">
+      <input v-model="newWebcam.staticImageUrl" v-bind:class="{ 'is-danger': !urlIsValid(newWebcam.staticImageUrl) }" class="input static-image-url" type="text" name="static-image-url">
+      <span class="icon is-small is-right test-link" v-show="newWebcam.staticImageUrl">
+        <a :href="newWebcam.staticImageUrl" tabindex="-1" target="_blank">
+          <i class="fas fa-external-link-alt" />
+        </a>
+      </span>
+    </div>
 
     <h2>Video Url:</h2>
-    <input v-model="newWebcam.streamingUrl" class="input streaming-url" type="text" name="streaming-url">
+    <div class="url-container">
+      <input v-model="newWebcam.streamingUrl" v-bind:class="{ 'is-danger': !urlIsValid(newWebcam.streamingUrl) }" class="input streaming-url" type="text" name="streaming-url">
+      <span class="icon is-small is-right test-link" v-show="newWebcam.streamingUrl">
+        <a :href="newWebcam.streamingUrl" tabindex="-1" target="_blank">
+          <i class="fas fa-external-link-alt" />
+        </a>
+      </span>
+    </div>
 
     <div class="toggle-container">
       <span>Is Active:</span>
@@ -21,6 +35,8 @@
         <span class="slider round"></span>
       </label>
     </div>
+
+    <div class="invalid-form-warning help is-danger" v-show="!isFormValid">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
 
     <div class="cancel-save">
       <span class="button is-primary new-push-button" :disabled="!webcamIsValid" @click="save()">Save</span>
@@ -43,11 +59,13 @@ import { mapGetters } from 'vuex'
 import moment from 'moment'
 import validationHelper from '../../helpers/validationHelper'
 import { v4 as uuidv4 } from 'uuid'
+import mixins from '../mixins'
 
 export default {
   components: {
 
   },
+  mixins: [mixins],
   props: {
     title: {
       type:     String,
@@ -69,6 +87,9 @@ export default {
   },
   computed: {
     ...mapGetters(['webcams']),
+    isFormValid () {
+      return
+    },
     urlsAreValid () {
       return validationHelper.url(this.newWebcam.staticImageUrl) || validationHelper.url(this.newWebcam.streamingUrl)
     },
@@ -136,6 +157,16 @@ export default {
   padding:                      1em;
   border:                       1px solid #dfe0e2;
   border-radius:                1em;
+
+  .url-container {
+    position:                   relative;
+
+    .icon {
+      position:                 absolute;
+      right:                    8.5em;
+      top:                      0.6em;
+    }
+  }
 
   input {
     width:                      80%;
