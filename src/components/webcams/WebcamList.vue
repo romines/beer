@@ -123,7 +123,7 @@
 
     </div>
     <div v-else class="no-webcams">
-      No webcams to display. Add a new webcam using the button above.
+      No webcams to display. <span v-if="currentUser.canEditWebcams()">Add a new webcam using the button above.</span>
     </div>
 
   </div>

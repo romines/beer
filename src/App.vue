@@ -2,7 +2,7 @@
   <div id="app">
     <!-- TODO: nav to separate component -->
 
-    <div v-if="currentUser && currentUser.uid && currentResort.id" class="top-nav-container">
+    <div v-if="currentUser && currentUser.uid && currentResort.id && !$store.state.loading" class="top-nav-container">
 
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
@@ -41,8 +41,8 @@
     <Modal />
 
     <!-- main content area.. -->
-    <LoadingSpinner v-show="$store.state.loading" />
-    <router-view v-show="!$store.state.loading" class="main" />
+    <LoadingSpinner v-if="$store.state.loading" />
+    <router-view v-else class="main" />
     <!--  -->
   </div>
 </template>
@@ -84,8 +84,10 @@ export default {
   },
   methods: {
     logOut() {
+      this.$store.commit('SET_LOADING_STATE', true)
       this.$store.dispatch('logOut').then(() => {
         this.$router.replace('/login')
+        this.$store.commit('SET_LOADING_STATE', false)
       })
     },
     goToProfile () {
