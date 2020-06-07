@@ -14,7 +14,12 @@
 
     <div class="link-container">
       <h2>Link:</h2>
-      <input v-model="messageLink" class="input" type="text" name="limit">
+      <input v-model="messageLink" v-bind:class="{ 'is-danger': !messageLinkIsValid }" class="input" type="text" name="limit">
+      <span class="icon is-small is-right test-link" v-show="messageLink.length > 0">
+        <a :href="messageLink" tabindex="-1" target="_blank">
+          <i class="fas fa-external-link-alt" />
+        </a>
+      </span>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
         <span class="tooltiptext top">Optional URL for web page containing additional information</span>
@@ -129,8 +134,12 @@
       </span>
     </div>
 
+    <div class="invalid-form-warning help is-danger" v-show="!formIsValid">Form contains missing or invalid data. Please fix errors.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!messageBodyExists && !isTilePush">Message Body is required.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!messageLinkIsValid">Message link is invalid. Link must begin with either "http://" or "https://".</div>
+
     <div class="cancel-save">
-      <span class="button is-primary new-push-button" :disabled="!messageIsValid" @click="showConfirmModal()">{{sendMessageText}}</span>
+      <span class="button is-primary new-push-button" :disabled="!formIsValid" @click="showConfirmModal()">{{sendMessageText}}</span>
       <span class="button is-light new-push-button" @click="cancelMessage()">Cancel</span>
     </div>
 
@@ -141,6 +150,7 @@
 
 import { mapGetters } from 'vuex'
 import LoadingSpinner from '../utilities/LoadingSpinner.vue'
+import validationHelper from '../../helpers/validationHelper'
 import moment from 'moment'
 import { functionsBaseUrl } from '../../firebaseInit.js'
 
@@ -176,8 +186,17 @@ export default {
   },
   computed: {
     ...mapGetters(['pushWooshData']),
-    messageIsValid () {
-      return this.messageBody.length > 0 || this.isTilePush
+    formIsValid () {
+      if (this.isTilePush) return true
+      if (this.messageBodyExists) return true
+      return false
+    },
+    messageLinkIsValid () {
+      if (this.messageLink.length === 0) return true
+      return validationHelper.url(this.messageLink)
+    },
+    messageBodyExists () {
+      return this.messageBody.length > 0
     },
     sendMessageText () {
       if (Object.keys(this.selectedGeoZone).length > 0) return 'Send to all users in zone'
@@ -417,9 +436,19 @@ export default {
 
   .link-container {
     margin:                     1em 0;
+    width:                      65%;
+    position:                   relative;
+
+    .icon {
+      position:                 absolute;
+      right:                    0.5em;
+      top:                      0.65em;
+      right:                    3.5em;
+      top:                      2.1em;
+    }
 
     > input {
-      width:                    60%;
+      width:                    90%;
     }
   }
 
@@ -526,6 +555,11 @@ export default {
         }
       }
     }
+  }
+
+  .invalid-form-warning {
+    text-align:                     left;
+    margin-top:                     0.5em;
   }
 
   .cancel-save {

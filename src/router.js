@@ -307,7 +307,7 @@ router.beforeEach(async (to, from, next) => {
     } else {
       const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
-      next('/webcam-manager')
+      next('/')
       // next('/resorts')
     }
 

@@ -40,7 +40,7 @@
       </label>
     </div>
 
-    <div class="invalid-form-warning help is-danger" v-show="!isFormValid">Form contains invalid data. Please fix errors.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!isFormValid">Form contains missing or invalid data. Please fix errors.</div>
     <div class="invalid-form-warning help is-danger" v-show="!webcamNameExists">Webcam name is required.</div>
     <div class="invalid-form-warning help is-danger" v-show="!urlsAreValid">Urls are either missing or invalid. Urls must begin with either "http://" or "https://"</div>
 
