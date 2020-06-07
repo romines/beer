@@ -3,13 +3,17 @@
     <h2 class="subtitle">{{title}}</h2>
 
     <h2>Name:</h2>
-    <input v-model="newWebcam.name" class="input name" type="text" name="name">
+    <div class="input-container">
+      <input v-model="newWebcam.name" class="input name" type="text" name="name">
+    </div>
 
     <h2>Short Name:</h2>
-    <input v-model="newWebcam.shortName" class="input short-name" type="text" name="short-name">
+    <div class="input-container">
+      <input v-model="newWebcam.shortName" class="input short-name" type="text" name="short-name">
+    </div>
 
     <h2>Still Image Url:</h2>
-    <div class="url-container">
+    <div class="input-container">
       <input v-model="newWebcam.staticImageUrl" v-bind:class="{ 'is-danger': !urlIsValid(newWebcam.staticImageUrl) }" class="input static-image-url" type="text" name="static-image-url">
       <span class="icon is-small is-right test-link" v-show="newWebcam.staticImageUrl">
         <a :href="newWebcam.staticImageUrl" tabindex="-1" target="_blank">
@@ -19,7 +23,7 @@
     </div>
 
     <h2>Video Url:</h2>
-    <div class="url-container">
+    <div class="input-container">
       <input v-model="newWebcam.streamingUrl" v-bind:class="{ 'is-danger': !urlIsValid(newWebcam.streamingUrl) }" class="input streaming-url" type="text" name="streaming-url">
       <span class="icon is-small is-right test-link" v-show="newWebcam.streamingUrl">
         <a :href="newWebcam.streamingUrl" tabindex="-1" target="_blank">
@@ -36,10 +40,12 @@
       </label>
     </div>
 
-    <div class="invalid-form-warning help is-danger" v-show="!isFormValid">Form contains invalid data. Please fix errors (outlined in red) and try again</div>
+    <div class="invalid-form-warning help is-danger" v-show="!isFormValid">Form contains invalid data. Please fix errors.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!webcamNameExists">Webcam name is required.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!urlsAreValid">Urls are either missing or invalid. Urls must begin with either "http://" or "https://"</div>
 
     <div class="cancel-save">
-      <span class="button is-primary new-push-button" :disabled="!webcamIsValid" @click="save()">Save</span>
+      <span class="button is-primary new-push-button" :disabled="!isFormValid" @click="save()">Save</span>
       <span class="button is-light new-push-button" @click="cancel()">Cancel</span>
     </div>
 
@@ -88,13 +94,16 @@ export default {
   computed: {
     ...mapGetters(['webcams']),
     isFormValid () {
-      return
+      if (this.newWebcam.staticImageUrl.length === 0 && this.newWebcam.streamingUrl.length === 0) return false
+      if (!this.urlsAreValid) return false
+      if (!this.webcamNameExists) return false
+      return true
+    },
+    webcamNameExists () {
+      return this.newWebcam.name.length > 0
     },
     urlsAreValid () {
       return validationHelper.url(this.newWebcam.staticImageUrl) || validationHelper.url(this.newWebcam.streamingUrl)
-    },
-    webcamIsValid () {
-      return this.newWebcam.name.length > 0 && (this.newWebcam.staticImageUrl.length > 0 || this.newWebcam.streamingUrl.length > 0) && this.urlsAreValid
     }
   },
   created () {
@@ -158,19 +167,19 @@ export default {
   border:                       1px solid #dfe0e2;
   border-radius:                1em;
 
-  .url-container {
+  .input-container {
     position:                   relative;
+    width:                      80%;
 
     .icon {
       position:                 absolute;
-      right:                    8.5em;
-      top:                      0.6em;
+      right:                    0.5em;
+      top:                      0.65em;
     }
-  }
 
-  input {
-    width:                      80%;
-    margin-bottom:              1em
+    input {
+      margin-bottom:            1em
+    }
   }
 
   .toggle-container {
@@ -197,6 +206,10 @@ export default {
       height:                   1.5em;
       width:                    1.5em;
     }
+  }
+
+  .invalid-form-warning {
+    margin:                     0.6em 0;
   }
 }
 

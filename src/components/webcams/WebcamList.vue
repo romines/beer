@@ -52,13 +52,13 @@
                 <label>Short Name:</label><span class="created">{{ webcam.shortName }}</span>
               </div>
               <div class="detail static-url">
-                <label>Still URL:</label><span class="created">
+                <label>Still Image URL:</label><span class="created">
                   <a v-bind:href="webcam.staticImageUrl" target="blank">{{ webcam.staticImageUrl }}</a>
                 </span>
               </div>
               <div class="detail streaming-url">
-                <label>Streaming Url:</label><span class="created">
-                  <a v-bind:href="webcam.staticImageUrl" target="blank">{{ webcam.staticImageUrl }}</a>
+                <label>Video Url:</label><span class="created">
+                  <a v-bind:href="webcam.staticImageUrl" target="blank">{{ webcam.streamingUrl }}</a>
                 </span>
               </div>
               <div class="detail is-active">
@@ -92,7 +92,6 @@
           </section>
 
           <section v-if="showWebcam(webcam.identifier)" class="body">
-
             <div class="webcam-details">
               <div class="detail name">
                 <label>Name:</label><span class="created">{{ webcam.name }}</span>
@@ -101,10 +100,10 @@
                 <label>Short Name:</label><span class="created">{{ webcam.shortName }}</span>
               </div>
               <div class="detail static-url">
-                <label>Still URL:</label><span class="created">{{ webcam.staticImageUrl }}</span>
+                <label>Still Image URL:</label><span class="created">{{ webcam.staticImageUrl }}</span>
               </div>
               <div class="detail streaming-url">
-                <label>Streaming Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
+                <label>Video Url:</label><span class="created">{{ webcam.streamingUrl }}</span>
               </div>
               <div class="detail is-active">
                 <label>Is Active?:</label><span class="created">{{ webcam.isActive ? 'Yes' : 'No' }}</span>
