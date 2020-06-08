@@ -82,6 +82,7 @@ module.exports = functions.https.onRequest((req, res) => {
       delete notification['ios_title']
 
       notification["data"]["priority"]  = 1
+      notification["data"]["dataType"]  = "-2"
       notification["data"]["message"]   = req.body.messageBody
       notification["android_silent"]    = 1
       notification["ios_root_params"]   =  {
