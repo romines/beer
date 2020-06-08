@@ -6,6 +6,7 @@ import { promiseTo } from './store/utils.js'
 import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
 import Leaderboard from './components/leaderboard/Leaderboard'
+import LeaderboardUser from './components/leaderboard/LeaderboardUser'
 import Profile from './components/Profile'
 import Settings from './components/Settings'
 import UserManager from './components/settings/UserManager'
@@ -146,6 +147,20 @@ const routes = [
     path: '/leaderboard',
     name: 'Leaderboard',
     component: Leaderboard,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.currentUser.canAccessLeaderboard()) return next('/')
+
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    }
+  },
+  {
+    path: '/leaderboard/user',
+    name: 'LeaderboardUser',
+    component: LeaderboardUser,
     meta: {
       requiresAuth: true
     },
@@ -319,7 +334,7 @@ router.beforeEach(async (to, from, next) => {
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
-      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'crystal_mtn'))
+      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
       next('/leaderboard')
