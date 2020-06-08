@@ -58,6 +58,12 @@
               <div v-if="resortPermissions.canManageWebcams" class="detail permission">
                 <label>Manage Webcams:</label><span class="created">{{ user.currentResortSettings().canManageWebcams ? 'Yes' : 'No' }}</span>
               </div>
+              <div v-if="resortPermissions.canManageLeaderboard" class="detail permission">
+                <label>View Leaderboard:</label><span class="created">{{ user.currentResortSettings().canViewLeaderboard ? 'Yes' : 'No' }}</span>
+              </div>
+              <div v-if="resortPermissions.canManageLeaderboard" class="detail permission">
+                <label>Manage Leaderboard:</label><span class="created">{{ user.currentResortSettings().canManageLeaderboard ? 'Yes' : 'No' }}</span>
+              </div>
             </section>
           </div>
         </section>
@@ -225,7 +231,7 @@ export default {
 
           > label {
             font-weight:          bold;
-            width:                25%;
+            width:                12em;
           }
 
           > span {

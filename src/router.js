@@ -150,6 +150,8 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
+      if (!store.getters.currentUser.canAccessLeaderboard()) return next('/')
+
       store.commit('SET_LOADING_STATE', false)
       next()
     }
@@ -317,7 +319,12 @@ router.beforeEach(async (to, from, next) => {
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
-      next('/resorts')
+      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'crystal_mtn'))
+      // Must go after setCurrentResort
+      const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
+      next('/leaderboard')
+
+      // next('/resorts')
     }
 
   }
