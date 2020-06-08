@@ -8,8 +8,9 @@
 
       <div class="link-nav">
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
-        <router-link v-if="showContacts" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
-        <router-link v-if="showWebcams" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
+        <router-link v-if="this.currentUser.canAccessContacts()" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
+        <router-link v-if="this.currentUser.canAccessWebcams()" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
+        <router-link v-if="true" v-bind:to="{ name: 'Leaderboard' }">Leaderboard</router-link>
       </div>
 
       <div class="right-nav">
@@ -74,13 +75,7 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['currentUser', 'currentResort', 'resortPermissions']),
-    showContacts () {
-      return this.currentUser.canAccessContacts()
-    },
-    showWebcams () {
-      return this.currentUser.canAccessWebcams()
-    }
+    ...mapGetters(['currentUser', 'currentResort', 'resortPermissions'])
   },
   methods: {
     logOut() {

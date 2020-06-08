@@ -5,6 +5,7 @@ import { promiseTo } from './store/utils.js'
 
 import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
+import Leaderboard from './components/leaderboard/Leaderboard'
 import Profile from './components/Profile'
 import Settings from './components/Settings'
 import UserManager from './components/settings/UserManager'
@@ -139,6 +140,18 @@ const routes = [
         store.commit('SET_LOADING_STATE', false)
         next()
       })
+    }
+  },
+  {
+    path: '/leaderboard',
+    name: 'Leaderboard',
+    component: Leaderboard,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
     }
   },
   {
