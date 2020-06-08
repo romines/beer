@@ -10,12 +10,10 @@ export default class User {
     return this.firstName + ' ' + this.lastName
   }
 
+  // Access permissions
+
   canAccessSettings () {
     return this.isResortAdmin() || this.superAdmin || this.currentResortSettings().canManagePushNotifications
-  }
-
-  canEditPushNotifications () {
-    return this.superAdmin || this.isResortAdmin() || this.currentResortSettings().canManagePushNotifications
   }
 
   canAccessWebcams () {
@@ -24,23 +22,41 @@ export default class User {
     return this.currentResortSettings().canViewWebcams || this.canEditWebcams()
   }
 
-  canEditWebcams () {
-    return this.currentResortSettings().canManageWebcams || this.superAdmin || this.isResortAdmin()
-  }
-
   canAccessContacts () {
     if (this.superAdmin) return true
     if (!store.getters.resortPermissions.canManageContacts) return false
     return this.currentResortSettings().canViewContacts || this.canEditContacts()
   }
 
-  canEditContacts () {
-    return this.currentResortSettings().canManageContacts || this.superAdmin || this.isResortAdmin()
+  canAccessLeaderboard () {
+    if (this.superAdmin) return true
+    if (!store.getters.resortPermissions.canManageLeaderboard) return false
+    return this.currentResortSettings().canViewLeaderboard || this.canEditLeaderboard()
   }
 
   canAccessResorts () {
     return this.superAdmin || this.hasManyResorts()
   }
+
+  // Edit Permissions
+
+  canEditPushNotifications () {
+    return this.superAdmin || this.isResortAdmin() || this.currentResortSettings().canManagePushNotifications
+  }
+
+  canEditWebcams () {
+    return this.currentResortSettings().canManageWebcams || this.superAdmin || this.isResortAdmin()
+  }
+
+  canEditContacts () {
+    return this.currentResortSettings().canManageContacts || this.superAdmin || this.isResortAdmin()
+  }
+
+  canEditLeaderboard () {
+    return this.currentResortSettings().canManageLeaderboard || this.superAdmin || this.isResortAdmin()
+  }
+
+  // Everything else
 
   currentResortSettings () {
     if (this.superAdmin) return {}
@@ -84,13 +100,5 @@ export default class User {
     this.superAdmin                   = !!user.superAdmin,
     this.createdAt                    = user.createdAt || '',
     this.authorizedResorts            = user.authorizedResorts
-
-    // this.canManageContacts            = user.canManageContacts || false,
-    // this.canManagePushNotifications   = user.canManagePushNotifications || false,
-    // this.canManageWebcams             = user.canManageWebcams || false,
-    // this.canViewContacts              = user.canViewContacts || false,
-    // this.canViewPushNotifications     = user.canViewPushNotifications || false,
-    // this.canViewWebcams               = user.canViewWebcams || false,
-    // this.isResortAdmin                = user.isResortAdmin || false
   }
 }

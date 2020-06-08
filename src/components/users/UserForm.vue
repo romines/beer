@@ -62,6 +62,20 @@
         <span class="slider round"></span>
       </label>
     </div>
+    <div v-if="resortPermissions.canManageLeaderboard" class="toggle-container">
+      <span>View Leaderboard:</span>
+      <label for="view-leaderboard" class="switch">
+        <input v-model="userPermissions.canViewLeaderboard" id="view-leaderboard" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div v-if="resortPermissions.canManageLeaderboard" class="toggle-container">
+      <span>Manage Leaderboard:</span>
+      <label for="manage-leaderboard" class="switch">
+        <input v-model="userPermissions.canManageLeaderboard" id="manage-leaderboard" type="checkbox">
+        <span class="slider round"></span>
+      </label>
+    </div>
 
     <div v-if="!existingUser" class="password-email">
       <input v-model="sendPasswordResetEmail" type="checkbox" class="reset-email">
@@ -181,7 +195,9 @@ export default {
         canViewPushNotifications:     false,
         canManagePushNotifications:   false,
         canViewContacts:              false,
-        canManageContacts:            false
+        canManageContacts:            false,
+        canViewLeaderboard:           false,
+        canManageLeaderboard:         false
       }
     },
     setAllPermissions (value) {
@@ -191,6 +207,8 @@ export default {
       this.$set(this.userPermissions, 'canManagePushNotifications', value)
       this.$set(this.userPermissions, 'canViewContacts', value)
       this.$set(this.userPermissions, 'canManageContacts', value)
+      this.$set(this.userPermissions, 'canViewLeaderboard', value)
+      this.$set(this.userPermissions, 'canManageLeaderboard', value)
     },
     save () {
       // Only set defaults on new user
@@ -256,7 +274,7 @@ export default {
     align-items:                center;
 
     > span {
-      min-width:                10em;
+      min-width:                11em;
     }
   }
 

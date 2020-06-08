@@ -53,7 +53,8 @@ const store = {
       // These act as defaults if value is not in Firestore
       canManageWebcams: false,
       canManagePushNotifications: true,
-      canManageContacts: false
+      canManageContacts: false,
+      canManageLeaderboard: false
     },
     webcams: [],
     resortMeta: {},

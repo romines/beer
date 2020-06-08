@@ -19,6 +19,14 @@
           <span class="slider round"></span>
         </label>
       </div>
+
+      <div class="toggle-container">
+        <span>Leaderboard Management:</span>
+        <label for="manage-leaderboard" class="switch">
+          <input v-model="resortPermissions.canManageLeaderboard" id="manage-leaderboard" type="checkbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
     </section>
 
   </div>
@@ -67,7 +75,7 @@ export default {
       align-items:                center;
 
       > span {
-        min-width:                12em;
+        min-width:                15em;
       }
     }
   }
