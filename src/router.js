@@ -276,9 +276,8 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-
-  // CurrentUser can sometimes be an empty object, check for email.
-  if (!store.getters.currentUser || !store.getters.currentUser.email) {
+  // CurrentUser can sometimes be an empty object, check for uid.
+  if (!store.getters.currentUser || !store.getters.currentUser.uid) {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
