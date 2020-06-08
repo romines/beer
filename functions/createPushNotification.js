@@ -53,8 +53,9 @@ module.exports = functions.https.onRequest((req, res) => {
         }
       }
 
-      // Omit content field from notifications
+      // Omit fields from notifications for iOS
       delete notification['content']
+      delete notification['ios_title']
 
       // Android stuff...
       notification["android_icon"]                = "ic_note"
@@ -71,13 +72,27 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["data"]["repeatInterval"]  = silentSettings.repeatInterval
       notification["data"]["repeatLimit"]     = silentSettings.repeatLimit
       notification["data"]["priority"]        = silentSettings.isHighPriority ? -1 : 0
-    } // end silent if
+    } // END silentSettings if
 
 
-    // Set priority for tile push
+    // Set tile push settings
     if (req.body.isTilePush) {
-      notification["data"]["priority"] = 1
-    }
+      // Omit fields from notifications for iOS
+      delete notification['content']
+      delete notification['ios_title']
+
+      notification["data"]["priority"]  = 1
+      notification["data"]["message"]   = req.body.messageBody
+      notification["android_silent"]    = 1
+      notification["ios_root_params"]   =  {
+        "aps": {
+            "content-available":1,
+            "apns-push-type":"background",
+            "apns-priority":5
+        }
+      }
+    } // END isTilePush if
+
 
     // Add geozone info
     if (req.body.geoZone.lat) {
@@ -88,11 +103,13 @@ module.exports = functions.https.onRequest((req, res) => {
       }
     }
 
+
     // Add selected cities info
     if (req.body.selectedCities && req.body.selectedCities.length > 0) {
       let array = [ ["City", "IN", req.body.selectedCities ] ]
       notification["conditions"] = array
     }
+
 
     // Add message link
     if (req.body.messageLink && req.body.messageLink.length > 0) {
