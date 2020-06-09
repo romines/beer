@@ -36,10 +36,10 @@ export default {
         requestFunction (data) {
           let parentComponent = this.$parent.$parent
           let appendUrl = parentComponent.createAppendUrl(data)
-          return this.axios.get('/leaderboard' + appendUrl).then((response) => {
+          return this.axios.get('/leaderboard' + appendUrl).then((data) => {
             return {
-              data:   response.data.leaderboard,
-              count:  response.data.count
+              data:   data.leaderboard,
+              count:  data.count
             }
           })
         },
