@@ -42,6 +42,7 @@
     "vue-axios": "^2.1.5",
     "vue-cleave": "^1.2.2",
     "vue-router": "^3.0.7",
+    "vue-tables-2": "^1.4.70",
     "vue2-editor": "^2.6.6",
     "vuedraggable": "^2.16.0",
     "vuex": "^3.1.1"

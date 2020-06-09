@@ -11,6 +11,9 @@ import tags from './tags'
 import users from './users'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 import pwConfig from '../static/pwConfig.js'
+import cmsAxios from '../api/vue-axios/axios.js'
+import leaderboardConfig from '../leaderboardConfig.js'
+import router from '../router'
 
 // import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
@@ -129,6 +132,23 @@ const store = {
   },
 
   actions: {
+    authenticateLeaderboard({ commit, dispatch, rootState }) {
+      return new Promise((resolve, reject) => {
+        let password = leaderboardConfig.auth[rootState.currentResort.id]
+
+        cmsAxios.post('/auth?app_id=' + rootState.currentResort.id + '&auth_id=' + password)
+          .then(request => {
+            localStorage.leaderboardToken = request.data.token
+            resolve(request)
+          }).catch(request => {
+            delete localStorage.leaderboardToken
+            dispatch('showErrorModal', 'Could not connect to Leaderboard. Please try again later. If problem persists, contact Resorts Tapped.')
+            router.push({ name: 'PushNotifications' })
+            reject(request)
+          })
+      })
+    },
+
     setCurrentResort({ commit, dispatch }, resortId) {
       return new Promise((resolve, reject) => {
         if (!resortId) {

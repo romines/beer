@@ -6,15 +6,19 @@ import router from './router.js'
 import store from './store'
 import App from './App.vue'
 import VueAxios from 'vue-axios'
-import axios from './api/vue-axios/axios.js'
+import cmsAxios from './api/vue-axios/axios.js'
 import globals from './globals.js'
+import { ClientTable, ServerTable } from 'vue-tables-2'
 
 
 import vClickOutside from 'v-click-outside'
 
+// Use stuff
 Vue.use(VueRouter)
-Vue.use(VueAxios, axios)
+Vue.use(VueAxios, cmsAxios)
 Vue.use(vClickOutside)
+Vue.use(ClientTable)
+Vue.use(ServerTable)
 
 Vue.config.productionTip = false
 
@@ -26,7 +30,7 @@ auth.onAuthStateChanged(() => {
     el: '#app',
     router,
     store,
-    axios,
+    cmsAxios,
     render: h => h(App),
   })
 

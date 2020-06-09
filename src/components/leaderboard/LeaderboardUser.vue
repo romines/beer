@@ -11,6 +11,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { LoadingSpinner } from '../../components'
+import store from '../../store'
 
 export default {
   components: {
@@ -24,6 +25,10 @@ export default {
   },
   computed: {
     ...mapGetters(['currentUser'])
+  },
+  beforeRouteEnter (to, from, next) {
+    if (!localStorage.leaderboardToken) store.dispatch('authenticateLeaderboard').then(() => next() )
+    else next()
   },
   created () {
     this.getUser()
