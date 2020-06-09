@@ -17,7 +17,8 @@ module.exports = functions.https.onRequest((req, res) => {
   let applicationCode = req.query.applicationCode
   let silentSettings  = req.body.silentSettings
 
-  if (!req.body.messageBody) {
+  // Allow empty messageBody only for tile push
+  if (!req.body.messageBody && !req.body.isTilePush) {
     res.send('Message body is required.');
   } else {
 
