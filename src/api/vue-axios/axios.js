@@ -1,9 +1,10 @@
 /* global localStorage */
 
 import axios from 'axios'
+import leaderboardConfig from '../../leaderboardConfig'
 
-// Set in config/prod.env.js
-const API_URL = process.env.API_URL || 'http://localhost:3000/api/v1'
+// Set in src/leaderboardConfig.js
+const API_URL = leaderboardConfig[process.env.NODE_ENV] || 'http://localhost:3000/api/v1'
 
 let cmsAxios = axios.create({
   baseURL: API_URL,
@@ -13,14 +14,14 @@ let cmsAxios = axios.create({
 })
 
 // IMPT we have to set the token in our header every single time
-// cmsAxios.interceptors.request.use(request => {
-//   // Get token from localStorage
-//   const token = localStorage.token
-//   // Update token axios header
-//   if (token) {
-//     request.headers['Authorization'] = 'Bearer ' + token
-//   }
-//   return request
-// })
+cmsAxios.interceptors.request.use(request => {
+  // Get token from localStorage
+  const token = localStorage.leaderboardToken
+  // Update token axios header
+  if (token) {
+    request.headers['Authorization'] = 'Bearer ' + token
+  }
+  return request
+})
 
 export default cmsAxios

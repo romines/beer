@@ -10,6 +10,7 @@ yarn-error.log
 
 # firebase
 src/firebaseConfig.js
+src/leaderboardConfig.js
 .firebase
 **/firebase-debug.log
 **/.runtimeconfig.json
