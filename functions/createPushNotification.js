@@ -49,8 +49,7 @@ module.exports = functions.https.onRequest((req, res) => {
         "aps": {
             "content-available":1,
             "apns-push-type":"background",
-            "apns-priority":5,
-            "sound":""
+            "apns-priority":5
         }
       }
 
