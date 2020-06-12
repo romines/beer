@@ -1,13 +1,6 @@
-const Firestore       = require('@google-cloud/firestore');
-const httpRequest     = require('request');
-const functions       = require('firebase-functions');
-const config          = JSON.parse(process.env.FIREBASE_CONFIG);
-const token           = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.development;
-const projectId       = config.projectId;
-const pushWooshEnv    = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
-const firestore       = new Firestore({ projectId: projectId, timestampsInSnapshots: true });
-const RESORTS_REF     = firestore.collection('resorts')
-
+const functions   = require('firebase-functions');
+const admin       = require('./initialize');
+const db          = admin.database();
 
 module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Origin', "*")
@@ -21,14 +14,9 @@ module.exports = functions.https.onRequest((req, res) => {
     return
   }
 
-  RESORTS_REF.doc(resortId).get().then((doc) => {
-    let resortData = doc.data()
-    let webcams = resortData.webcams
-
-    if (!webcams) webcams = {}
-
-    res.status(200).send(webcams)
-
+  db.ref(resortId).once('value').then((snapshot) => {
+    let cams = snapshot.val().webcams || {}
+    res.status(200).send(cams)
   }).catch((error) => {
     console.log(error)
     res.status(200).send(error)
