@@ -14,6 +14,10 @@
     <div v-if="!existingUser">
       <h2>Password:</h2>
       <input v-model="newUser.password" class="input name" type="text" name="name">
+      <span class="tooltip">
+        <i class="fa fa-info-circle"></i>
+        <span class="tooltiptext top">If the email address is for a user who already exists, the password setting will be ignored, and no password reset email will be sent.</span>
+      </span>
     </div>
 
     <div v-if="currentUser.superAdmin" class="toggle-container">

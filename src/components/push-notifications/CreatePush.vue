@@ -72,7 +72,7 @@
       <span v-if="localDevicesCount" class="device-count">&nbsp;({{localDevicesCount}} devices)</span>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
-        <span class="tooltiptext top">Sends the message only to users within 20km of the resort. The app will receive the message only if it has been allowed to track the user’s location.</span>
+        <span class="tooltiptext top">Sends the message only to users within 20km of the resort. To receive the message an app must be permitted to always track the user’s location.</span>
       </span>
     </div>
 
@@ -81,35 +81,35 @@
       <label>Send as In-App Message</label>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
-        <span class="tooltiptext top">Presents the message only when the user brings the app to the foreground</span>
+        <span class="tooltiptext top">Presents the message only when the user brings the app to the foreground.</span>
       </span>
 
       <transition name="fade">
         <div v-if="isSilentPush" class="push-choice-options">
           <div class="option">
             <span class="option-title">Valid Duration:</span>
-            <input v-model="silentSettings.validMinutes" class="input" type="number"><span>&nbsp;(mins)</span>
+            <input v-model="silentSettings.validMinutes" class="input" type="number"><span>&nbsp;(min)</span>
             <span class="tooltip">
               <i class="fa fa-info-circle"></i>
-              <span class="tooltiptext top">Time for which the message remains valid after it is sent</span>
+              <span class="tooltiptext top">Time for which the message remains valid after it is sent.</span>
             </span>
           </div>
           <div class="option">
-            <span class="option-title">Repeat Interval:</span><input v-model="silentSettings.repeatInterval" class="input" type="number"><span>&nbsp;(mins)</span>
+            <span class="option-title">Repeat Interval:</span><input v-model="silentSettings.repeatInterval" class="input" type="number"><span>&nbsp;(min)</span>
             <span class="tooltip">
               <i class="fa fa-info-circle"></i>
-              <span class="tooltiptext top">Minimum interval between message presentations when the app comes to the foreground</span>
+              <span class="tooltiptext top">Minimum interval between message presentations when the app comes to the foreground.</span>
             </span>
           </div>
           <div class="option">
             <span class="option-title">Repeat Limit:</span><input v-model="silentSettings.repeatLimit" class="input" type="number">
             <span class="tooltip">
               <i class="fa fa-info-circle"></i>
-              <span class="tooltiptext top">The maximum number of times the message will be shown to the user</span>
+              <span class="tooltiptext top">The maximum number of times the message will be shown to the user.</span>
             </span>
           </div>
           <div class="option">
-            <span class="option-title">High priority:</span>
+            <span class="option-title">Persists Until Dismissed:</span>
             <div class="toggle-container">
               <label for="no-sort" class="switch">
                 <input v-model="silentSettings.isHighPriority" id="no-sort" type="checkbox">
@@ -118,7 +118,7 @@
             </div>
             <span class="tooltip">
               <i class="fa fa-info-circle"></i>
-              <span class="tooltiptext top">Leaves the message on the screen until the user dismisses it</span>
+              <span class="tooltiptext top">Leaves the message on the screen until the user dismisses it.</span>
             </span>
           </div>
         </div>
@@ -130,7 +130,7 @@
       <label>Send as Home Screen Tile</label>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
-        <span class="tooltiptext top">Display the message in a tile on the Home screen. Remains on display until replaced with an empty message or a new message.</span>
+        <span class="tooltiptext top">Display the message as a tile inserted at the top of the Home screen. Remains part of the Home screen until replaced with an empty message or a new message.</span>
       </span>
     </div>
 
@@ -542,7 +542,7 @@ export default {
         margin:                     0.5em 0;
 
         .option-title {
-          width:                    9em;
+          width:                    12em;
         }
 
         .toggle-container {
