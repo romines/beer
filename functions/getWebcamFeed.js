@@ -1,6 +1,6 @@
 const functions   = require('firebase-functions');
 const admin       = require('./initialize');
-const db          = admin.database();
+const firestore   = admin.firestore();
 
 module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Origin', "*")
@@ -14,11 +14,12 @@ module.exports = functions.https.onRequest((req, res) => {
     return
   }
 
-  db.ref(resortId).once('value').then((snapshot) => {
-    let cams = snapshot.val().webcams || {}
+  firestore.collection('resorts').doc(resortId).get().then((snapshot) => {
+    let cams = snapshot.data().webcams || {}
     res.status(200).send(cams)
   }).catch((error) => {
     console.log(error)
     res.status(200).send(error)
   })
+
 });
