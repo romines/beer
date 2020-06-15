@@ -29,6 +29,7 @@ module.exports = functions.https.onRequest((req, res) => {
     Promise.all(docs.map((doc) => { return getSetRequestIdForDoc(doc) })).then((values) => {
       res.status(200).send(values)
     }).catch((error) => {
+      console.log('WOOF')
       res.status(500).send(error)
     })
   })
@@ -85,6 +86,9 @@ function fetchSubscriberRequestId(applicationCode) {
   return new Promise((resolve, reject) => {
     httpRequest.post(fullRequest, (error, response, body) => {
       // TODO add error handling
+
+      if (!response) return
+
       let parsedResponseBody = JSON.parse(response.body)
       var requestId
 
@@ -97,8 +101,6 @@ function fetchSubscriberRequestId(applicationCode) {
         requestId       = match[1].trim()
       }
       resolve(requestId)
-    }).catch((error) => {
-      reject(error)
     })
   })
 }
