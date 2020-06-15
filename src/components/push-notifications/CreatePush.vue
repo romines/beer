@@ -125,14 +125,14 @@
       </transition>
     </div>
 
-    <div class="push-choice home-tile">
+    <!-- <div class="push-choice home-tile">
       <input v-model="isTilePush" type="checkbox">
       <label>Send as Home Screen Tile</label>
       <span class="tooltip">
         <i class="fa fa-info-circle"></i>
         <span class="tooltiptext top">Display the message as a tile inserted at the top of the Home screen. Remains part of the Home screen until replaced with an empty message or a new message.</span>
       </span>
-    </div>
+    </div> -->
 
     <div class="invalid-form-warning help is-danger" v-show="!formIsValid">Form contains missing or invalid data. Please fix errors.</div>
     <div class="invalid-form-warning help is-danger" v-show="!messageBodyExists && !isTilePush">Message Body is required.</div>
