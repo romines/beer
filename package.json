@@ -9,6 +9,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
     "deploy": "firebase deploy -P tapped",
     "production-deploy": "cross-env NODE_ENV=production webpack --progress --hide-modules && firebase deploy -P tapped",
+    "production-functions": "firebase deploy --only functions -P tapped",
     "staging-deploy": "cross-env NODE_ENV=staging webpack --progress --hide-modules && firebase deploy -P staging",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --host 0.0.0.0 --open --hot --overlay",
     "export": "cd utils && node ./export.js",
