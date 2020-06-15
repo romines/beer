@@ -61,10 +61,8 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["android_icon"]                = "ic_note"
       notification["android_priority"]            = 0
       notification["android_delivery_priority"]   = "normal"
-      notification["android_silent"]              = 1
 
       // Data stuff...
-      notification["data"]["is_silent"]       = true
       notification["data"]["dataType"]        = "-2"
       notification["data"]["message"]         = req.body.messageBody
       notification["data"]["startTime"]       = req.body.startTime || 'now'
@@ -84,7 +82,6 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["data"]["priority"]  = 1
       notification["data"]["dataType"]  = "-2"
       notification["data"]["message"]   = req.body.messageBody
-      notification["android_silent"]    = 1
       notification["ios_root_params"]   =  {
         "aps": {
             "content-available":1,
