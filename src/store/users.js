@@ -210,15 +210,10 @@ const actions = {
       let baseUrl = functionsBaseUrl + '/deleteFirebaseUser/' + user.uid
 
       // Delete both the auth user and the RT custom user
-      // return Promise.all([
-      //   USERS_REF.doc(user.uid).delete(),
-      //   axios.delete(baseUrl)
-      // ])
-      // For some reason the functions call returns error, even though user is deleted. Going with this for now... 4/29/2020
-      axios.delete(baseUrl).then(() => {}).catch((error) => {
-        console.log(error.response.data)
-      })
-      USERS_REF.doc(user.uid).delete().then(() => {
+      Promise.all([
+        USERS_REF.doc(user.uid).delete(),
+        axios.delete(baseUrl)
+      ]).then(() => {
         commit('DELETE_RESORT_USER', user)
         resolve()
       }).catch((err) => {

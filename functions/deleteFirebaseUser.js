@@ -13,9 +13,13 @@ module.exports = functions.https.onRequest((request, response) => {
   const path = request.params['0']
   const uid = path.substr(1);
 
+  // This is buggy. Currently, this function gets called twice, even though client only makes one DELETE request
+  // So, just return 200 every time, and log result
   auth.deleteUser(uid).then(() => {
-    response.status(200).send('success')
-  }).catch((error) => {
-    response.status(500).send(error)
+    console.log('SUCCESS')
+  }).catch(() => {
+    console.log('ERROR')
   })
+
+  response.status(200).send()
 });

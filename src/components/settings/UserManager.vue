@@ -53,7 +53,7 @@ export default {
       this.$store.dispatch('lookupUserByEmailAddress', newUser.email).then((existingUser) => {
         if (existingUser) {
           // User exists for this resort already... show error
-          if (existingUser["authorizedResorts"][this.currentResort.id]) {
+          if (existingUser["authorizedResorts"] && existingUser["authorizedResorts"][this.currentResort.id]) {
             this.$store.commit('SET_LOADING_STATE', false)
             this.$store.dispatch('showErrorModal', 'User already exists for this resort.')
           } else {
