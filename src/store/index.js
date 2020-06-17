@@ -303,7 +303,7 @@ const store = {
 
     setLastPublishedDate({ commit, dispatch, rootState }, date) {
       // 2020-05-09 11:51:25
-      return RESORTS_REF.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.currentResort.id).update({
         lastPublishedDate: date,
       })
     },
