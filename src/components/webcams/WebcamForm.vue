@@ -42,6 +42,7 @@
 
     <div class="invalid-form-warning help is-danger" v-show="!isFormValid">Form contains missing or invalid data. Please fix errors.</div>
     <div class="invalid-form-warning help is-danger" v-show="!webcamNameExists">Webcam name is required.</div>
+    <div class="invalid-form-warning help is-danger" v-show="!stillUrlExists">Still Image Url is required.</div>
     <div class="invalid-form-warning help is-danger" v-show="!urlsAreValid">Urls are either missing or invalid. Urls must begin with either "http://" or "https://"</div>
 
     <div class="cancel-save">
@@ -97,13 +98,18 @@ export default {
       if (this.newWebcam.staticImageUrl.length === 0 && this.newWebcam.streamingUrl.length === 0) return false
       if (!this.urlsAreValid) return false
       if (!this.webcamNameExists) return false
+      if (!this.stillUrlExists) return false
       return true
     },
     webcamNameExists () {
       return this.newWebcam.name.length > 0
     },
+    stillUrlExists () {
+      return this.newWebcam.staticImageUrl.length > 0
+    },
     urlsAreValid () {
-      return validationHelper.url(this.newWebcam.staticImageUrl) || validationHelper.url(this.newWebcam.streamingUrl)
+      if (this.stillUrlExists) return validationHelper.url(this.newWebcam.staticImageUrl)
+      else return validationHelper.url(this.newWebcam.streamingUrl)
     }
   },
   created () {
