@@ -424,7 +424,7 @@ export default {
     getMapIdFromAlt(altText) {
       return this.maps.filter(({ url }) => {
         const mapInStoreSlug = url.split('2Fmap_files%2Fmap_')[1].substring(0, 13)
-        const mapViewedSlug = altText.split('2Fmap_files%2Fmap_')[1].substring(0, 13)
+        const mapViewedSlug = altText.split('/map_files/map_')[1].substring(0, 13)
         return mapInStoreSlug === mapViewedSlug
       })[0].id
     },
