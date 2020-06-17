@@ -56,9 +56,7 @@
 import moment from 'moment'
 
 export default {
-
-  components: {
-  },
+  components: {},
   data () {
     return {
       editingName: false,
@@ -79,6 +77,9 @@ export default {
       }
     }
   },
+  created () {
+    console.log(moment.utc())
+  },
   methods: {
     startNameEdit () {
       if (this.editingName) return
@@ -97,6 +98,7 @@ export default {
     saveAndPublish () {
       this.$store.dispatch('archive', {...this.newArchive, publish: true}).then(() => {
         this.resetForm()
+        this.$store.dispatch('setLastPublishedDate', moment.utc().format('YYYY-MM-DDTHH:mm:ss') + 'Z')
         this.$store.dispatch('showSuccessModal', 'Contacts published successfully')
       })
     },
