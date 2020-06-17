@@ -22,12 +22,12 @@
           @click="onGroupHeaderClick(group.id, $event)">
 
           <span class="name-and-edit" v-show="editingNameOfGroupAtIndex !== groupIndex">
-            <span class="grippy" />
+            <span v-if="currentUser.canEditContacts()" class="grippy" />
             <span class="name">{{ group.section }}</span>
-            <span class="icon edit-name is-small" v-show="!group.emergency" @click.stop="editGroupTitle(groupIndex)">
+            <span v-if="currentUser.canEditContacts()" class="icon edit-name is-small" v-show="!group.emergency" @click.stop="editGroupTitle(groupIndex)">
               <i class="fas fa-edit" />
             </span>
-            <span class="icon delete-group is-small" v-show="!group.emergency" @click.stop="deleteGroup(groupIndex)">
+            <span v-if="currentUser.canEditContacts()" class="icon delete-group is-small" v-show="!group.emergency" @click.stop="deleteGroup(groupIndex)">
               <i class="fas fa-trash-alt" />
             </span>
           </span>
@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <span class="icon is-small" v-show="detailGroup !== group.id">
+          <span v-if="currentUser.canEditContacts()" class="icon is-small" v-show="detailGroup !== group.id">
             <i class="fas fa-chevron-down" />
           </span>
           <span class="icon is-small" v-show="detailGroup === group.id">
@@ -107,7 +107,7 @@
         </div>
         <!-- OR -->
 
-        <span class="icon is-small" v-show="detailGroup !== 'EMERGENCY'">
+        <span v-if="currentUser.canEditContacts()" class="icon is-small" v-show="detailGroup !== 'EMERGENCY'">
           <i class="fas fa-chevron-down" />
         </span>
         <span class="icon is-small" v-show="detailGroup === 'EMERGENCY'">
@@ -131,6 +131,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import draggable from 'vuedraggable'
 import ContactList from './ContactList'
 import EditContact from './EditContact'
@@ -158,6 +159,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['currentUser']),
     draggableList: {
       get() {
         return this.$store.state.contactGroups
@@ -190,7 +192,7 @@ export default {
       })
     },
     onGroupHeaderClick (id, event) {
-
+      if (!this.currentUser.canEditContacts()) return
       if (event.target.nodeName === 'INPUT') return
 
       const applyGroupOpenClosedState = this.detailGroup === id

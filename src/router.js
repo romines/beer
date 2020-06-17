@@ -3,7 +3,14 @@ import VueRouter from 'vue-router'
 import { auth } from './firebaseInit.js'
 import { promiseTo } from './store/utils.js'
 
-import Home from './components/Home'
+import PushNotifications from './components/PushNotifications'
+import WebcamManager from './components/WebcamManager'
+import Profile from './components/Profile'
+import Settings from './components/Settings'
+import UserManager from './components/settings/UserManager'
+import ResortManager from './components/settings/ResortManager'
+import PushSettings from './components/settings/PushSettings'
+
 import {
   Archive,
   ExportJson,
@@ -13,19 +20,20 @@ import {
   Tags,
   Resorts,
   Resort,
-  SignUp,
+  SignUp
 } from './components'
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home,
+    path: '/contacts',
+    name: 'Resort',
+    component: Resort,
     meta: {
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (store.state.user.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
+      if (!store.getters.currentUser.canAccessContacts()) return next('/')
 
       Promise.all([
         store.dispatch('listenToResortRoot'),
@@ -44,7 +52,7 @@ const routes = [
       requiresAuth: true,
     },
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId && store.state.user.superAdmin) return next('/resorts')
+      if (!store.getters.currentResort.id) return next('/resorts')
 
       Promise.all([
         store.dispatch('listenToArchiveList'),
@@ -65,7 +73,7 @@ const routes = [
       requiresSuperAdmin: true,
     },
     beforeEnter: async (to, from, next) => {
-      if (!store.state.resortId) return next('/')
+      if (!store.getters.currentResort.id) return next('/')
       await store.dispatch('listenToResortRoot')
       next()
     },
@@ -79,7 +87,7 @@ const routes = [
       requiresSuperAdmin: true,
     },
     beforeEnter: async (to, from, next) => {
-      if (!store.state.resortId) return next('/')
+      if (!store.getters.currentResort.id) return next('/')
       await store.dispatch('listenToResortRoot')
       next()
     },
@@ -89,8 +97,7 @@ const routes = [
     name: 'Resorts',
     component: Resorts,
     meta: {
-      requiresAuth: true,
-      requiresSuperAdmin: true,
+      requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
       store.commit('SET_LOADING_STATE', true)
@@ -102,38 +109,123 @@ const routes = [
     },
   },
   {
-    path: '/resorts/:resortId',
-    name: 'Resort Home',
-    component: Resort,
+    path: '/webcam-manager',
+    name: 'WebcamManager',
+    component: WebcamManager,
     meta: {
-      requiresAuth: true,
-      requiresSuperAdmin: true,
+      requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
-      store
-        .dispatch('getResorts')
-        .then(() => {
-          store.commit('SET_RESORT_ID', to.params.resortId)
-          return Promise.all([
-            store.dispatch('listenToResortRoot'),
-            store.dispatch('listenToPublishedContacts'),
-          ])
-        })
-        .then(() => {
+      if (!store.getters.currentResort.id) return next('/resorts')
+      if (!store.getters.currentUser.canAccessWebcams()) return next('/')
+
+      store.dispatch('getResortWebcams').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
+    }
+  },
+  {
+    path: '/',
+    name: 'PushNotifications',
+    component: PushNotifications,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.currentResort.id) return next('/resorts')
+
+      store.dispatch('initializePushWooshData').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
+    }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.currentResort.id) return next('/resorts')
+      if (!store.getters.currentUser.canAccessSettings()) return next('/')
+
+      store.dispatch('initializePushWooshData').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        next()
+      })
+    },
+    children: [
+      {
+        path: 'push',
+        name: 'PushSettings',
+        component: PushSettings
+      },
+      {
+        path: 'users',
+        name: 'UserManager',
+        component: UserManager,
+        meta: {
+          requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+          if (!store.getters.currentResort.id) return next('/resorts')
+          if (!store.getters.currentUser.superAdmin && !store.getters.currentUser.isResortAdmin()) return next('/')
+
           store.commit('SET_LOADING_STATE', false)
           next()
-        })
+        }
+      },
+      {
+        path: 'resorts',
+        name: 'ResortManager',
+        component: ResortManager,
+        meta: {
+          requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+          if (!store.getters.currentResort.id) return next('/resorts')
+          if (!store.getters.currentUser.superAdmin) return next('/')
+
+          store.commit('SET_LOADING_STATE', false)
+          next()
+        }
+      }
+    ]
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: {
+      requiresAuth: true
     },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    }
   },
   {
     path: '/login',
     name: 'Login',
     component: Login,
+    meta: {
+      blockedForUsers: true,
+    },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    }
   },
   {
     path: '/reset',
     name: 'Reset Password',
     component: ForgotPassword,
+    meta: {
+      blockedForUsers: true,
+    }
   },
   {
     path: '/sign-up/:encodedResortId',
@@ -145,18 +237,28 @@ const routes = [
     path: '/json',
     component: ExportJson,
     beforeEnter: (to, from, next) => {
-      if (!store.state.resortId) return next('/')
+      if (!store.getters.currentResort.id) return next('/')
       next()
     },
   },
 ]
 
-const router = new VueRouter({ routes })
+const router = new VueRouter({ mode: 'history', routes })
 
 router.beforeEach(async (to, from, next) => {
+
+  if (to.matched.some(record => record.meta.blockedForUsers) && auth.currentUser) {
+    // Route is off-limits to logged-in users
+    // Return them to previous route or root page
+    let path = from.path ? from.path : '/'
+
+    return next({
+      path: path,
+    })
+  }
+
   if (!to.matched.some(record => record.meta.requiresAuth)) {
     // route is open to unauthenticated users
-    store.commit('SET_LOADING_STATE', false)
     return next()
   }
 
@@ -174,17 +276,39 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  if (!store.state.user.authorizedIds) {
+  // CurrentUser can sometimes be an empty object, check for uid.
+  if (!store.getters.currentUser || !store.getters.currentUser.uid) {
     // if no user in state, await user data fetch based on Firebase auth user
     console.log('no user in state . . .')
 
-    const [err] = await promiseTo(store.dispatch('getUserData', auth.currentUser))
+    const [err, user] = await promiseTo(store.dispatch('setCurrentUser', auth.currentUser))
     if (err) {
       store.commit('SET_LOADING_STATE', false)
       console.log(err.message)
       return store.dispatch('showErrorModal', err)
     }
+
+    // User does not have access to any resorts. Log them out and show error
+    if (!user.superAdmin && user.authorizedResortCount() === 0) {
+      store.dispatch('logOut').then(() => {
+        store.commit('SET_LOADING_STATE', false)
+        store.dispatch('showErrorModal', 'You do not have access to view any resorts. Please contact your administrator for assistance.')
+        next('/login')
+      })
+      return
+    }
+
+    // If user is not a superAdmin, and has more than one authorizedResort, we want to send them to /resorts
+    if (!user.superAdmin && user.authorizedResortCount() === 1) {
+      const [err2] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResort()))
+      // Must go after setCurrentResort
+      const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
+    } else {
+      next('/resorts')
+    }
+
   }
+
 
   /**
    *
@@ -192,13 +316,14 @@ router.beforeEach(async (to, from, next) => {
    *
    */
 
-  if (store.state.user.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
+  if (store.getters.currentUser.superAdmin || !to.matched.some(record => record.meta.requiresSuperAdmin)) {
     // this is a superAdmin or route does NOT require superAdmin.
     // send user on their way
     next()
   } else {
     // non superAdmin trying to access route requiring superAdmin
     // redirect home
+    console.log("Need superAdmin priviledges...")
     next('/')
   }
 })

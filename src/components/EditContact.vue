@@ -87,7 +87,7 @@
       </div>
     </div>
 
-    <div class="active-toggles box" v-show="$store.state.resortId !== 'russell_lands'">
+    <div class="active-toggles box" v-show="currentResort.id !== 'russell_lands'">
       <div class="title is-6">Contact Active</div>
       <div class="field is-horizontal toggle">
         <div class="field-label is-normal">
@@ -254,7 +254,7 @@
 
         <image-upload
           @uploadComplete="onImageUpload"
-          :path-prefix="$store.state.resortId + '/images/'"
+          :path-prefix="currentResort.id + '/images/'"
           v-show="!localState.contact.imageUrl"
         />
       </div>
@@ -313,6 +313,7 @@ import 'cleave.js/dist/addons/cleave-phone.i18n.js'
 import mixins from './mixins'
 import LocationSelector from './LocationSelector.vue'
 import ImageUpload from './ImageUpload.vue'
+import { mapGetters } from 'vuex'
 
 // fields that might be missing should be initialized with default values to ensure reactivity
 const contactDefaults = {
@@ -375,6 +376,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['currentResort']),
     contactIsDirty() {
       const contact = { ...this.localState.contact, descriptionEditor: null }
       const contactAtInitialization = { ...this.contactAtInitialization, descriptionEditor: null }

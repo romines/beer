@@ -3,7 +3,7 @@
 
     <contact-group-list :new-group-identifier="newGroupIdentifier" />
 
-    <div class="add-new-bar box" @click="addingGroup = true" v-show="!addingGroup">
+    <div v-if="currentUser.canEditContacts()" class="add-new-bar box" @click="addingGroup = true" v-show="!addingGroup">
       <span class="text">Add New Contact Group</span>
       <span class="icon is-small">
         <i class="fas fa-plus" />
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import ContactGroupList from './ContactGroupList'
 
 export default {
@@ -37,10 +37,8 @@ export default {
     }
   },
   computed: {
-    ...mapState([
-      'contactGroups'
-    ])
-
+    ...mapState(['contactGroups']),
+    ...mapGetters(['currentUser'])
   },
   created () {
   },

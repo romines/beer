@@ -3,7 +3,7 @@
     <site-header title="Manage Maps" />
     <map-manager
       :maps="$store.state.maps.maps"
-      :path-prefix="$store.state.resortId"
+      :path-prefix="currentResort.id"
       @mapUpload="onMapUpload"
       @nameChange="onNameChange"
       @removeMap="onMapRemove"
@@ -25,7 +25,7 @@
           <span @click="onMapRemove(slotProps.map.id)">remove</span>
           <image-upload
             file-name-prefix="map_"
-            :path-prefix="`${$store.state.resortId}/map_files/`"
+            :path-prefix="`${currentResort.id}/map_files/`"
             button-label="Add a map..."
             @uploadComplete="({ url }) => onMapReplaceUpload(slotProps.map.id, url)"
             ref="replaceUploader"
@@ -44,6 +44,8 @@
 import SiteHeader from './SiteHeader.vue'
 import MapManager from './MapManager.vue'
 import ImageUpload from './ImageUpload.vue'
+import { mapGetters } from 'vuex'
+
 export default {
   components: {
     ImageUpload,
@@ -51,9 +53,10 @@ export default {
     MapManager,
   },
   computed: {
+    ...mapGetters(['currentResort']),
     numberOfActiveMaps() {
       return this.$store.state.maps.maps.filter(map => map.active).length
-    },
+    }
   },
   methods: {
     onMapUpload({ id, url, name }) {

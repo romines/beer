@@ -8,7 +8,6 @@ import EditContact from './EditContact.vue'
 import EmergencyContactGroup from './EmergencyContactGroup.vue'
 import ExportJson from './ExportJson.vue'
 import ForgotPassword from './ForgotPassword.vue'
-import Home from './Home.vue'
 import ImageUpload from './ImageUpload.vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 import LocationSelector from './LocationSelector.vue'
@@ -33,7 +32,6 @@ export {
   EmergencyContactGroup,
   ExportJson,
   ForgotPassword,
-  Home,
   ImageUpload,
   LoadingSpinner,
   LocationSelector,

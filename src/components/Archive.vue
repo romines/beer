@@ -109,7 +109,7 @@
           <!--  -->
           <div class="row-two" v-show="editingNameOfArchiveAtIndex !== index">
             <span class="date">{{ getDateString(archive.date) }}</span>
-            <span class="version" v-show="$store.state.user.superAdmin">Version id: {{ archive.key }}</span>
+            <span class="version" v-show="currentUser.superAdmin">Version id: {{ archive.key }}</span>
           </div>
         </div>
         <div class="col col-three actions">
@@ -132,6 +132,7 @@
 import SavePublish from './SavePublish.vue'
 import SiteHeader from './SiteHeader.vue'
 import moment from 'moment'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -151,6 +152,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['currentUser']),
     archives() {
       if (!this.$store.state.archives.archiveList) return []
       const sorted = Object.keys(this.$store.state.archives.archiveList)

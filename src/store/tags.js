@@ -16,12 +16,12 @@ export default {
         ...(state.availableTags ? state.availableTags : []),
         tag
       ]
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         availableTags,
       })
     },
     deleteTag ({ state, rootState }, tagToDelete) {
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: removeTagFromGroups(rootState.contactGroups, tagToDelete),
         availableTags: state.availableTags.filter(tag => tag !== tagToDelete)
       })

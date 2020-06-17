@@ -8,7 +8,9 @@ import 'babel-polyfill'
 import archives from './archives'
 import maps from './maps'
 import tags from './tags'
+import users from './users'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
+import pwConfig from '../static/pwConfig.js'
 
 // import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
@@ -23,7 +25,7 @@ const defaultModalContents = {
   buttonLess: false,
   hideCancel: false,
   loading: false,
-  classList: [],
+  classList: []
 }
 
 Vue.use(Vuex)
@@ -33,11 +35,26 @@ const store = {
     archives,
     maps,
     tags,
+    users
   },
   state: {
-    user: {},
     resorts: [],
     resortId: '',
+    currentResort: {},
+    pushWooshData: {
+      appId: '',
+      exportSubscribers: {},
+      exportSubscribersCityOptions: {},
+      preferredCityOptions: [],
+      baseDistanceRequestIds: {}
+    },
+    resortPermissions: {
+      // These act as defaults if value is not in Firestore
+      canManageWebcams: false,
+      canManagePushNotifications: true,
+      canManageContacts: false
+    },
+    webcams: [],
     resortMeta: {},
     contactGroups: [],
     emergencyGroup: {},
@@ -45,24 +62,30 @@ const store = {
     modal: {
       show: false,
       contents: defaultModalContents,
+      showLoading: false
     },
     openContactIsDirty: false,
     openGroupIsDirty: false,
     uploadBufferUrl: '',
   },
   mutations: {
-    SET_RESORT_ID(state, resortId) {
-      state.resortId = resortId
+    SET_CURRENT_RESORT(state, payload) {
+      state.currentResort = {
+        id:   payload.id,
+        name: payload.name
+      }
     },
     SET_RESORTS(state, resorts) {
       console.log('SET(ing)_RESORTS . . .')
       state.resorts = resorts
     },
-    SET_USER(state, user) {
-      state.user = { ...user }
-    },
     SET_RESORT_META(state, resortMeta) {
       state.resortMeta = resortMeta
+    },
+    SET_PUSHWOOSH_DATA(state, pushWooshData) {
+      Object.keys(pushWooshData).forEach((key) => {
+        state.pushWooshData[key] = pushWooshData[key]
+      })
     },
     SET_CONTACT_GROUPS(state, { contactGroups, emergencyGroup }) {
       console.log('SET_CONTACT_GROUPS . . .')
@@ -75,11 +98,12 @@ const store = {
     },
     CLOSE_MODAL(state) {
       state.modal.show = false
-      state.modal.content = defaultModalContents
+      state.modal.contents = defaultModalContents
+    },
+    SET_MODAL_LOADING_STATE (state, boolean) {
+      state.modal.showLoading = boolean
     },
     SET_LOADING_STATE(state, loading) {
-      console.log('SET_LOADING_STATE . . .')
-
       state.loading = loading
     },
     SET_CONTACT_DIRTY_STATE(state, isDirty) {
@@ -91,39 +115,32 @@ const store = {
     UPDATE_IMAGE_URL(state, { groupIndex, contactIndex, scaledUrl }) {
       state.contactGroups[groupIndex].list[contactIndex].imageUrl = scaledUrl
     },
+    SET_WEBCAMS(state, webcams) {
+      state.webcams = webcams
+    },
+    SET_RESORT_PERMISSIONS(state, permissions) {
+      if (permissions) state.resortPermissions = permissions
+    }
   },
+
   actions: {
-    getUserData({ commit }, user) {
-      console.log('getUserData dispatched . . .')
-
-      return firestore
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then(
-          doc => {
-            const userData = doc.data()
-            user.authorizedResortIds = userData.authorizedResortIds
-
-            // if not superAdmin set resortId here to first (only) resortId in authorized list
-            if (!userData.superAdmin) commit('SET_RESORT_ID', userData.authorizedResortIds[0])
-
-            commit('SET_USER', {
-              email: user.email,
-              uid: user.uid,
-              superAdmin: !!userData.superAdmin,
-              authorizedResortIds: userData.authorizedResortIds,
-            })
-
-            return Promise.resolve()
-          },
-          err => console.log(err)
-        )
+    setCurrentResort({ commit, dispatch }, resortId) {
+      return new Promise((resolve, reject) => {
+        if (!resortId) {
+          commit('SET_CURRENT_RESORT', {})
+          resolve()
+        } else {
+          RESORTS_REF.doc(resortId).get().then((doc) => {
+            let data = doc.data()
+            commit('SET_CURRENT_RESORT', { id: resortId, name: data.name })
+            resolve()
+          })
+        }
+      })
     },
 
     getResorts({ commit }) {
       return RESORTS_REF.get().then(snapshot => {
-        console.log('inside getResorts .then')
         let resorts = []
         snapshot.forEach(doc => {
           resorts.push(doc.data())
@@ -147,11 +164,123 @@ const store = {
       ])
     },
 
+    initializePushWooshData({ rootState, commit, dispatch }) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
+          const resortData = doc.data()
+          // If there is no PW data object in firestore, create one
+          if (!resortData.pushWooshData || !resortData.pushWooshData.appId) {
+            console.log('MISSING PW DATA... SETTING...')
+            let pushWooshEnv = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
+            let pwId = pwConfig[pushWooshEnv][rootState.currentResort.id]
+            if (!pwId) console.log('MISSING PW ID IN PWCONFIG FILE. PLEASE SET!')
+            rootState.pushWooshData.appId = pwId
+            dispatch('updatePushWooshData', rootState.pushWooshData).then(() => {
+              resolve()
+            })
+          } else {
+            commit('SET_PUSHWOOSH_DATA', resortData.pushWooshData)
+            resolve()
+          }
+        })
+      })
+    },
+
+    clearPushWooshData({ rootState, commit }) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({ pushWooshData: {} }).then((response) => {
+          commit('SET_PUSHWOOSH_DATA', {})
+          resolve()
+        })
+      })
+    },
+
+    updatePushWooshData({ rootState, commit }, pushWooshData) {
+      if (!rootState.currentResort.id) return // quick bug fix
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({ pushWooshData: pushWooshData }).then((response) => {
+          commit('SET_PUSHWOOSH_DATA', pushWooshData)
+          resolve()
+        })
+      })
+    },
+
+    getCurrentResortPermissions({ rootState, commit }) {
+      return new Promise((resolve, reject) => {
+
+        if (!rootState.currentResort.id) {
+          resolve()
+          return
+        }
+
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
+          const resortData = doc.data()
+          commit('SET_RESORT_PERMISSIONS', resortData.resortPermissions)
+          resolve()
+        }).catch((e) => {
+          reject(e)
+        })
+      })
+    },
+
+    updateResortPermissions({ rootState, commit }, permissions) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({ resortPermissions: permissions }).then((response) => {
+          commit('SET_RESORT_PERMISSIONS', permissions)
+          resolve()
+        })
+      })
+    },
+
+    createWebcamForResort({ rootState, commit, dispatch }, webcam) {
+      let webcams = rootState.webcams
+      webcams.push(webcam)
+
+      return new Promise((resolve, reject) => {
+        dispatch('saveResortWebcams', webcams).then(() => resolve(webcam)).catch((error) => reject(error))
+      })
+    },
+
+    saveResortWebcams({ rootState, commit }, webcams) {
+      return new Promise((resolve, reject) => {
+        commit('SET_WEBCAMS', webcams)
+        firestore
+          .collection('resorts')
+          .doc(rootState.currentResort.id)
+          .update({
+            webcams: webcams,
+          })
+          .then(() => {
+            resolve()
+          })
+          .catch(error => {
+            // The document probably doesn't exist.
+            reject(error)
+          })
+      })
+    },
+
+    getResortWebcams({ rootState, commit }) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
+          if (!doc.data().webcams) {
+            RESORTS_REF.doc(rootState.currentResort.id).update({ webcams: [] }).then((response) => {
+              commit('SET_WEBCAMS', [])
+              resolve()
+            })
+          } else {
+            commit('SET_WEBCAMS', doc.data().webcams)
+            resolve()
+          }
+        })
+      })
+    },
+
     listenToResortRoot({ rootState, commit }) {
       console.log('listen[ing]ToResortRoot . . .')
 
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId).onSnapshot(
+        RESORTS_REF.doc(rootState.currentResort.id).onSnapshot(
           doc => {
             const resortData = doc.data()
 
@@ -180,10 +309,10 @@ const store = {
     },
 
     resetResortState({ commit, dispatch }) {
-      commit('SET_RESORT_ID', '')
-      commit('SET_USER', {})
+      dispatch('setCurrentResort', null)
       commit('SET_CONTACT_GROUPS', {})
       commit('SET_RESORT_META', {})
+      commit('SET_PUSHWOOSH_DATA', {})
       dispatch('resetArchiveState')
     },
 
@@ -194,51 +323,15 @@ const store = {
       })
     },
 
-    logOut({ commit }) {
-      auth.signOut().then(() => {
-        commit('SET_RESORT_ID', '')
-        commit('SET_USER', {})
-        commit('SET_CONTACT_GROUPS', {})
+    logOut({ commit, dispatch }) {
+      return new Promise((resolve, reject) => {
+        auth.signOut().then(() => {
+          dispatch('setCurrentResort', null)
+          commit('SET_CONTACT_GROUPS', {})
+          dispatch('clearCurrentUser')
+          resolve()
+        })
       })
-    },
-
-    async createUser({ commit, dispatch }, { email, password, resortId }) {
-      const [createError, firebaseUser] = await promiseTo(
-        auth.createUserWithEmailAndPassword(email, password)
-      )
-
-      if (createError) {
-        commit('SET_LOADING_STATE', false)
-        return dispatch('showErrorModal', createError.message)
-      }
-
-      const uid = firebaseUser.user.uid
-      const user = {
-        email,
-        authorizedResortIds: [resortId],
-      }
-
-      const [rtdbSaveError] = await promiseTo(
-        firestore
-          .collection('users')
-          .doc(uid)
-          .set(user)
-      )
-
-      if (rtdbSaveError) {
-        commit('SET_LOADING_STATE', false)
-        return dispatch('showErrorModal', createError.message)
-      }
-
-      const userForStore = {
-        ...user,
-        uid,
-        superAdmin: false,
-      }
-
-      commit('SET_USER', userForStore)
-
-      return { successfulUserCreation: true }
     },
 
     async triggerPasswordResetEmail({ commit, dispatch }, { email }) {
@@ -265,7 +358,7 @@ const store = {
       return new Promise((resolve, reject) => {
         firestore
           .collection('resorts')
-          .doc(rootState.resortId)
+          .doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
           })
@@ -282,7 +375,7 @@ const store = {
     saveContactGroupName({ rootState }, { groupIndex, updatedName }) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].section = updatedName
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
@@ -293,7 +386,7 @@ const store = {
       // let groups = rootState.contactGroups.slice()
 
       // groups[groupIndex] = updatedEmergencyGroup
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         emergencyGroup: updatedEmergencyGroup,
       })
     },
@@ -301,14 +394,14 @@ const store = {
     deleteContactGroup({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups.splice(groupIndex, 1)
-      return RESORTS_REF.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
 
     saveContactGroupList({ rootState }, { updatedList }) {
       // currently unused, but could DRY out contact mutation methods below
-      return RESORTS_REF.doc(rootState.resortId).update({
+      return RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: updatedList,
       })
     },
@@ -316,7 +409,7 @@ const store = {
     toggleSortable({ rootState }, groupIndex) {
       let groups = rootState.contactGroups.slice()
       groups[groupIndex].noSort = !rootState.contactGroups[groupIndex].noSort
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
@@ -337,7 +430,7 @@ const store = {
         // existing contact
         groups[groupIndex].list[contactIndex] = updatedContact
       }
-      return RESORTS_REF.doc(rootState.resortId)
+      return RESORTS_REF.doc(rootState.currentResort.id)
         .update({
           contactGroups: groups,
         })
@@ -354,11 +447,11 @@ const store = {
       const contact = groups[groupIndex].list.splice(contactIndex, 1)[0]
 
       if (!contact.imageUrl) {
-        return RESORTS_REF.doc(rootState.resortId).update({
+        return RESORTS_REF.doc(rootState.currentResort.id).update({
           contactGroups: groups,
         })
       } else {
-        return RESORTS_REF.doc(rootState.resortId)
+        return RESORTS_REF.doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
           })
@@ -386,7 +479,7 @@ const store = {
       groups[groupIndex].list.splice(contactIndex + 1, 0, newContact)
 
       return new Promise((resolve, reject) => {
-        RESORTS_REF.doc(rootState.resortId)
+        RESORTS_REF.doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
           })
@@ -411,7 +504,7 @@ const store = {
       const groupIndex = rootState.contactGroups.findIndex(group => group.id === groupId)
       const groups = rootState.contactGroups.slice()
       groups[groupIndex].list = updatedList
-      RESORTS_REF.doc(rootState.resortId).update({
+      RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
       })
     },
@@ -442,7 +535,7 @@ const store = {
 
     listenForScaledImage({ rootState, commit }, { fileName, url }) {
       console.log('Listening for scaled image . . .')
-      RESORTS_REF.doc(rootState.resortId)
+      RESORTS_REF.doc(rootState.currentResort.id)
         .collection('scaledImages')
         .doc(fileName.split('.')[0])
         .onSnapshot(() => {
@@ -516,6 +609,39 @@ const store = {
       })
       setTimeout(closeModal, 5500)
     },
+
+    setModalLoadingState({commit}, boolean) {
+      commit('SET_MODAL_LOADING_STATE', boolean)
+    }
+  },
+  getters: {
+    modal (state) {
+      return state.modal
+    },
+    modalShowLoading (state) {
+      return state.modal.showLoading
+    },
+    modalContents (state) {
+      return state.modal.contents
+    },
+    modalShow (state) {
+      return state.modal.show
+    },
+    pushWooshData (state) {
+      return state.pushWooshData
+    },
+    webcams (state) {
+      return state.webcams
+    },
+    currentResort (state) {
+      return state.currentResort
+    },
+    resorts (state) {
+      return state.resorts
+    },
+    resortPermissions (state) {
+      return state.resortPermissions
+    }
   },
 }
 

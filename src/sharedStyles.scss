@@ -25,14 +25,13 @@ $title-color: $dark;
 .icon { cursor: pointer; }
 
 body {
-  margin: 0;
-  padding-top: 28px;
+  margin: 3.5em 0 0 0;
 }
 
 .main {
   max-width: 772px;
-  margin: -28px auto;
-  padding: 43px .85rem;
+  margin: 0 auto;
+  padding: 2em .85rem;
   background-color: white;
 }
 // .title {
@@ -104,4 +103,61 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  min-width: 120px;
+  min-width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 0.5em;
+  border-radius: 6px;
+  font-size: 0.9em;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltiptext.top {
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+/* ALERTS */
+.alert {
+  padding: .5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.setting-title {
+  font-size:      1.5em;
+  font-weight:    bold;
 }

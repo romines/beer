@@ -1,7 +1,12 @@
 <template>
   <div class="resorts">
+    <div class="links">
+      <router-link v-if="currentResort.id && currentUser.canEditContacts()" to="/history">Revision History</router-link>
+      <router-link v-if="currentResort.id && currentUser.superAdmin" to="/maps">Maps</router-link>
+      <router-link v-if="currentResort.id && currentUser.superAdmin" to="/tags">Tags</router-link>
+    </div>
     <site-header title="Contacts" />
-    <save-publish />
+    <save-publish v-if="currentUser.canEditContacts()" />
     <contacts />
   </div>
 </template>
@@ -10,6 +15,7 @@
 import SiteHeader from './SiteHeader.vue'
 import SavePublish from './SavePublish.vue'
 import Contacts from './Contacts.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -21,32 +27,23 @@ export default {
     return {}
   },
   computed: {
-    name() {
-      if (!this.$store.state.resortId) return
-      return this.$store.state.resorts.filter(
-        resort => resort.resortId === this.$store.state.resortId
-      )[0].name
-    },
+    ...mapGetters(['currentUser', 'currentResort'])
   },
   created() {},
-  methods: {
-    goBack() {
-      this.$store.commit('SET_LOADING_STATE', true)
-      this.$router.push('/resorts')
-    },
-  },
+  methods: {},
 }
 </script>
 
 <style lang="scss" scoped>
-.title-container {
-  // color: red !important;
-  h1 {
-    margin-bottom: 0;
-  }
-  .icon.back {
-    font-size: 0.8em;
-    // margin-right: .6em;
+
+.resorts {
+
+  .links {
+    text-align:             right;
+
+    a {
+      margin-left:          1.5em;
+    }
   }
 }
 </style>
