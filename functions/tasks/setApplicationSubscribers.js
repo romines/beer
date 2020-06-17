@@ -4,8 +4,6 @@ const functions       = require('firebase-functions');
 const config          = JSON.parse(process.env.FIREBASE_CONFIG);
 const token           = config.projectId === 'resorts-tapped-admin' ? functions.config().pushwoosh.production : functions.config().pushwoosh.development;
 const projectId       = config.projectId;
-const pushWooshEnv    = process.env.NODE_ENV === 'production' ? 'production' : 'staging'
-const pwConfig        = require('../static/pwConfig.js');
 const parse           = require('csv-parse')
 const firestore       = new Firestore({ projectId: projectId, timestampsInSnapshots: true });
 const RESORTS_REF     = firestore.collection('resorts')
@@ -17,6 +15,11 @@ module.exports = functions.https.onRequest((req, res) => {
   res.set('Access-Control-Allow-Methods', 'GET')
 
   const resortId = req.query.resortId
+
+  if (!resortId) {
+    res.status(500).send('Parameter missing: resortId')
+    return
+  }
 
   RESORTS_REF.doc(resortId).get().then((doc) => {
     // Go out and get results
