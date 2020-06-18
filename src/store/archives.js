@@ -162,6 +162,16 @@ export default {
 
       const different = !equal(working, state.publishedContacts)
 
+      const workingJson = JSON.parse(JSON.stringify(working.contactGroups))
+      const publishedJson = JSON.parse(JSON.stringify(state.publishedContacts.contactGroups))
+
+      const eq1 = equal(workingJson, publishedJson)
+
+      console.log(workingJson)
+      console.log(publishedJson)
+
+      console.log(eq1)
+
       if (different) {
         flatten(state.publishedContacts)
         // console.log('PUBLISHED: ')
@@ -170,7 +180,7 @@ export default {
         // console.log(JSON.stringify(working))
       }
 
-      return different
+      return !eq1
     },
   },
 }

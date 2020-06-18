@@ -330,10 +330,17 @@ export default {
       }
 
       const addMapEventHandlers = () => {
+
+        // pin placement
+        document.body.addEventListener('pointerdown', e => {
+          if (!e.target.matches('.viewer-canvas img')) return
+          this.hidePin = true     // Hide pin while dragging
+        })
+
         // pin placement
         document.body.addEventListener('pointerup', e => {
           if (!e.target.matches('.viewer-canvas img')) return
-
+          this.hidePin = false    // Hide pin while dragging
           if (
             e.target.style.marginLeft === this.mapMargins.marginLeft &&
             e.target.style.marginTop === this.mapMargins.marginTop
