@@ -41,6 +41,7 @@ const store = {
     resorts: [],
     resortId: '',
     currentResort: {},
+    contactsAreDirty: false,
     pushWooshData: {
       appId: '',
       exportSubscribers: {},
@@ -120,6 +121,9 @@ const store = {
     },
     SET_RESORT_PERMISSIONS(state, permissions) {
       if (permissions) state.resortPermissions = permissions
+    },
+    SET_CONTACT_GROUP_DIRTY_STATE(state, value) {
+      state.contactsAreDirty = value
     }
   },
 
@@ -276,6 +280,19 @@ const store = {
       })
     },
 
+    setContactGroupDirtyState({ rootState, commit }, value) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update({
+          contactsAreDirty: value
+        }).then(() => {
+          commit('SET_CONTACT_GROUP_DIRTY_STATE', value)
+          resolve()
+        }).catch(() => {
+          reject()
+        })
+      })
+    },
+
     listenToResortRoot({ rootState, commit }) {
       console.log('listen[ing]ToResortRoot . . .')
 
@@ -285,6 +302,7 @@ const store = {
             const resortData = doc.data()
 
             commit('SET_CONTACT_GROUPS', resortData)
+            commit('SET_CONTACT_GROUP_DIRTY_STATE', resortData.contactsAreDirty)
             commit('SET_RESORT_META', {
               country: resortData.country,
               mapFiles: resortData.mapFiles, // TODO: remove
@@ -361,6 +379,7 @@ const store = {
           .doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
+            contactsAreDirty: true
           })
           .then(() => {
             resolve(groupId)
@@ -377,6 +396,7 @@ const store = {
       groups[groupIndex].section = updatedName
       RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
+        contactsAreDirty: true
       })
     },
 
@@ -388,6 +408,7 @@ const store = {
       // groups[groupIndex] = updatedEmergencyGroup
       RESORTS_REF.doc(rootState.currentResort.id).update({
         emergencyGroup: updatedEmergencyGroup,
+        contactsAreDirty: true
       })
     },
 
@@ -396,6 +417,7 @@ const store = {
       groups.splice(groupIndex, 1)
       return RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
+        contactsAreDirty: true
       })
     },
 
@@ -403,6 +425,7 @@ const store = {
       // currently unused, but could DRY out contact mutation methods below
       return RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: updatedList,
+        contactsAreDirty: true
       })
     },
 
@@ -433,6 +456,7 @@ const store = {
       return RESORTS_REF.doc(rootState.currentResort.id)
         .update({
           contactGroups: groups,
+          contactsAreDirty: true
         })
         .then(() => {
           commit('SET_UPLOAD_BUFFER_URL', '')
@@ -449,11 +473,13 @@ const store = {
       if (!contact.imageUrl) {
         return RESORTS_REF.doc(rootState.currentResort.id).update({
           contactGroups: groups,
+          contactsAreDirty: true
         })
       } else {
         return RESORTS_REF.doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
+            contactsAreDirty: true
           })
           .then(() => {
             return dispatch('destroyImageFile', contact.imageUrl)
@@ -482,6 +508,7 @@ const store = {
         RESORTS_REF.doc(rootState.currentResort.id)
           .update({
             contactGroups: groups,
+            contactsAreDirty: true
           })
           .then(() => {
             resolve(newContact)
@@ -506,6 +533,7 @@ const store = {
       groups[groupIndex].list = updatedList
       RESORTS_REF.doc(rootState.currentResort.id).update({
         contactGroups: groups,
+        contactsAreDirty: true
       })
     },
 

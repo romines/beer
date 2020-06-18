@@ -98,6 +98,7 @@ export default {
     saveAndPublish () {
       this.$store.dispatch('archive', {...this.newArchive, publish: true}).then(() => {
         this.resetForm()
+        this.$store.dispatch('setContactGroupDirtyState', false)
         this.$store.dispatch('setLastPublishedDate', moment.utc().format('YYYY-MM-DDTHH:mm:ss') + 'Z')
         this.$store.dispatch('showSuccessModal', 'Contacts published successfully')
       })
@@ -113,6 +114,8 @@ export default {
         this.$store.commit('SET_LOADING_STATE', true)
         await this.$store.dispatch('discardChanges')
         this.$store.commit('SET_LOADING_STATE', false)
+
+        this.$store.dispatch('setContactGroupDirtyState', false)
 
         this.$store.dispatch('showModal', {
           heading: 'Changes discarded',
