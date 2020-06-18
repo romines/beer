@@ -151,36 +151,38 @@ export default {
 
   getters: {
     dirty: (state, getters, rootState) => {
-      if (!rootState.currentResort.id) return false
-      if (!(rootState.contactGroups && rootState.contactGroups.length)) return false
-      if (Object.keys(state.publishedContacts).length === 0) return false
-
-      const working = standardizeArchive({
-        contactGroups: rootState.contactGroups.map(rmDescriptionEditor),
-        emergencyGroup: rootState.emergencyGroup,
-      })
-
-      const different = !equal(working, state.publishedContacts)
-
-      const workingJson = JSON.parse(JSON.stringify(working.contactGroups))
-      const publishedJson = JSON.parse(JSON.stringify(state.publishedContacts.contactGroups))
-
-      const eq1 = equal(workingJson, publishedJson)
-
-      console.log(workingJson)
-      console.log(publishedJson)
-
-      console.log(eq1)
-
-      if (different) {
-        flatten(state.publishedContacts)
-        // console.log('PUBLISHED: ')
-        // console.log(JSON.stringify(state.publishedContacts))
-        // console.log('WORKING: ')
-        // console.log(JSON.stringify(working))
-      }
-
-      return !eq1
+      // 6/18 implemented rudimentary dirty approach using #this.$store.dispatch('setContactGroupDirtyState', false)
+      return rootState.contactsAreDirty
+      // if (!rootState.currentResort.id) return false
+      // if (!(rootState.contactGroups && rootState.contactGroups.length)) return false
+      // if (Object.keys(state.publishedContacts).length === 0) return false
+      //
+      // const working = standardizeArchive({
+      //   contactGroups: rootState.contactGroups.map(rmDescriptionEditor),
+      //   emergencyGroup: rootState.emergencyGroup,
+      // })
+      //
+      // const different = !equal(working, state.publishedContacts)
+      //
+      // const workingJson = JSON.parse(JSON.stringify(working.contactGroups))
+      // const publishedJson = JSON.parse(JSON.stringify(state.publishedContacts.contactGroups))
+      //
+      // const eq1 = equal(workingJson, publishedJson)
+      //
+      // console.log(workingJson)
+      // console.log(publishedJson)
+      //
+      // console.log(eq1)
+      //
+      // if (different) {
+      //   flatten(state.publishedContacts)
+      //   // console.log('PUBLISHED: ')
+      //   // console.log(JSON.stringify(state.publishedContacts))
+      //   // console.log('WORKING: ')
+      //   // console.log(JSON.stringify(working))
+      // }
+      //
+      // return !eq1
     },
   },
 }

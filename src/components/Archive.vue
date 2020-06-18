@@ -218,6 +218,7 @@ export default {
       const doRestore = () => {
         this.$store.commit('SET_LOADING_STATE', true)
         this.$store.dispatch('restoreArchive', archive).then(() => {
+          this.$store.dispatch('setContactGroupDirtyState', true)
           this.$store.commit('SET_LOADING_STATE', false)
           this.$store.dispatch('showModal', {
             heading: 'Contacts restored successfully',
@@ -246,6 +247,7 @@ export default {
       const doRestorePublish = () => {
         this.$store.commit('SET_LOADING_STATE', true)
         this.$store.dispatch('restoreAndPublish', archive).then(() => {
+          this.$store.dispatch('setContactGroupDirtyState', false)
           this.$store.commit('SET_LOADING_STATE', false)
           this.$store.dispatch('showSuccessModal', 'Contacts published successfully')
           setTimeout(() => {
