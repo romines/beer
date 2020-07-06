@@ -62,6 +62,10 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["android_priority"]            = 0
       notification["android_delivery_priority"]   = "normal"
 
+      // Silent stuff
+      notification["ios_silent"]      = 1
+      notification["android_silent"]  = 1
+
       // Data stuff...
       notification["data"]["dataType"]        = "-2"
       notification["data"]["message"]         = req.body.messageBody
@@ -78,6 +82,10 @@ module.exports = functions.https.onRequest((req, res) => {
       // Omit fields from notifications for iOS
       delete notification['content']
       delete notification['ios_title']
+
+      // Silent stuff
+      notification["ios_silent"]      = 1
+      notification["android_silent"]  = 1
 
       notification["data"]["priority"]  = 1
       notification["data"]["dataType"]  = "-2"
