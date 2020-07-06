@@ -55,6 +55,9 @@
             >
               <img src="../assets/knife-and-fork.svg" class="" /> Dining
             </span>
+            <span v-for="tag in additionalContactTags(contact)" @click.stop="toggleTag(contact, tag)" class="tag additional is-active">
+               {{tag}}
+            </span>
           </span>
           <span class="icon is-small" v-show="!contactIsOpen(contact.id)">
             <i class="fas fa-chevron-down" />
@@ -126,7 +129,7 @@ export default {
     },
     sortable() {
       return this.$store.state.contactGroups[this.groupIndex].noSort
-    },
+    }
   },
   watch: {
     groupIsOpen(open) {
@@ -229,6 +232,19 @@ export default {
     deriveTagState(contact, tag) {
       const tags = contact.id === this.editingContactId ? this.openContactTagBuffer : contact.tags
       return tags[tag]
+    },
+    additionalContactTags (contact) {
+      let additionalContactTags = []
+      let normalizedTags = ['winter', 'summer', 'dining']
+      const tags = contact.id === this.editingContactId ? this.openContactTagBuffer : contact.tags
+
+      Object.keys(tags).forEach((k, v) => {
+        if (normalizedTags.includes(k)) return  // Don't show winter, summer, dining
+        if (!tags[k]) return                    // If the value of the tag is false, don't show
+        additionalContactTags.push(k)
+      })
+
+      return additionalContactTags
     },
     sortByName(list) {
       return list.slice().sort((a, b) => {
