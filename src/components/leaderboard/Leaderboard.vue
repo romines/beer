@@ -15,6 +15,7 @@ import { mapGetters } from 'vuex'
 import SiteHeader from '../SiteHeader.vue'
 import { LoadingSpinner } from '../../components'
 import store from '../../store'
+import stringHelper from '../../helpers/stringHelper'
 
 export default {
   components: {
@@ -82,6 +83,10 @@ export default {
       string += '&exclude_profile_image=true'
       string += '&include_count=true'
       string += '&additional_properties=[ "total_days_skied", "total_distance_vertical"]'
+      
+      if (data.orderBy) string += '&order_by=' + stringHelper.unCamelize(data.orderBy)
+      if (data.orderBy) string += '&sort_order=' + (data.ascending ? "ASC" : "DESC")
+      
       return string
     },
     showUser (user) {
