@@ -5,7 +5,7 @@ import leaderboardConfig from '../../leaderboardConfig'
 import stringHelper from '../../helpers/stringHelper'
 
 // Set in src/leaderboardConfig.js
-const API_URL = leaderboardConfig[process.env.NODE_ENV] || 'http://localhost:3000/api/v1'
+const API_URL = leaderboardConfig[process.env.NODE_ENV] || 'http://localhost:3000/admin/v1'
 
 let cmsAxios = axios.create({
   baseURL: API_URL,

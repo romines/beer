@@ -137,13 +137,13 @@ const store = {
         let password = leaderboardConfig.auth[rootState.currentResort.id]
 
         cmsAxios.post('/auth?app_id=' + rootState.currentResort.id + '&auth_id=' + password)
-          .then(request => {
-            localStorage.leaderboardToken = request.data.token
-            resolve(request)
+          .then(data => {
+            localStorage.leaderboardToken = data.token
+            resolve(data)
           }).catch(request => {
             delete localStorage.leaderboardToken
             dispatch('showErrorModal', 'Could not connect to Leaderboard. Please try again later. If problem persists, contact Resorts Tapped.')
-            router.push({ name: 'PushNotifications' })
+            router.push('/')
             reject(request)
           })
       })
