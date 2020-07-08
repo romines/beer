@@ -26,7 +26,7 @@ export default {
     return {
       isLoading:        true,
       tableParams:      {},
-      columns:          ['rank', 'displayName', 'totalDaysSkied', 'totalDistanceVertical', 'view'],
+      columns:          ['rank', 'displayName', 'totalDaysSkied', 'totalTracks', 'totalDistanceVertical', 'view'],
       options: {
         requestFunction (data) {
           let parentComponent = this.$parent.$parent
@@ -48,7 +48,7 @@ export default {
         },
         pagination: { chunk: 10, dropdown: false },
         filterable: ['displayName'],
-        sortable: ['totalDaysSkied', 'totalDistanceVertical'],
+        sortable: ['totalDaysSkied', 'totalDistanceVertical', 'totalTracks'],
         headings: {
           'displayName':            'Display Name',
           'totalDaysSkied':         'Days Skied',
@@ -82,11 +82,11 @@ export default {
       string += '?resort_identifier=' + this.currentResort.id
       string += '&exclude_profile_image=true'
       string += '&include_count=true'
-      string += '&additional_properties=[ "total_days_skied", "total_distance_vertical"]'
-      
+      string += '&additional_properties=[ "total_days_skied", "total_distance_vertical", "total_tracks"]'
+
       if (data.orderBy) string += '&order_by=' + stringHelper.unCamelize(data.orderBy)
       if (data.orderBy) string += '&sort_order=' + (data.ascending ? "ASC" : "DESC")
-      
+
       return string
     },
     showUser (user) {
