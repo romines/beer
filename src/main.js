@@ -20,6 +20,12 @@ Vue.use(vClickOutside)
 Vue.use(ClientTable)
 Vue.use(ServerTable)
 
+// Mixins
+import dateMixin from './mixins/date'
+
+// Add global mixins
+Vue.mixin(dateMixin)
+
 Vue.config.productionTip = false
 
 Vue.prototype.$globals = globals

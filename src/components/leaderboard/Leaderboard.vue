@@ -2,13 +2,8 @@
   <div class="leaderboard">
 
     <site-header title="Leaderboard" />
-    {{userData}}
+
     <v-server-table ref="usersTable" v-bind:columns="columns" v-bind:options="options">
-      <!-- <a slot="sales" slot-scope="props" class="sales">{{numberToCurrency(props.row.totalSales)}}</a>
-      <a slot="createdAt" slot-scope="props" class="date">{{formatDate(props.row.createdAt, 'MM/DD/YYYY - HH:MM:SS')}}</a>
-      <a slot="lastSignInDate" slot-scope="props" class="date">{{formatDate(props.row.lastSignInDate, 'MM/DD/YYYY - HH:MM:SS')}}</a>
-      <a slot="approved" slot-scope="props" class="approved">{{props.row.isApproved ? 'Yes' : 'No'}}</a>
-      <a slot="reviewed" slot-scope="props" class="reviewed">{{props.row.isReviewed ? 'Yes' : 'No'}}</a> -->
       <a slot="view" slot-scope="props" class="view-user" v-on:click="showUser(props.row)">View</a>
     </v-server-table>
 
@@ -30,8 +25,7 @@ export default {
     return {
       isLoading:        true,
       tableParams:      {},
-      userData: {},
-      columns:          ['rank', 'displayName', 'totalDaysSkied', 'totalDistanceVertical'],
+      columns:          ['rank', 'displayName', 'totalDaysSkied', 'totalDistanceVertical', 'view'],
       options: {
         requestFunction (data) {
           let parentComponent = this.$parent.$parent
@@ -77,16 +71,12 @@ export default {
       if (data) this.tableParams = data
 
       return this.axios.get('/leaderboard' + this.currentAppendUrl).then((response) => {
-        console.log(this.$refs.usersTable)
-
-        this.userData = response.data.leaderboard
         this.$refs.usersTable.data  = response.data.leaderboard
         this.$refs.usersTable.count = response.data.count
         return response.data
       })
     },
     createAppendUrl (data) {
-      console.log(data)
       let string = ''
       string += '?resort_identifier=' + this.currentResort.id
       string += '&exclude_profile_image=true'
@@ -95,7 +85,7 @@ export default {
       return string
     },
     showUser (user) {
-      this.$router.push({ name: 'LeaderboardUser', query: { external_id: user.external_id } })
+      this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId } })
     }
   }
 }

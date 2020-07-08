@@ -158,7 +158,7 @@ const routes = [
     }
   },
   {
-    path: '/leaderboard/user',
+    path: '/leaderboard/users/:external_id',
     name: 'LeaderboardUser',
     component: LeaderboardUser,
     meta: {
