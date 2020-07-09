@@ -39,20 +39,21 @@ export default {
           })
         },
         filterByColumn: true,
-        perPage: 25,
+        perPage: 5,
         perPageValues: [10, 25, 50, 100, 250, 500],
         texts: {
           filter:   'Filter:',
           filterBy: 'Filter by {column}',
           count:    ''
         },
-        pagination: { chunk: 10, dropdown: false },
+        pagination: { chunk: 5, dropdown: false },
         filterable: ['displayName'],
         sortable: ['totalDaysSkied', 'totalDistanceVertical', 'totalTracks'],
         headings: {
           'displayName':            'Display Name',
           'totalDaysSkied':         'Days Skied',
-          'totalDistanceVertical':  'Total Vertical Distance'
+          'totalDistanceVertical':  'Total Vertical Dist.',
+          'totalTracks':            'Total Tracks'
         }
       }
     }
@@ -81,11 +82,13 @@ export default {
       let string = ''
       string += '?resort_identifier=' + this.currentResort.id
       string += '&exclude_profile_image=true'
-      string += '&include_count=true'
       string += '&additional_properties=[ "total_days_skied", "total_distance_vertical", "total_tracks"]'
 
       if (data.orderBy) string += '&order_by=' + stringHelper.unCamelize(data.orderBy)
       if (data.orderBy) string += '&sort_order=' + (data.ascending ? "ASC" : "DESC")
+      if (data.query.displayName) string += '&display_name=' + data.query.displayName
+      if (data.limit) string += '&limit=' + data.limit
+      if (data.page) string += '&offset=' + data.page
 
       return string
     },
