@@ -6,16 +6,16 @@
     <LoadingSpinner v-if="isLoadingUser"></LoadingSpinner>
 
     <div v-else class="user-summary">
-      <div class="header">
+      <section class="header">
         <img v-if="userSummary.profileImage" v-bind:src="userImage" />
         <div class="header-right">
           <h1>{{userSummary.displayName}}</h1>
           <span class="email">Email Address: {{ userSummary.emailAddress }} </span>
           <span class="created-at">Member Since: {{ formatDate(userSummary.createdAt, 'MM/DD/YYYY') }} </span>
         </div>
-      </div>
+      </section>
 
-      <div class="body">
+      <section class="body">
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDaysSkied) }}</span>
           <span class="name">Total Days</span>
@@ -34,21 +34,45 @@
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.speedAverage) }}</span>
-          <span class="name">Avg. Speed</span>
+          <span class="name">Avg. Speed (km/h)</span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.speedMax) }}</span>
-          <span class="name">Max Speed</span>
+          <span class="name">Max Speed (km/h)</span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceVertical) }}</span>
-          <span class="name">Total Vertical Distance</span>
+          <span class="name">Total Vertical Distance (km)</span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceSurface) }}</span>
-          <span class="name">Total Surface Distance</span>
+          <span class="name">Total Surface Distance (km)</span>
         </div>
+      </section>
+    </div>
+
+
+    <LoadingSpinner v-if="isLoadingResortDays"></LoadingSpinner>
+    <div class="resort-days">
+
+      <h2>Ski Days</h2>
+
+      <div v-for="resortDay in resortDays" class="resort-day-container">
+        <section class="header" v-on:click="showResortDay(resortDay, $event)">
+          <span class="date">{{ formatDate(resortDay.date, 'lll') }}</span>
+          <span class="tracks">{{ resortDay.tracks.length }} Runs</span>
+        </section>
+        <section class="body" v-if="openPanels.includes(resortDay.id)">
+          <div class="detail">
+            <label>Kcals:</label><span class="kcals">{{resortDay.kcals || 'N/A'}}</span>
+          </div>
+
+          <v-client-table v-bind:data="resortDay.tracks" v-bind:columns="trackColumns" v-bind:options="trackOptions" class="track-table">
+            <span slot="startTime" slot-scope="props" class="start-date">{{ formatDate(props.row.startTime, 'HH:MM:SS') }}</span>
+          </v-client-table>
+        </section>
       </div>
+
     </div>
 
   </div>
@@ -60,6 +84,8 @@ import { LoadingSpinner } from '../../components'
 import SiteHeader from '../SiteHeader.vue'
 import store from '../../store'
 import moment from 'moment'
+import arrayHelper from '../../helpers/arrayHelper.js'
+import numberHelper from '../../helpers/numberHelper.js'
 
 export default {
   components: {
@@ -68,8 +94,41 @@ export default {
   },
   data () {
     return {
-      userSummary:      {},
-      isLoadingUser:    true,
+      userSummary:          {},
+      resortDays:           [],
+      isLoadingUser:        true,
+      isLoadingResortDays:  true,
+      openPanels:           [],
+      trackColumns:         ['startTime', 'liftName', 'duration', 'distanceVertical', 'distanceSurface', 'speedMax'],
+      trackOptions: {
+        filterable: false,
+        filterByColumn: false,
+        perPage: 25,
+        perPageValues: [10, 25, 50, 100, 250, 500],
+        pagination: { chunk: 10, dropdown: false },
+        sortable: ['startTime', 'liftName', 'duration', 'distanceVertical', 'distanceSurface', 'speedMax'],
+        headings: {
+          'startTime': 'Time',
+          'liftName': 'Lift',
+          'distanceVertical': 'Vertical Dist.',
+          'distanceSurface': 'Surface Dist.',
+          'speedMax': 'Max Speed'
+        },
+        descOrderColumns: ['createdAt'],
+        orderBy: {
+          column: 'createdAt',
+          ascending: false
+        },
+        rowAttributesCallback (row) {
+          for (var key in row) {
+            if (row.hasOwnProperty(key)) {
+              if (['distanceSurface', 'distanceVertical', 'duration'].includes(key)) {
+                row[key] = numberHelper.commaSeparateNumber(row[key])
+              }
+            }
+          }
+        }
+      },
     }
   },
   computed: {
@@ -81,6 +140,7 @@ export default {
   },
   created () {
     this.getUser()
+    this.getUserResortDays()
   },
   computed: {
     userImage () {
@@ -97,8 +157,24 @@ export default {
         console.log(err)
       })
     },
+    getUserResortDays () {
+      this.isLoadingResortDays = true
+      this.axios.get('/users/' + this.$route.params.external_id + '/resort_days').then((data) => {
+        this.resortDays           = data.resortDays
+        this.isLoadingResortDays  = false
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
     formatDate (date, format) {
       return moment.utc(date).local().format(format)
+    },
+    showResortDay (resortDay, event) {
+      if (this.openPanels.includes(resortDay.id)) {
+        arrayHelper.removeValue(this.openPanels, resortDay.id)
+      } else {
+        this.openPanels.push(resortDay.id)
+      }
     }
   }
 }
@@ -163,6 +239,62 @@ export default {
           display:                      block;
           width:                        100%;
           word-wrap:                    break-word;
+        }
+      }
+    }
+  }
+
+  .resort-days {
+
+    margin-top:                         1.5em;
+
+    > h2 {
+      font-size:                        2em;
+      margin-bottom:                    0.5em;
+    }
+
+    .resort-day-container {
+      border:                           1px solid #dfe0e2;
+      border-radius:                    0.25em;
+      margin-bottom:                    0.88em;
+
+      .header {
+        display:                        flex;
+        align-items:                    center;
+        cursor:                         pointer;
+        background:                     #dfe0e2;
+        padding:                        0.88em;
+
+        .date {
+          margin-left:                  0.5em;
+        }
+
+        .tracks {
+          margin-left:                  auto;
+          margin-right:                 1em;
+        }
+      }
+
+      .body {
+        padding:                        1.5em 2em;
+
+        .detail {
+
+          display:                      flex;
+          word-wrap:                    break-word;
+
+          > label {
+            font-weight:                bold;
+            width:                      15%;
+          }
+
+          > span {
+            width:                      80%;
+          }
+        }
+
+        .track-table {
+          margin-top:                   2em;
         }
       }
     }

@@ -106,53 +106,9 @@ export default {
 }
 </script>
 
-<style lang="scss">
-// NOTE - This is not scoped, be careful. Need to apply table styles without scope.
+<style lang="scss" scoped>
 
 .leaderboard {
-
-  .table-responsive {
-    .VueTables__sortable {
-
-      &:hover {
-        cursor:                     pointer;
-      }
-    }
-
-    .table {
-
-      td {
-        padding:                    0.75em 0.75em;
-      }
-    }
-  }
-
-  .VuePagination {
-    margin-top:                     1.5em;
-
-    .pagination {
-      justify-content:              center;
-
-      li {
-        margin:                     0 15px;
-        font-size:                  1.2em;
-
-        &.active {
-          font-weight:              bold;
-        }
-
-        &.disabled {
-          a {
-            color:                  darkgray;
-          }
-        }
-
-        a {
-          color:                    black;
-        }
-      }
-    }
-  }
 
 }
 

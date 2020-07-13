@@ -337,7 +337,6 @@ router.beforeEach(async (to, from, next) => {
       const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
-      next('/leaderboard')
 
       // next('/resorts')
     }
