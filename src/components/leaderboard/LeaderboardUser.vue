@@ -1,11 +1,13 @@
 <template>
   <div class="leaderboard-user">
 
+    <site-header />
+
     <LoadingSpinner v-if="isLoadingUser"></LoadingSpinner>
 
     <div v-else class="user-summary">
       <div class="header">
-        <img v-bind:src="userImage" />
+        <img v-if="userSummary.profileImage" v-bind:src="userImage" />
         <div class="header-right">
           <h1>{{userSummary.displayName}}</h1>
           <span class="created-at">Member Since: {{ formatDate(userSummary.createdAt, 'MM/DD/YYYY') }} </span>
@@ -13,6 +15,22 @@
       </div>
 
       <div class="body">
+        <div class="block">
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalDaysSkied) }}</span>
+          <span class="name">Total Days</span>
+        </div>
+        <div class="block">
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalLiftRides) }}</span>
+          <span class="name">Total Lift Rides</span>
+        </div>
+        <div class="block">
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalTracks) }}</span>
+          <span class="name">Total Tracks</span>
+        </div>
+        <div class="block">
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalKcals) }}</span>
+          <span class="name">Total Kcals</span>
+        </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.speedAverage) }}</span>
           <span class="name">Avg. Speed</span>
@@ -22,28 +40,12 @@
           <span class="name">Max Speed</span>
         </div>
         <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.totalDaysSkied) }}</span>
-          <span class="name">Total Days</span>
-        </div>
-        <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceVertical) }}</span>
           <span class="name">Total Vertical Distance</span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceSurface) }}</span>
           <span class="name">Total Surface Distance</span>
-        </div>
-        <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.totalKcals) }}</span>
-          <span class="name">Total Kcals</span>
-        </div>
-        <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.totalLiftRides) }}</span>
-          <span class="name">Total Lift Rides</span>
-        </div>
-        <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.totalTracks) }}</span>
-          <span class="name">Total Tracks</span>
         </div>
       </div>
     </div>
@@ -54,12 +56,14 @@
 <script>
 import { mapGetters } from 'vuex'
 import { LoadingSpinner } from '../../components'
+import SiteHeader from '../SiteHeader.vue'
 import store from '../../store'
 import moment from 'moment'
 
 export default {
   components: {
-    LoadingSpinner
+    LoadingSpinner,
+    SiteHeader
   },
   data () {
     return {

@@ -54,7 +54,8 @@ export default {
           'displayName':      'Display Name',
           'totalDaysSkied':   'Days Skied',
           'vert':             'Total Vertical Dist.',
-          'totalTracks':      'Total Tracks'
+          'totalTracks':      'Total Tracks',
+          'view':             ''
         }
       }
     }
@@ -110,6 +111,13 @@ export default {
 
       &:hover {
         cursor:                     pointer;
+      }
+    }
+
+    .table {
+
+      td {
+        padding:                    0.75em 0.75em;
       }
     }
   }
