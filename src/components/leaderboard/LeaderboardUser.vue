@@ -10,6 +10,7 @@
         <img v-if="userSummary.profileImage" v-bind:src="userImage" />
         <div class="header-right">
           <h1>{{userSummary.displayName}}</h1>
+          <span class="email">Email Address: {{ userSummary.emailAddress }} </span>
           <span class="created-at">Member Since: {{ formatDate(userSummary.createdAt, 'MM/DD/YYYY') }} </span>
         </div>
       </div>
@@ -127,6 +128,10 @@ export default {
         > h1 {
           font-size:                    2em;
           font-weight:                  bold;
+        }
+
+        > span {
+          display:                      block;
         }
       }
     }
