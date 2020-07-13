@@ -14,35 +14,35 @@
 
       <div class="body">
         <div class="block">
-          <span class="metric">{{userSummary.speedAverage}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.speedAverage) }}</span>
           <span class="name">Avg. Speed</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.speedMax}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.speedMax) }}</span>
           <span class="name">Max Speed</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.totalDaysSkied}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalDaysSkied) }}</span>
           <span class="name">Total Days</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.totalDistanceVertical}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceVertical) }}</span>
           <span class="name">Total Vertical Distance</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.totalDistanceSurface}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceSurface) }}</span>
           <span class="name">Total Surface Distance</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.totalKcals}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalKcals) }}</span>
           <span class="name">Total Kcals</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.totalLiftRides}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalLiftRides) }}</span>
           <span class="name">Total Lift Rides</span>
         </div>
         <div class="block">
-          <span class="metric">{{userSummary.totalTracks}}</span>
+          <span class="metric">{{ commaSeparateNumber(userSummary.totalTracks) }}</span>
           <span class="name">Total Tracks</span>
         </div>
       </div>
@@ -55,6 +55,7 @@
 import { mapGetters } from 'vuex'
 import { LoadingSpinner } from '../../components'
 import store from '../../store'
+import moment from 'moment'
 
 export default {
   components: {
@@ -90,6 +91,9 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    formatDate (date, format) {
+      return moment.utc(date).local().format(format)
     }
   }
 }
@@ -131,11 +135,11 @@ export default {
       .block {
         display:                        flex;
         flex-wrap:                      wrap;
-        width:                          20%;
+        width:                          23%;
         margin:                         1%;
         text-align:                     center;
         margin-top:                     1em;
-        height:                         8em;
+        min-height:                     8em;
         padding:                        0.5em;
         border:                         1px solid black;
         border-radius:                  5px;
@@ -143,11 +147,13 @@ export default {
         .metric {
           font-size:                    2em;
           width:                        100%;
+          word-wrap:                    break-word;
         }
 
         .name {
           display:                      block;
           width:                        100%;
+          word-wrap:                    break-word;
         }
       }
     }

@@ -22,9 +22,11 @@ Vue.use(ServerTable)
 
 // Mixins
 import dateMixin from './mixins/date'
+import numberHelper from './mixins/number'
 
 // Add global mixins
-Vue.mixin(dateMixin)
+// Vue.mixin(numberHelper) Current causing an error w/ Vuetables
+Vue.mixin(numberHelper)
 
 Vue.config.productionTip = false
 
