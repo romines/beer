@@ -27,7 +27,7 @@ export default {
     return {
       isLoading:        true,
       tableParams:      {},
-      columns:          ['rank', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
+      columns:          ['rank', 'emailAddress', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
       options: {
         requestFunction (data) {
           let parentComponent = this.$parent.$parent
@@ -48,12 +48,13 @@ export default {
           count:    ''
         },
         pagination: { chunk: 25, dropdown: false },
-        filterable: ['displayName'],
-        sortable: ['totalDaysSkied', 'totalDistanceVertical', 'totalTracks'],
+        filterable: ['emailAddress', 'displayName'],
+        sortable: ['totalDaysSkied', 'vert', 'totalTracks'],
         headings: {
           'displayName':      'Display Name',
+          'emailAddress':     'Email Address',
           'totalDaysSkied':   'Days Skied',
-          'vert':             'Total Vertical Dist.',
+          'vert':             'Total Vert.',
           'totalTracks':      'Total Tracks',
           'view':             ''
         }
@@ -86,9 +87,13 @@ export default {
       string += '&exclude_profile_image=true'
       string += '&additional_properties=[ "total_days_skied", "total_distance_vertical", "total_tracks"]'
 
+      // Hack... maps column name to query string we want. Maybe move to a function if it gets unwieldy
+      if (data.orderBy && data.orderBy === 'vert') data.orderBy = "total_distance_vertical"
+
       if (data.orderBy)             string += '&order_by=' + stringHelper.unCamelize(data.orderBy)
       if (data.orderBy)             string += '&sort_order=' + (data.ascending ? "ASC" : "DESC")
       if (data.query.displayName)   string += '&display_name=' + data.query.displayName
+      if (data.query.emailAddress)  string += '&email_address=' + data.query.emailAddress
       if (data.limit)               string += '&limit=' + data.limit
       if (data.page)                string += '&offset=' + data.page
 

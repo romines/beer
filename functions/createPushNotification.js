@@ -93,9 +93,9 @@ module.exports = functions.https.onRequest((req, res) => {
       notification["data"]["message"]   = req.body.messageBody
       notification["ios_root_params"]   =  {
         "aps": {
-            "content-available":1,
-            "apns-push-type":"background",
-            "apns-priority":5
+            "content-available":  1,
+            "apns-push-type":     "background",
+            "apns-priority":      5
         }
       }
     } // END isTilePush if
