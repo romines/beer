@@ -125,6 +125,7 @@ export default {
               if (['distanceSurface', 'distanceVertical', 'duration'].includes(key)) {
                 row[key] = numberHelper.commaSeparateNumber(row[key])
               }
+              if (key === 'speedMax') row[key] = parseInt(row[key])
             }
           }
         }

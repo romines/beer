@@ -3,6 +3,28 @@
 
     <site-header title="Leaderboard" />
 
+    <!-- <div class="query-container">
+      <h2>Custom Query</h2>
+
+      <select name="column" v-model="customQuery.column">
+        <option disabled value="null">Select column...</option>
+        <option value="total_days_skied">Days Skied</option>
+        <option value="total_tracks">Total Tracks</option>
+        <option value="total_distance_vertical">Total Vertical</option>
+      </select>
+
+      <select name="operator" v-model="customQuery.operator">
+        <option disabled value="null">Select operator...</option>
+        <option value="=">equals</option>
+        <option value=">">is greater than</option>
+        <option value="<">is less than</option>
+      </select>
+
+      <input v-model="customQuery.value" placeholder="Value (numbers only)" type="number">
+
+      <span v-bind:disabled="!isQueryValid" v-on:click="runCustomQuery()" class="button is-primary">Search</span>
+    </div> -->
+
     <v-server-table ref="usersTable" v-bind:columns="columns" v-bind:options="options">
       <span slot="vert" slot-scope="props" class="vert">{{commaSeparateNumber(props.row.totalDistanceVertical)}}</span>
       <a slot="view" slot-scope="props" class="view-user" v-on:click="showUser(props.row)">View</a>
@@ -26,13 +48,25 @@ export default {
   data () {
     return {
       isLoading:        true,
+      customQuery:      {
+        column:         null,
+        operator:       null,
+        value:          null
+      },
       tableParams:      {},
       columns:          ['rank', 'emailAddress', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
       options: {
-        requestFunction (data) {
-          let parentComponent = this.$parent.$parent
+        requestFunction (data, thisComponent) {
+          let context = this
+
+          if (this.requestFunction) {
+            context = thisComponent
+          }
+
+          let parentComponent = this.requestFunction ? context.$parent : context.$parent.$parent
+
           let appendUrl = parentComponent.createAppendUrl(data)
-          return this.axios.get('/leaderboard' + appendUrl).then((data) => {
+          return context.axios.get('/leaderboard' + appendUrl).then((data) => {
             return {
               data:   data.leaderboard,
               count:  data.count
@@ -63,6 +97,9 @@ export default {
   },
   computed: {
     ...mapGetters(['currentUser', 'currentResort']),
+    isQueryValid () {
+      return this.customQuery.column && this.customQuery.operator && this.customQuery.value
+    }
   },
   beforeRouteEnter (to, from, next) {
     if (!localStorage.leaderboardToken) store.dispatch('authenticateLeaderboard').then(() => next() )
@@ -72,35 +109,40 @@ export default {
     // this.getLeaderboardData()
   },
   methods: {
-    getLeaderboardData (data) {
-      if (data) this.tableParams = data
-
-      return this.axios.get('/leaderboard' + this.currentAppendUrl).then((response) => {
-        this.$refs.usersTable.data  = response.data.leaderboard
-        this.$refs.usersTable.count = response.data.count
+    getLeaderboardData () {
+      return this.axios.get('/leaderboard' + this.createAppendUrl({})).then((response) => {
+        this.$refs.usersTable.data  = response.leaderboard
+        this.$refs.usersTable.count = response.count
         return response.data
       })
     },
-    createAppendUrl (data) {
+    createAppendUrl (tableData) {
       let string = ''
       string += '?resort_identifier=' + this.currentResort.id
       string += '&exclude_profile_image=true'
       string += '&additional_properties=[ "total_days_skied", "total_distance_vertical", "total_tracks"]'
 
       // Hack... maps column name to query string we want. Maybe move to a function if it gets unwieldy
-      if (data.orderBy && data.orderBy === 'vert') data.orderBy = "total_distance_vertical"
+      if (tableData.orderBy && tableData.orderBy === 'vert') tableData.orderBy = "total_distance_vertical"
 
-      if (data.orderBy)             string += '&order_by=' + stringHelper.unCamelize(data.orderBy)
-      if (data.orderBy)             string += '&sort_order=' + (data.ascending ? "ASC" : "DESC")
-      if (data.query.displayName)   string += '&display_name=' + data.query.displayName
-      if (data.query.emailAddress)  string += '&email_address=' + data.query.emailAddress
-      if (data.limit)               string += '&limit=' + data.limit
-      if (data.page)                string += '&offset=' + data.page
+      if (tableData.orderBy)             string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
+      if (tableData.orderBy)             string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
+      if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
+      if (tableData.query.emailAddress)  string += '&email_address=' + tableData.query.emailAddress
+      if (tableData.limit)               string += '&limit=' + tableData.limit
+      if (tableData.page)                string += '&offset=' + tableData.page
+
+      if (this.customQuery.column) string += '&query_column=' + this.customQuery.column
+      if (this.customQuery.operator) string += '&query_operator=' + this.customQuery.operator
+      if (this.customQuery.value) string += '&query_value=' + this.customQuery.value
 
       return string
     },
     showUser (user) {
       this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId } })
+    },
+    runCustomQuery () {
+      this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
     }
   }
 }
@@ -109,6 +151,33 @@ export default {
 <style lang="scss" scoped>
 
 .leaderboard {
+
+  .query-container {
+    padding:                      0.5em 1em 1em 1em;;
+    border:                       1px solid gray;
+    background:                   #e1f0f6;
+    border-radius:                0.5em;
+    display:                      flex;
+    align-items:                  center;
+    flex-wrap:                    wrap;
+    margin:                       1em 0;
+
+    h2 {
+      font-size:                  1.25em;
+      margin-bottom:              0.25em;
+      display:                    block;
+      width:                      100%;
+    }
+
+    select, input {
+      padding:                    0.25em 0.5em;
+      margin-right:               0.5em;
+    }
+
+    .button {
+      margin-left:                auto;
+    }
+  }
 
 }
 
