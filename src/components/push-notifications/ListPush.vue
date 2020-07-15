@@ -142,7 +142,7 @@ export default {
       baseUrl += "?applicationCode=" + this.pushWooshData.appId
 
       this.axios.get(baseUrl).then((response) => {
-        let body = JSON.parse(response.data.body)
+        let body = JSON.parse(response.body)
 
         body.response.rows.map((notification) => {
           notification.sendDate = moment.utc(notification.sendDate).local().format('lll')
