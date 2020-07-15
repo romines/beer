@@ -184,7 +184,7 @@ export default {
       let baseUrl = functionsBaseUrl + '/getPushNotification'
 
       this.axios.get(baseUrl + "?messageId=" + notification.id).then((response) => {
-        let body            = JSON.parse(response.data.body)
+        let body            = JSON.parse(response.body)
         let messageDetails  = body.response.message
 
         messageDetails.platforms  = JSON.parse(messageDetails.platforms)
@@ -207,7 +207,7 @@ export default {
       this.currentRetryCount = 0      // Reset retry count on new open
 
       this.axios.get(baseUrl).then((response) => {
-        let res         = JSON.parse(response.data.body)
+        let res         = JSON.parse(response.body)
         let requestId   = res.response.request_id
         this.getMsgStatResults(requestId)
       })
@@ -220,7 +220,7 @@ export default {
       this.isLoadingMsgStats = true
 
       this.axios.get(baseUrl).then((response) => {
-        if (response.data.error) {
+        if (response.error) {
           if (this.currentRetryCount < this.maxRetryCount) {
             this.currentRetryCount += 1
             this.getMsgStatResults(requestId)
@@ -232,7 +232,7 @@ export default {
           this.currentRetryCount        = 0
           this.currentPendingRequestId  = null
 
-          let res = JSON.parse(response.data.body)
+          let res = JSON.parse(response.body)
 
           this.setPlatformStats(res)
 
