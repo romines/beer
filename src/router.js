@@ -7,6 +7,7 @@ import PushNotifications from './components/PushNotifications'
 import WebcamManager from './components/WebcamManager'
 import Leaderboard from './components/leaderboard/Leaderboard'
 import LeaderboardUser from './components/leaderboard/LeaderboardUser'
+import LeaderboardTable from './components/leaderboard/LeaderboardTable'
 import Profile from './components/Profile'
 import Settings from './components/Settings'
 import UserManager from './components/settings/UserManager'
@@ -155,21 +156,37 @@ const routes = [
 
       store.commit('SET_LOADING_STATE', false)
       next()
-    }
-  },
-  {
-    path: '/leaderboard/users/:external_id',
-    name: 'LeaderboardUser',
-    component: LeaderboardUser,
-    meta: {
-      requiresAuth: true
     },
-    beforeEnter: (to, from, next) => {
-      if (!store.getters.currentUser.canAccessLeaderboard()) return next('/')
+    children: [
+      {
+        path: 'table',
+        name: 'LeaderboardTable',
+        component: LeaderboardTable,
+        meta: {
+          requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+          if (!store.getters.currentUser.canAccessLeaderboard()) return next('/')
 
-      store.commit('SET_LOADING_STATE', false)
-      next()
-    }
+          store.commit('SET_LOADING_STATE', false)
+          next()
+        }
+      },
+      {
+        path: 'users/:external_id',
+        name: 'LeaderboardUser',
+        component: LeaderboardUser,
+        meta: {
+          requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+          if (!store.getters.currentUser.canAccessLeaderboard()) return next('/')
+
+          store.commit('SET_LOADING_STATE', false)
+          next()
+        }
+      },
+    ]
   },
   {
     path: '/settings',

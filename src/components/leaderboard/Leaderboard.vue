@@ -2,33 +2,33 @@
   <div class="leaderboard">
 
     <site-header title="Leaderboard" />
+    {{startDate}}
+    <div>{{endDate}}</div>
+    <div class="query-container date-range">
 
-    <!-- <div class="query-container">
-      <h2>Custom Query</h2>
+      <div v-on:click="showDateRangePicker = !showDateRangePicker" class="header">
+        <h2>Date Range</h2>
 
-      <select name="column" v-model="customQuery.column">
-        <option disabled value="null">Select column...</option>
-        <option value="total_days_skied">Days Skied</option>
-        <option value="total_tracks">Total Tracks</option>
-        <option value="total_distance_vertical">Total Vertical</option>
-      </select>
+        <span v-show="showDateRangePicker">
+          <i class="fas chevron fa-chevron-up" />
+        </span>
+        <span v-show="!showDateRangePicker">
+          <i class="fas chevron fa-chevron-down" />
+        </span>
+      </div>
 
-      <select name="operator" v-model="customQuery.operator">
-        <option disabled value="null">Select operator...</option>
-        <option value="=">equals</option>
-        <option value=">">is greater than</option>
-        <option value="<">is less than</option>
-      </select>
+      <div v-if="showDateRangePicker" class="body">
+        <AdminDatepicker
+          v-bind:startDate="startDate"
+          v-bind:endDate="endDate"
+          v-on:removeDates="removeDates"
+          v-on:applyDates="applyDates">
+        </AdminDatepicker>
+      </div>
 
-      <input v-model="customQuery.value" placeholder="Value (numbers only)" type="number">
+    </div>
 
-      <span v-bind:disabled="!isQueryValid" v-on:click="runCustomQuery()" class="button is-primary">Search</span>
-    </div> -->
-
-    <v-server-table ref="usersTable" v-bind:columns="columns" v-bind:options="options">
-      <span slot="vert" slot-scope="props" class="vert">{{commaSeparateNumber(props.row.totalDistanceVertical)}}</span>
-      <a slot="view" slot-scope="props" class="view-user" v-on:click="showUser(props.row)">View</a>
-    </v-server-table>
+    <router-view></router-view>
 
   </div>
 </template>
@@ -37,114 +37,86 @@
 import { mapGetters } from 'vuex'
 import SiteHeader from '../SiteHeader.vue'
 import { LoadingSpinner } from '../../components'
+import AdminDatepicker from '../../components/utilities/AdminDatepicker'
 import store from '../../store'
+import moment from 'moment'
 import stringHelper from '../../helpers/stringHelper'
 
 export default {
   components: {
     SiteHeader,
-    LoadingSpinner
+    LoadingSpinner,
+    AdminDatepicker
   },
   data () {
     return {
-      isLoading:        true,
-      customQuery:      {
-        column:         null,
-        operator:       null,
-        value:          null
-      },
-      tableParams:      {},
-      columns:          ['rank', 'emailAddress', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
-      options: {
-        requestFunction (data, thisComponent) {
-          let context = this
-
-          if (this.requestFunction) {
-            context = thisComponent
-          }
-
-          let parentComponent = this.requestFunction ? context.$parent : context.$parent.$parent
-
-          let appendUrl = parentComponent.createAppendUrl(data)
-          return context.axios.get('/leaderboard' + appendUrl).then((data) => {
-            return {
-              data:   data.leaderboard,
-              count:  data.count
-            }
-          })
-        },
-        filterByColumn: true,
-        perPage: 25,
-        perPageValues: [10, 25, 50, 100, 250, 500],
-        texts: {
-          filter:   'Filter:',
-          filterBy: 'Filter by {column}',
-          count:    ''
-        },
-        pagination: { chunk: 25, dropdown: false },
-        filterable: ['emailAddress', 'displayName'],
-        sortable: ['totalDaysSkied', 'vert', 'totalTracks'],
-        headings: {
-          'displayName':      'Display Name',
-          'emailAddress':     'Email Address',
-          'totalDaysSkied':   'Days Skied',
-          'vert':             'Total Vert.',
-          'totalTracks':      'Total Tracks',
-          'view':             ''
-        }
-      }
+      isLoading:              true,
+      showDateRangePicker:    false,
+      startDate:              this.initializeStartDate(),
+      endDate:                this.initializeEndDate()
     }
   },
   computed: {
     ...mapGetters(['currentUser', 'currentResort']),
     isQueryValid () {
       return this.customQuery.column && this.customQuery.operator && this.customQuery.value
+    },
+    isDateRangeValid () {
+      return true
     }
   },
   beforeRouteEnter (to, from, next) {
-    if (!localStorage.leaderboardToken) store.dispatch('authenticateLeaderboard').then(() => next() )
-    else next()
+    if (!localStorage.leaderboardToken) {
+      store.dispatch('authenticateLeaderboard').then(() => {
+        if (to.name === 'Leaderboard') next('/leaderboard/table')
+        else next()
+      })
+    } else {
+      if (to.name === 'Leaderboard') next('/leaderboard/table')
+      else next()
+    }
   },
   created () {
-    // this.getLeaderboardData()
   },
   methods: {
-    getLeaderboardData () {
-      return this.axios.get('/leaderboard' + this.createAppendUrl({})).then((response) => {
-        this.$refs.usersTable.data  = response.leaderboard
-        this.$refs.usersTable.count = response.count
-        return response.data
-      })
+    initializeStartDate () {
+      let start = this.$route.query.startDate
+      let month = start.split('-')[0]
+      let day   = start.split('-')[1]
+      let year  = start.split('-')[2]
+
+      return new Date(year, month -1, day)
     },
-    createAppendUrl (tableData) {
-      let string = ''
-      string += '?resort_identifier=' + this.currentResort.id
-      string += '&exclude_profile_image=true'
-      string += '&additional_properties=[ "total_days_skied", "total_distance_vertical", "total_tracks"]'
+    initializeEndDate () {
+      let start = this.$route.query.endDate
+      let month = start.split('-')[0]
+      let day   = start.split('-')[1]
+      let year  = start.split('-')[2]
 
-      // Hack... maps column name to query string we want. Maybe move to a function if it gets unwieldy
-      if (tableData.orderBy && tableData.orderBy === 'vert') tableData.orderBy = "total_distance_vertical"
-
-      if (tableData.orderBy)             string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
-      if (tableData.orderBy)             string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
-      if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
-      if (tableData.query.emailAddress)  string += '&email_address=' + tableData.query.emailAddress
-      if (tableData.limit)               string += '&limit=' + tableData.limit
-      if (tableData.page)                string += '&offset=' + tableData.page
-
-      if (this.customQuery.column) string += '&query_column=' + this.customQuery.column
-      if (this.customQuery.operator) string += '&query_operator=' + this.customQuery.operator
-      if (this.customQuery.value) string += '&query_value=' + this.customQuery.value
-
-      return string
+      return new Date(year, month -1, day)
     },
     showUser (user) {
       this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId } })
     },
-    runCustomQuery () {
-      this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
+    removeDates () {
+      console.log("MEOW")
+    },
+    applyDates (startDate, endDate) {
+      let formatStart = moment.utc(startDate).format('MM-DD-YYYY')
+      let formatEnd   = moment.utc(endDate).format('MM-DD-YYYY')
+
+      this.$router.push({ query: { startDate: formatStart, endDate: formatEnd } }).catch(() => {})
     }
+  },
+  watch: {
+  '$route.query': {
+    handler: function (newVal, oldVal) {
+      this.startDate  = this.initializeStartDate()
+      this.endDate    = this.initializeEndDate()
+    },
+    deep: true
   }
+}
 }
 </script>
 
@@ -152,30 +124,27 @@ export default {
 
 .leaderboard {
 
-  .query-container {
-    padding:                      0.5em 1em 1em 1em;;
+  .date-range {
+    padding:                      0.5em 1em;
     border:                       1px solid gray;
     background:                   #e1f0f6;
     border-radius:                0.5em;
-    display:                      flex;
-    align-items:                  center;
-    flex-wrap:                    wrap;
     margin:                       1em 0;
 
-    h2 {
-      font-size:                  1.25em;
-      margin-bottom:              0.25em;
-      display:                    block;
-      width:                      100%;
-    }
+    .header {
+      display:                    flex;
+      align-items:                center;
+      cursor:                     pointer;
 
-    select, input {
-      padding:                    0.25em 0.5em;
-      margin-right:               0.5em;
-    }
+      h2 {
+        font-size:                1.25em;
+        display:                  block;
+        width:                    100%;
+      }
 
-    .button {
-      margin-left:                auto;
+      .chevron {
+        margin-left:              auto;
+      }
     }
   }
 

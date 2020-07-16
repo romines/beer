@@ -1,8 +1,6 @@
 <template>
   <div class="leaderboard-user">
 
-    <site-header />
-
     <LoadingSpinner v-if="isLoadingUser"></LoadingSpinner>
 
     <div v-else class="user-summary">
