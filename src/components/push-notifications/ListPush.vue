@@ -39,7 +39,7 @@
               <span v-else>None provided</span>
             </div>
             <div class="detail message-content">
-              <label>Message:</label><span class="message-content">{{ displayMessageContent(currentNotification) }}</span>
+              <label>Message:</label><span class="message-content">{{ currentNotification.data.message }}</span>
             </div>
           </div>
         </div>
@@ -193,8 +193,7 @@ export default {
 
         if (messageDetails.data && messageDetails.data.default) {
           let parsed = JSON.parse(messageDetails.data.default)
-          messageDetails.title    = parsed.title
-          messageDetails.isSilent = parsed.is_silent
+          messageDetails.data = parsed
         }
 
         this.currentNotification    = messageDetails
