@@ -92,7 +92,7 @@ export default {
     LoadingSpinner,
     SiteHeader
   },
-  props: ['startDate', 'endDate'],
+  props: ['startDate', 'endDate', 'queryStartDate', 'queryEndDate'],
   data () {
     return {
       userSummary:          {},
@@ -147,21 +147,26 @@ export default {
   computed: {
     userImage () {
       return 'data:image/png;base64,' + this.userSummary.profileImage
+    },
+    currentParams () {
+      let string = '?'
+      if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
+      if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate
+      return string
     }
   },
   methods: {
     getUser () {
-      this.axios.get('/users/' + this.$route.params.external_id + '/summary').then((data) => {
+      this.axios.get('/users/' + this.$route.params.external_id + '/summary' + this.currentParams).then((data) => {
         this.userSummary    = data.userSummary
         this.isLoadingUser  = false
-        console.log(data.userSummary)
       }).catch((err) => {
         console.log(err)
       })
     },
     getUserResortDays () {
       this.isLoadingResortDays = true
-      this.axios.get('/users/' + this.$route.params.external_id + '/resort_days').then((data) => {
+      this.axios.get('/users/' + this.$route.params.external_id + '/resort_days' + this.currentParams).then((data) => {
         this.resortDays           = data.resortDays
         this.isLoadingResortDays  = false
       }).catch((err) => {
@@ -180,6 +185,16 @@ export default {
     },
     backToTable () {
       this.$router.push({ name: 'LeaderboardTable', query: { startDate: this.startDate, endDate: this.endDate } })
+    }
+  },
+  watch: {
+    '$route.query': {
+      handler: function (newVal, oldVal) {
+        // this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
+        this.getUser()
+        this.getUserResortDays()
+      },
+      deep: true
     }
   }
 }

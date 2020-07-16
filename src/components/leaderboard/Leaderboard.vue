@@ -2,11 +2,7 @@
   <div class="leaderboard">
 
     <h1>Leaderboard</h1>
-    {{formattedStartDate}}
-    <div>{{formattedEndDate}}</div>
-    <div>{{startDate}}</div>
-    <div>{{endDate}}</div>
-    {{queryStartDate}}
+
     <div class="query-container date-range">
 
       <div v-on:click="showDateRangePicker = !showDateRangePicker" class="header">
@@ -145,6 +141,10 @@ export default {
 <style lang="scss" scoped>
 
 .leaderboard {
+
+  > h1 {
+    font-size:                    2em;
+  }
 
   .date-range {
     padding:                      0.5em 1em;

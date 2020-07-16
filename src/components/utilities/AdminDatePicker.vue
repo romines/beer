@@ -1,18 +1,22 @@
 <template>
-  <div class="select-date row">
+  <div class="select-date">
 
-    <div class="date-pick col-md-6">
-      <span class="text">Start Date:</span>
+    <div class="date-pick">
+      <span class="text">Start:</span>
       <Datepicker v-model="localStartDate"></Datepicker>
     </div>
-    <div class="date-pick col-md-6">
-      <span class="text">End Date:</span>
+    <div class="date-pick">
+      <span class="text">End:</span>
       <Datepicker v-model="localEndDate"></Datepicker>
     </div>
 
-    <div class="buttons col-md-12">
-      <button class="button" v-on:click="removeDates()">Clear Dates</button>
-      <button class="button action-button" v-on:click="runDateSearch()" v-bind:class="{ inactive: !true }">Search</button>
+    <div class="buttons">
+      <button class="button is-primary" v-on:click="runDateSearch()" v-bind:disabled="!searchIsValid">Search</button>
+      <button class="button" v-on:click="removeDates()">Clear</button>
+    </div>
+
+    <div class="errors">
+      <span v-if="!datesAreValid">Start date must come before end date</span>
     </div>
 
   </div>
@@ -24,7 +28,7 @@ import Datepicker from 'vuejs-datepicker'
 
 export default {
   name: 'AdminDatepicker',
-  props: ['startDate', 'endDate', 'datesAreActive', 'datesAreValid'],
+  props: ['startDate', 'endDate'],
   components: {
     Datepicker
   },
@@ -34,8 +38,22 @@ export default {
       localEndDate:    this.endDate
     }
   },
+  computed: {
+    searchIsValid () {
+      return this.bothDatesExist && this.datesAreValid
+    },
+    bothDatesExist () {
+      return this.localStartDate && this.localEndDate
+    },
+    datesAreValid () {
+      if (!this.bothDatesExist) return true
+      return this.localEndDate > this.localStartDate
+    }
+  },
   methods: {
     removeDates () {
+      this.localStartDate = null
+      this.localEndDate   = null
       this.$emit('removeDates')
     },
     runDateSearch () {
@@ -58,14 +76,15 @@ export default {
 
 .select-date {
 
-  max-width:                70%;
   margin:                   0 auto;
-  padding:                  2em;
-  border:                   1px solid lightgray;
+  padding:                  1em 0;
   border-radius:            0.25em;
+  display:                  flex;
+  align-items:              center;
 
   .date-pick {
     text-align:             center;
+    margin-left:            1em;
 
     .vdp-datepicker {
       display:              inline-block;
@@ -74,14 +93,15 @@ export default {
 
   .buttons {
     text-align:             center;
-    margin-top:             1em;
+    margin-left:            auto;
+    margin-bottom:          none;
+    margin-right:           1em;
 
     > button {
-      margin:               0.5em;
 
       &.inactive {
-        opacity: 0.6;
-        cursor: default;
+        opacity:            0.6;
+        cursor:             default;
       }
     }
   }

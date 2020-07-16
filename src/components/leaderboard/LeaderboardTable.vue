@@ -108,22 +108,22 @@ export default {
       // Hack... maps column name to query string we want. Maybe move to a function if it gets unwieldy
       if (tableData.orderBy && tableData.orderBy === 'vert') tableData.orderBy = "total_distance_vertical"
 
-      if (tableData.orderBy)             string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
-      if (tableData.orderBy)             string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
-      if (tableData.limit)               string += '&limit=' + tableData.limit
-      if (tableData.page)                string += '&offset=' + tableData.page
+      if (tableData.orderBy)  string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
+      if (tableData.orderBy)  string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
+      if (tableData.limit)    string += '&limit=' + tableData.limit
+      if (tableData.page)     string += '&offset=' + tableData.page
 
       if (tableData.query) {
         if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
         if (tableData.query.emailAddress)  string += '&email_address=' + tableData.query.emailAddress
       }
 
-      if (this.customQuery.column) string += '&query_column=' + this.customQuery.column
-      if (this.customQuery.operator) string += '&query_operator=' + this.customQuery.operator
-      if (this.customQuery.value) string += '&query_value=' + this.customQuery.value
+      if (this.customQuery.column)    string += '&query_column=' + this.customQuery.column
+      if (this.customQuery.operator)  string += '&query_operator=' + this.customQuery.operator
+      if (this.customQuery.value)     string += '&query_value=' + this.customQuery.value
 
-      if (this.queryStartDate) string += '&start_date=' + this.queryStartDate
-      if (this.queryEndDate) string += '&end_date=' + this.queryEndDate
+      if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
+      if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate
 
       return string
     },
