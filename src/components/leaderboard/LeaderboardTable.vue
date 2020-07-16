@@ -23,6 +23,7 @@ export default {
     LoadingSpinner,
     AdminDatepicker
   },
+  props: ['startDate', 'endDate', 'queryStartDate', 'queryEndDate'],
   data () {
     return {
       isLoading:        true,
@@ -31,25 +32,21 @@ export default {
         operator:       null,
         value:          null
       },
-      tableParams:      {},
+      tableData:        {},
       columns:          ['rank', 'emailAddress', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
       options: {
-        requestFunction (data, thisComponent) {
-          let context = this
+        requestFunction (data) {
+          return this.$parent.getLeaderboardData(data)
 
-          if (this.requestFunction) {
-            context = thisComponent
-          }
-
-          let parentComponent = context.$parent.createAppendUrl ? context.$parent : context.$parent.$parent
-
-          let appendUrl = parentComponent.createAppendUrl(data)
-          return context.axios.get('/leaderboard' + appendUrl).then((data) => {
-            return {
-              data:   data.leaderboard,
-              count:  data.count
-            }
-          })
+          // let parentComponent = context.$parent.createAppendUrl ? context.$parent : context.$parent.$parent
+          //
+          // let appendUrl = parentComponent.createAppendUrl(data)
+          // return context.axios.get('/leaderboard' + appendUrl).then((data) => {
+          //   return {
+          //     data:   data.leaderboard,
+          //     count:  data.count
+          //   }
+          // })
         },
         filterByColumn: true,
         perPage: 25,
@@ -90,11 +87,16 @@ export default {
     // this.getLeaderboardData()
   },
   methods: {
-    getLeaderboardData () {
-      return this.axios.get('/leaderboard' + this.createAppendUrl({})).then((response) => {
+    getLeaderboardData (tableData) {
+      if (tableData) this.tableData = tableData
+
+      return this.axios.get('/leaderboard' + this.createAppendUrl(this.tableData)).then((response) => {
         this.$refs.usersTable.data  = response.leaderboard
         this.$refs.usersTable.count = response.count
-        return response.data
+        return {
+          data:   response.leaderboard,
+          count:  response.count
+        }
       })
     },
     createAppendUrl (tableData) {
@@ -108,22 +110,37 @@ export default {
 
       if (tableData.orderBy)             string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
       if (tableData.orderBy)             string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
-      if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
-      if (tableData.query.emailAddress)  string += '&email_address=' + tableData.query.emailAddress
       if (tableData.limit)               string += '&limit=' + tableData.limit
       if (tableData.page)                string += '&offset=' + tableData.page
+
+      if (tableData.query) {
+        if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
+        if (tableData.query.emailAddress)  string += '&email_address=' + tableData.query.emailAddress
+      }
 
       if (this.customQuery.column) string += '&query_column=' + this.customQuery.column
       if (this.customQuery.operator) string += '&query_operator=' + this.customQuery.operator
       if (this.customQuery.value) string += '&query_value=' + this.customQuery.value
 
+      if (this.queryStartDate) string += '&start_date=' + this.queryStartDate
+      if (this.queryEndDate) string += '&end_date=' + this.queryEndDate
+
       return string
     },
     showUser (user) {
-      this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId } })
+      this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId }, query: { startDate: this.startDate, endDate: this.endDate } })
     },
     runCustomQuery () {
-      this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
+      // this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
+    }
+  },
+  watch: {
+    '$route.query': {
+      handler: function (newVal, oldVal) {
+        // this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
+        this.getLeaderboardData()
+      },
+      deep: true
     }
   }
 }

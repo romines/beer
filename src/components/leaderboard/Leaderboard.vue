@@ -1,9 +1,12 @@
 <template>
   <div class="leaderboard">
 
-    <site-header title="Leaderboard" />
-    {{startDate}}
+    <h1>Leaderboard</h1>
+    {{formattedStartDate}}
+    <div>{{formattedEndDate}}</div>
+    <div>{{startDate}}</div>
     <div>{{endDate}}</div>
+    {{queryStartDate}}
     <div class="query-container date-range">
 
       <div v-on:click="showDateRangePicker = !showDateRangePicker" class="header">
@@ -19,16 +22,21 @@
 
       <div v-if="showDateRangePicker" class="body">
         <AdminDatepicker
-          v-bind:startDate="startDate"
-          v-bind:endDate="endDate"
+          v-bind:startDate="formattedStartDate"
+          v-bind:endDate="formattedEndDate"
           v-on:removeDates="removeDates"
-          v-on:applyDates="applyDates">
+          v-on:runDateSearch="runDateSearch">
         </AdminDatepicker>
       </div>
 
     </div>
 
-    <router-view></router-view>
+    <router-view
+      v-bind:startDate="startDate"
+      v-bind:endDate="endDate"
+      v-bind:queryStartDate="queryStartDate"
+      v-bind:queryEndDate="queryEndDate">
+    </router-view>
 
   </div>
 </template>
@@ -52,8 +60,8 @@ export default {
     return {
       isLoading:              true,
       showDateRangePicker:    false,
-      startDate:              this.initializeStartDate(),
-      endDate:                this.initializeEndDate()
+      startDate:              this.$route.query.startDate,
+      endDate:                this.$route.query.endDate
     }
   },
   computed: {
@@ -63,6 +71,36 @@ export default {
     },
     isDateRangeValid () {
       return true
+    },
+    formattedStartDate () {
+      // Takes simple date string from URL and converts to date object for use in Datepicker component
+      if (!this.$route.query.startDate) return null
+      let start = this.$route.query.startDate
+      let month = start.split('-')[0]
+      let day   = start.split('-')[1]
+      let year  = start.split('-')[2]
+
+      return new Date(year, month -1, day)
+    },
+    formattedEndDate () {
+      // Takes simple date string from URL and converts to date object for use in Datepicker component
+      if (!this.$route.query.endDate) return null
+      let start = this.$route.query.endDate
+      let month = start.split('-')[0]
+      let day   = start.split('-')[1]
+      let year  = start.split('-')[2]
+
+      return new Date(year, month -1, day)
+    },
+    queryStartDate () {
+      // Date without timezones
+      if (!this.startDate) return null
+      return moment(this.startDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'
+    },
+    queryEndDate () {
+      // Date without timezones
+      if (!this.endDate) return null
+      return moment(this.endDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -79,29 +117,13 @@ export default {
   created () {
   },
   methods: {
-    initializeStartDate () {
-      let start = this.$route.query.startDate
-      let month = start.split('-')[0]
-      let day   = start.split('-')[1]
-      let year  = start.split('-')[2]
-
-      return new Date(year, month -1, day)
-    },
-    initializeEndDate () {
-      let start = this.$route.query.endDate
-      let month = start.split('-')[0]
-      let day   = start.split('-')[1]
-      let year  = start.split('-')[2]
-
-      return new Date(year, month -1, day)
-    },
-    showUser (user) {
-      this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId } })
-    },
     removeDates () {
-      console.log("MEOW")
+      this.startDate  = null
+      this.endDate    = null
+
+      this.$router.push({ query: {} }).catch(() => {})
     },
-    applyDates (startDate, endDate) {
+    runDateSearch (startDate, endDate) {
       let formatStart = moment.utc(startDate).format('MM-DD-YYYY')
       let formatEnd   = moment.utc(endDate).format('MM-DD-YYYY')
 
@@ -109,14 +131,14 @@ export default {
     }
   },
   watch: {
-  '$route.query': {
-    handler: function (newVal, oldVal) {
-      this.startDate  = this.initializeStartDate()
-      this.endDate    = this.initializeEndDate()
-    },
-    deep: true
+    '$route.query': {
+      handler: function (newVal, oldVal) {
+        this.startDate  = this.$route.query.startDate
+        this.endDate    = this.$route.query.endDate
+      },
+      deep: true
+    }
   }
-}
 }
 </script>
 

@@ -4,6 +4,8 @@
     <LoadingSpinner v-if="isLoadingUser"></LoadingSpinner>
 
     <div v-else class="user-summary">
+      <div v-on:click="backToTable()" class="go-back"><< Back to table</div>
+
       <section class="header">
         <img v-if="userSummary.profileImage" v-bind:src="userImage" />
         <div class="header-right">
@@ -90,6 +92,7 @@ export default {
     LoadingSpinner,
     SiteHeader
   },
+  props: ['startDate', 'endDate'],
   data () {
     return {
       userSummary:          {},
@@ -174,6 +177,9 @@ export default {
       } else {
         this.openPanels.push(resortDay.id)
       }
+    },
+    backToTable () {
+      this.$router.push({ name: 'LeaderboardTable', query: { startDate: this.startDate, endDate: this.endDate } })
     }
   }
 }

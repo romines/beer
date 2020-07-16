@@ -12,7 +12,7 @@
 
     <div class="buttons col-md-12">
       <button class="button" v-on:click="removeDates()">Clear Dates</button>
-      <button class="button action-button" v-on:click="applyDates()" v-bind:class="{ inactive: !true }">Apply</button>
+      <button class="button action-button" v-on:click="runDateSearch()" v-bind:class="{ inactive: !true }">Search</button>
     </div>
 
   </div>
@@ -38,8 +38,16 @@ export default {
     removeDates () {
       this.$emit('removeDates')
     },
-    applyDates () {
-      this.$emit('applyDates', this.localStartDate, this.localEndDate)
+    runDateSearch () {
+      this.$emit('runDateSearch', this.localStartDate, this.localEndDate)
+    }
+  },
+  watch: {
+    startDate (val) {
+      this.localStartDate = val
+    },
+    endDate (val) {
+      this.localEndDate = val
     }
   }
 }
