@@ -15,8 +15,8 @@
       <button class="button" v-on:click="removeDates()">Clear</button>
     </div>
 
-    <div class="errors">
-      <span v-if="!datesAreValid">Start date must come before end date</span>
+    <div v-if="!datesAreValid" class="errors">
+      <span>Start date must come before end date</span>
     </div>
 
   </div>
@@ -47,7 +47,7 @@ export default {
     },
     datesAreValid () {
       if (!this.bothDatesExist) return true
-      return this.localEndDate > this.localStartDate
+      return this.localEndDate >= this.localStartDate
     }
   },
   methods: {
@@ -81,6 +81,7 @@ export default {
   border-radius:            0.25em;
   display:                  flex;
   align-items:              center;
+  flex-wrap:                wrap;
 
   .date-pick {
     text-align:             center;
@@ -94,7 +95,7 @@ export default {
   .buttons {
     text-align:             center;
     margin-left:            auto;
-    margin-bottom:          none;
+    margin-bottom:          0;
     margin-right:           1em;
 
     > button {
@@ -104,6 +105,12 @@ export default {
         cursor:             default;
       }
     }
+  }
+
+  .errors {
+    margin-left:            auto;
+    color:                  red;
+    font-style:             italic;
   }
 }
 

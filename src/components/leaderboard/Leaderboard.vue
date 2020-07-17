@@ -91,12 +91,12 @@ export default {
     queryStartDate () {
       // Date without timezones
       if (!this.startDate) return null
-      return moment(this.startDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'
+      return moment(this.startDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'  // beginning of day
     },
     queryEndDate () {
       // Date without timezones
       if (!this.endDate) return null
-      return moment(this.endDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'
+      return moment(this.endDate).format('YYYY-MM-DD') + 'T23:59:59-00:00'  // end of day
     }
   },
   beforeRouteEnter (to, from, next) {

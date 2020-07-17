@@ -53,24 +53,29 @@
 
 
     <LoadingSpinner v-if="isLoadingResortDays"></LoadingSpinner>
-    <div class="resort-days">
+    <div v-else class="resort-days">
 
       <h2>Ski Days</h2>
 
-      <div v-for="resortDay in resortDays" class="resort-day-container">
-        <section class="header" v-on:click="showResortDay(resortDay, $event)">
-          <span class="date">{{ formatDate(resortDay.date, 'lll') }}</span>
-          <span class="tracks">{{ resortDay.tracks.length }} Runs</span>
-        </section>
-        <section class="body" v-if="openPanels.includes(resortDay.id)">
-          <div class="detail">
-            <label>Kcals:</label><span class="kcals">{{resortDay.kcals || 'N/A'}}</span>
-          </div>
+      <div v-if="resortDays.length > 0">
+        <div v-for="resortDay in resortDays" class="resort-day-container">
+          <section class="header" v-on:click="showResortDay(resortDay, $event)">
+            <span class="date">{{ formatDate(resortDay.date, 'lll') }}</span>
+            <span class="tracks">{{ resortDay.tracks.length }} Runs</span>
+          </section>
+          <section class="body" v-if="openPanels.includes(resortDay.id)">
+            <div class="detail">
+              <label>Kcals:</label><span class="kcals">{{resortDay.kcals || 'N/A'}}</span>
+            </div>
 
-          <v-client-table v-bind:data="resortDay.tracks" v-bind:columns="trackColumns" v-bind:options="trackOptions" class="track-table">
-            <span slot="startTime" slot-scope="props" class="start-date">{{ formatDate(props.row.startTime, 'HH:MM:SS') }}</span>
-          </v-client-table>
-        </section>
+            <v-client-table v-bind:data="resortDay.tracks" v-bind:columns="trackColumns" v-bind:options="trackOptions" class="track-table">
+              <span slot="startTime" slot-scope="props" class="start-date">{{ formatDate(props.row.startTime, 'HH:MM:SS') }}</span>
+            </v-client-table>
+          </section>
+        </div>
+      </div>
+      <div v-else class="no-results">
+        No results found, please refine your search.
       </div>
 
     </div>
@@ -205,6 +210,15 @@ export default {
 .leaderboard-user {
 
   .user-summary {
+
+    .go-back {
+      cursor:                           pointer;
+      color:                            #42b983;
+
+      &:hover {
+        color:                          black;
+      }
+    }
 
     margin-top:                         1em;
 
