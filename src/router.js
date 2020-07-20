@@ -103,6 +103,7 @@ const routes = [
       requiresAuth: true
     },
     beforeEnter: (to, from, next) => {
+      delete localStorage.leaderboardToken        // Clear leaderboardToken, as switching resorts requires new token
       store.commit('SET_LOADING_STATE', true)
       store.dispatch('resetResortState')
       store.dispatch('getResorts').then(() => {
@@ -351,7 +352,7 @@ router.beforeEach(async (to, from, next) => {
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
-      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
+      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'mt_buller'))
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
 

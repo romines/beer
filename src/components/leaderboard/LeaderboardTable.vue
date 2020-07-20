@@ -14,7 +14,6 @@ import { mapGetters } from 'vuex'
 import SiteHeader from '../SiteHeader.vue'
 import { LoadingSpinner } from '../../components'
 import AdminDatepicker from '../../components/utilities/AdminDatepicker'
-import store from '../../store'
 import stringHelper from '../../helpers/stringHelper'
 
 export default {
@@ -37,16 +36,6 @@ export default {
       options: {
         requestFunction (data) {
           return this.$parent.getLeaderboardData(data)
-
-          // let parentComponent = context.$parent.createAppendUrl ? context.$parent : context.$parent.$parent
-          //
-          // let appendUrl = parentComponent.createAppendUrl(data)
-          // return context.axios.get('/leaderboard' + appendUrl).then((data) => {
-          //   return {
-          //     data:   data.leaderboard,
-          //     count:  data.count
-          //   }
-          // })
         },
         filterByColumn: true,
         perPage: 25,
@@ -79,12 +68,8 @@ export default {
       return true
     }
   },
-  beforeRouteEnter (to, from, next) {
-    if (!localStorage.leaderboardToken) store.dispatch('authenticateLeaderboard').then(() => next() )
-    else next()
-  },
   created () {
-    // this.getLeaderboardData()
+
   },
   methods: {
     getLeaderboardData (tableData) {
@@ -137,7 +122,6 @@ export default {
   watch: {
     '$route.query': {
       handler: function (newVal, oldVal) {
-        // this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
         this.getLeaderboardData()
       },
       deep: true

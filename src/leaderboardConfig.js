@@ -16,5 +16,21 @@ export default {
     thredbo: "eb99f277-bb73-45d3-bdbb-61f80b27f653"
   },
   staging: "https://rt-leaderboards-staging-258502.appspot.com/api/v1",
-  production: "https://rt-leaderboards.appspot.com/api/v1"
+  production: "https://rt-leaderboards.appspot.com/api/v1",
+  timezones: {
+    crystal_mtn: "America/Los_Angeles",
+    falls_creek: "Australia/Sydney",
+    jackson_hole: "America/Denver",
+    mt_buller: "Australia/Sydney",
+    mtwashington: "America/Vancouver",
+    perisher: "Australia/Sydney",
+    smuggs: "America/New_York",
+    snow_king: "America/Denver",
+    steamboat: "America/Denver",
+    stevens_pass: "America/Los_Angeles",
+    sugarbush: "America/New_York",
+    sunshine_village: "America/Edmonton",
+    telluride: "America/Denver",
+    thredbo: "Australia/Sydney"
+  }
 }

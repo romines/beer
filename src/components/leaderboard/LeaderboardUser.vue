@@ -60,7 +60,7 @@
       <div v-if="resortDays.length > 0">
         <div v-for="resortDay in resortDays" class="resort-day-container">
           <section class="header" v-on:click="showResortDay(resortDay, $event)">
-            <span class="date">{{ formatDate(resortDay.date, 'lll') }}</span>
+            <span class="date">{{ formatDate(resortDay.date, 'll', true) }}</span> <!-- We do not want to convert this date to a specific timezone, as it is stored as beginning of day in UTC -->
             <span class="tracks">{{ resortDay.tracks.length }} Runs</span>
           </section>
           <section class="body" v-if="openPanels.includes(resortDay.id)">
@@ -69,7 +69,7 @@
             </div>
 
             <v-client-table v-bind:data="resortDay.tracks" v-bind:columns="trackColumns" v-bind:options="trackOptions" class="track-table">
-              <span slot="startTime" slot-scope="props" class="start-date">{{ formatDate(props.row.startTime, 'HH:MM:SS') }}</span>
+              <span slot="startTime" slot-scope="props" class="start-date">{{ formatDate(props.row.startTime, 'HH:mm:ss') }}</span>
             </v-client-table>
           </section>
         </div>
@@ -87,7 +87,6 @@
 import { mapGetters } from 'vuex'
 import { LoadingSpinner } from '../../components'
 import SiteHeader from '../SiteHeader.vue'
-import store from '../../store'
 import moment from 'moment'
 import arrayHelper from '../../helpers/arrayHelper.js'
 import numberHelper from '../../helpers/numberHelper.js'
@@ -139,17 +138,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentUser'])
-  },
-  beforeRouteEnter (to, from, next) {
-    if (!localStorage.leaderboardToken) store.dispatch('authenticateLeaderboard').then(() => next() )
-    else next()
-  },
-  created () {
-    this.getUser()
-    this.getUserResortDays()
-  },
-  computed: {
+    ...mapGetters(['currentResort']),
     userImage () {
       return 'data:image/png;base64,' + this.userSummary.profileImage
     },
@@ -160,8 +149,12 @@ export default {
       return string
     }
   },
+  created () {
+    this.getUserSummaryData()
+    this.getUserResortDays()
+  },
   methods: {
-    getUser () {
+    getUserSummaryData () {
       this.axios.get('/users/' + this.$route.params.external_id + '/summary' + this.currentParams).then((data) => {
         this.userSummary    = data.userSummary
         this.isLoadingUser  = false
@@ -178,8 +171,9 @@ export default {
         console.log(err)
       })
     },
-    formatDate (date, format) {
-      return moment.utc(date).local().format(format)
+    formatDate (date, format, isUtc) {
+      if (isUtc) return moment.utc(date).format(format)
+      return moment(date).tz(this.currentResort.timezone).format(format)
     },
     showResortDay (resortDay, event) {
       if (this.openPanels.includes(resortDay.id)) {
@@ -195,8 +189,7 @@ export default {
   watch: {
     '$route.query': {
       handler: function (newVal, oldVal) {
-        // this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
-        this.getUser()
+        this.getUserSummaryData()
         this.getUserResortDays()
       },
       deep: true

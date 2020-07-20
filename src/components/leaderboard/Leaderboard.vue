@@ -44,6 +44,7 @@ import { LoadingSpinner } from '../../components'
 import AdminDatepicker from '../../components/utilities/AdminDatepicker'
 import store from '../../store'
 import moment from 'moment'
+import tz from 'moment-timezone'
 import stringHelper from '../../helpers/stringHelper'
 
 export default {
@@ -92,11 +93,13 @@ export default {
       // Date without timezones
       if (!this.startDate) return null
       return moment(this.startDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'  // beginning of day
+      // TODO convert timezone based on resort
     },
     queryEndDate () {
       // Date without timezones
       if (!this.endDate) return null
       return moment(this.endDate).format('YYYY-MM-DD') + 'T23:59:59-00:00'  // end of day
+      // TODO convert timezone based on resort
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -111,6 +114,7 @@ export default {
     }
   },
   created () {
+
   },
   methods: {
     removeDates () {

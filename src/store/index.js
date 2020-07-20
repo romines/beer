@@ -75,10 +75,7 @@ const store = {
   },
   mutations: {
     SET_CURRENT_RESORT(state, payload) {
-      state.currentResort = {
-        id:   payload.id,
-        name: payload.name
-      }
+      state.currentResort = payload
     },
     SET_RESORTS(state, resorts) {
       console.log('SET(ing)_RESORTS . . .')
@@ -157,10 +154,22 @@ const store = {
         } else {
           RESORTS_REF.doc(resortId).get().then((doc) => {
             let data = doc.data()
-            commit('SET_CURRENT_RESORT', { id: resortId, name: data.name })
-            resolve()
+            if (!data.timezone) {
+              dispatch('setResortTimezone', resortId).then(() => {
+                dispatch('setCurrentResort', resortId)
+              })
+            } else {
+              commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone })
+              resolve()
+            }
           })
         }
+      })
+    },
+
+    setResortTimezone({ commit }, resortId) {
+      return RESORTS_REF.doc(resortId).update({
+        timezone: leaderboardConfig.timezones[resortId],
       })
     },
 
@@ -368,6 +377,7 @@ const store = {
           dispatch('setCurrentResort', null)
           commit('SET_CONTACT_GROUPS', {})
           dispatch('clearCurrentUser')
+          delete localStorage.leaderboardToken
           resolve()
         })
       })
