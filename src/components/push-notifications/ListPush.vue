@@ -157,7 +157,7 @@ export default {
       // baseUrl += "&tagName=basedistance"
 
       this.axios.get(baseUrl).then((response) => {
-        let newRequestId  = response.data
+        let newRequestId  = response.data || null
         let oldRequestId  = this.pushWooshData.baseDistanceRequestIds.current ? this.pushWooshData.baseDistanceRequestIds.current : newRequestId
 
         this.pushWooshData.baseDistanceRequestIds = {
