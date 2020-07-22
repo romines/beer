@@ -6,6 +6,10 @@
       <a slot="view" slot-scope="props" class="view-user" v-on:click="showUser(props.row)">View</a>
     </v-server-table>
 
+    <VueJsonToCsv v-bind:json-data="exportData" csv-title="RT_Leaderboard" v-bind:labels="exportLabels" class="export-button">
+      <button class="button is-primary" v-bind:disabled="!exportData.length > 0">Export Table</button>
+    </VueJsonToCsv>
+
   </div>
 </template>
 
@@ -15,23 +19,26 @@ import SiteHeader from '../SiteHeader.vue'
 import { LoadingSpinner } from '../../components'
 import AdminDatepicker from '../../components/utilities/AdminDatepicker'
 import stringHelper from '../../helpers/stringHelper'
+import VueJsonToCsv from 'vue-json-to-csv'
 
 export default {
   components: {
     SiteHeader,
     LoadingSpinner,
-    AdminDatepicker
+    AdminDatepicker,
+    VueJsonToCsv
   },
   props: ['startDate', 'endDate', 'queryStartDate', 'queryEndDate'],
   data () {
     return {
       isLoading:        true,
-      customQuery:      {
+      customQuery: {
         column:         null,
         operator:       null,
         value:          null
       },
       tableData:        {},
+      exportData:       [],
       columns:          ['rank', 'emailAddress', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
       options: {
         requestFunction (data) {
@@ -39,7 +46,7 @@ export default {
         },
         filterByColumn: true,
         perPage: 25,
-        perPageValues: [10, 25, 50, 100, 250, 500],
+        perPageValues: [10, 25, 50, 100, 50, 500],
         texts: {
           filter:   'Filter:',
           filterBy: 'Filter by {column}',
@@ -56,6 +63,14 @@ export default {
           'totalTracks':      'Total Tracks',
           'view':             ''
         }
+      },
+      exportLabels: {
+        rank:                     { title: 'Rank' },
+        emailAddress:             { title: 'Email Address' },
+        displayName:              { title: 'Display Name'},
+        totalDaysSkied:           { title: 'Total Days Skied' },
+        totalTracks:              { title: 'Total Tracks' },
+        totalDistanceVertical:    { title: 'Total Vertical' }
       }
     }
   },
@@ -63,9 +78,6 @@ export default {
     ...mapGetters(['currentUser', 'currentResort']),
     isQueryValid () {
       return this.customQuery.column && this.customQuery.operator && this.customQuery.value
-    },
-    isDateRangeValid () {
-      return true
     }
   },
   created () {
@@ -74,6 +86,8 @@ export default {
   methods: {
     getLeaderboardData (tableData) {
       if (tableData) this.tableData = tableData
+
+      this.getExportData()
 
       return this.axios.get('/leaderboard' + this.createAppendUrl(this.tableData)).then((response) => {
         this.$refs.usersTable.data  = response.leaderboard
@@ -84,7 +98,13 @@ export default {
         }
       })
     },
-    createAppendUrl (tableData) {
+    getExportData () {
+      this.exportData = []
+      return this.axios.get('/leaderboard' + this.createAppendUrl(this.tableData, true)).then((response) => {
+        this.exportData = response.leaderboard
+      })
+    },
+    createAppendUrl (tableData, skipLimit) {
       let string = ''
       string += '?resort_identifier=' + this.currentResort.id
       string += '&exclude_profile_image=true'
@@ -95,17 +115,20 @@ export default {
 
       if (tableData.orderBy)  string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
       if (tableData.orderBy)  string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
-      if (tableData.limit)    string += '&limit=' + tableData.limit
-      if (tableData.page)     string += '&offset=' + tableData.page
 
       if (tableData.query) {
         if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
         if (tableData.query.emailAddress)  string += '&email_address=' + tableData.query.emailAddress
       }
 
-      if (this.customQuery.column)    string += '&query_column=' + this.customQuery.column
-      if (this.customQuery.operator)  string += '&query_operator=' + this.customQuery.operator
-      if (this.customQuery.value)     string += '&query_value=' + this.customQuery.value
+      if (!skipLimit) {
+        if (tableData.limit)  string += '&limit=' + tableData.limit
+        if (tableData.page)   string += '&offset=' + tableData.page
+      }
+
+      // if (this.customQuery.column)    string += '&query_column=' + this.customQuery.column
+      // if (this.customQuery.operator)  string += '&query_operator=' + this.customQuery.operator
+      // if (this.customQuery.value)     string += '&query_value=' + this.customQuery.value
 
       if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
       if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate

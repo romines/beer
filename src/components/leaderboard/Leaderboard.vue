@@ -1,7 +1,9 @@
 <template>
   <div class="leaderboard">
 
-    <h1>Leaderboard</h1>
+    <div class="header">
+      <h1>Leaderboard</h1>
+    </div>
 
     <div class="query-container date-range">
 
@@ -65,9 +67,6 @@ export default {
     ...mapGetters(['currentUser', 'currentResort']),
     isQueryValid () {
       return this.customQuery.column && this.customQuery.operator && this.customQuery.value
-    },
-    isDateRangeValid () {
-      return true
     },
     formattedStartDate () {
       // Takes simple date string from URL and converts to date object for use in Datepicker component
@@ -146,8 +145,15 @@ export default {
 
 .leaderboard {
 
-  > h1 {
-    font-size:                    2em;
+  .header {
+
+    display:                      flex;
+    align-items:                  center;
+
+    > h1 {
+      font-size:                  2em;
+      display:                    inline-block;
+    }
   }
 
   .date-range {

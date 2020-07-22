@@ -42,6 +42,7 @@
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
     "vue-cleave": "^1.2.2",
+    "vue-json-to-csv": "^1.1.8",
     "vue-router": "^3.0.7",
     "vue-tables-2": "^1.4.70",
     "vue2-editor": "^2.6.6",
