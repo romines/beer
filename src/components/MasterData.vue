@@ -35,26 +35,20 @@
         </section>
         <section v-if="showObject(key)" class="body">
           <div v-if="Array.isArray(value)">
-            <textarea v-bind:value="value">
-            </textarea>
-          </div>
-          <div v-else>
-            <div v-for="(val, key) in value" class="data-container">
-              <div v-if="typeof(val) === 'string'" class="string-container">
-                <label>{{key}}</label>
-                <input v-bind:value="val"></input>
-                <button v-on:click="updateStringField(key, $event)" class="button is-primary">Update</button>
-              </div>
-              <div v-if="typeof(value) === 'boolean'" class="string-container">
-                <label>{{key}}</label>
-                <input v-bind:checked="value" type="checkbox"></input>
-                <button v-on:click="updateBooleanField(key, $event)" class="button is-primary">Update</button>
-              </div>
-              {{typeof(value)}}
-              {{value}}
+            <div v-if="typeof(value[0]) === 'object'">
+              <textarea v-bind:value="convertValue(value)"></textarea>
+              <button v-on:click="updateObjectField(key, $event)" class="button is-primary">Update</button>
+            </div>
+            <div v-else>
+              <div class="desc">Values must be comma-separated with no spaces</div>
+              <textarea v-bind:value="value"></textarea>
+              <button v-on:click="updateArrayField(key, $event)" class="button is-primary">Update</button>
             </div>
           </div>
-          <button v-on:click="updateStringField(key, $event)" class="button is-primary">Update</button>
+          <div v-else>
+            <textarea v-bind:value="convertValue(value)"></textarea>
+            <button v-on:click="updateObjectField(key, $event)" class="button is-primary">Update</button>
+          </div>
         </section>
 
       </div>
@@ -107,9 +101,17 @@ export default {
       let value = $event.target.previousElementSibling.checked  // input val
       this.updateField(key, value)
     },
+    updateArrayField (key, $event) {
+      let value = $event.target.previousElementSibling.value.split(',')  // input val
+      this.updateField(key, value)
+    },
+    updateObjectField (key, $event) {
+      let value = JSON.parse($event.target.previousElementSibling.value)
+      this.updateField(key, value)
+    },
     updateField (key, value) {
-      let payload = {}
-      payload[key] = value
+      let payload   = {}
+      payload[key]  = value
 
       this.$store.dispatch('setResortData', payload).then(() => {
         this.$store.dispatch('showSuccessModal', 'Field updated!')
@@ -127,6 +129,9 @@ export default {
       } else {
         this.currentObjectKey = key
       }
+    },
+    convertValue (value) {
+      return JSON.stringify(value)
     }
   }
 }
@@ -191,6 +196,11 @@ export default {
 
       .body {
         padding:                    1.5em 2em;
+
+        textarea {
+          height:                   10em;
+          width:                    90%;
+        }
       }
     }
   }
