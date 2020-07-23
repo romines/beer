@@ -15,6 +15,20 @@
         {{key}}
       </div>
     </div> -->
+    <div class="add-fields">
+      <section>
+        <input v-model="newFieldName" placeholder="Field Name">
+        <input v-model="newFieldValue" placeholder="Value">
+        <button v-on:click="addNewField()" class="button is-primary">Add Field</button>
+      </section>
+      <section>
+        <input v-model="newObjectName" placeholder="Field Name">
+        <span>Make sure to double-quote all keys</span>
+        <textarea v-model="newObjectValue" placeholder="Value"></textarea>
+        <button v-on:click="addNewObject()" class="button is-primary">Add Object</button>
+      </section>
+    </div>
+
     <div v-for="(value, key) in resortData" class="data-container">
       <div v-if="typeof(value) === 'string'" class="string-container">
         <label>{{key}}</label>
@@ -69,7 +83,11 @@ export default {
       userPassword:             '',
       passwordError:            false,
       resortData:               {},
-      currentObjectKey:         ''
+      currentObjectKey:         '',
+      newFieldName:             null,
+      newFieldValue:            null,
+      newObjectName:            null,
+      newObjectValue:           null
     }
   },
   computed: {
@@ -91,6 +109,38 @@ export default {
     getResortData () {
       this.$store.dispatch('getResortData').then((resortData) => {
         this.resortData = resortData
+      })
+    },
+    addNewField () {
+      let key       = this.newFieldName
+      let value     = this.newFieldValue
+      let payload   = {}
+      payload[key]  = value
+
+      this.$store.dispatch('setResortData', payload).then(() => {
+        this.$store.dispatch('showSuccessModal', 'Field Added!')
+        this.newFieldName   = null
+        this.newFieldValue  = null
+        this.getResortData()    // refresh resortData value
+      }).catch((error) => {
+        console.log('ERROR SAVING DATA')
+        console.log(error)
+      })
+    },
+    addNewObject () {
+      let key       = this.newObjectName
+      let value     = JSON.parse(this.newObjectValue)
+      let payload   = {}
+      payload[key]  = value
+
+      this.$store.dispatch('setResortData', payload).then(() => {
+        this.$store.dispatch('showSuccessModal', 'Field Added!')
+        this.getResortData()    // refresh resortData value
+        this.newObjectName   = null
+        this.newObjectValue  = null
+      }).catch((error) => {
+        console.log('ERROR SAVING DATA')
+        console.log(error)
       })
     },
     updateStringField (key, $event) {
@@ -115,6 +165,7 @@ export default {
 
       this.$store.dispatch('setResortData', payload).then(() => {
         this.$store.dispatch('showSuccessModal', 'Field updated!')
+        this.getResortData()    // refresh resortData value
       }).catch((error) => {
         console.log('ERROR SAVING DATA')
         console.log(error)
@@ -160,6 +211,25 @@ export default {
       color:                        red;
       display:                      block;
       margin:                       1em 0;
+    }
+  }
+
+  .add-fields {
+
+    > section {
+      display:                      flex;
+      align-items:                  center;
+      flex-wrap:                    wrap;
+      padding:                      0.5em;
+      border:                       1px solid #dfe0e2;
+      border-radius:                0.25em;
+      margin-bottom:                0.88em;
+      background:                   #dfe0e2;
+
+      > * {
+        width:                      100%;
+        margin-top:                 0.5em;
+      }
     }
   }
 
