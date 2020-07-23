@@ -34,11 +34,13 @@
         <label>{{key}}</label>
         <input v-bind:value="value"></input>
         <button v-on:click="updateStringField(key, $event)" class="button is-primary">Update</button>
+        <!-- <button v-on:click="deleteField(key)" class="button">Delete</button> -->
       </div>
       <div v-if="typeof(value) === 'boolean'" class="string-container">
         <label>{{key}}</label>
         <input v-bind:checked="value" type="checkbox"></input>
         <button v-on:click="updateBooleanField(key, $event)" class="button is-primary">Update</button>
+        <!-- <button v-on:click="deleteField(key)" class="button">Delete</button> -->
       </div>
     </div>
 
@@ -141,6 +143,12 @@ export default {
       }).catch((error) => {
         console.log('ERROR SAVING DATA')
         console.log(error)
+      })
+    },
+    deleteField (fieldName) {
+      this.$store.dispatch('deleteResortField', fieldName).then(() => {
+        this.$store.dispatch('showSuccessModal', 'Field Deleted!')
+        this.getResortData()
       })
     },
     updateStringField (key, $event) {

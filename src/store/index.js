@@ -15,6 +15,9 @@ import cmsAxios from '../api/vue-axios/axios.js'
 import leaderboardConfig from '../leaderboardConfig.js'
 import router from '../router'
 
+// import * as admin from 'firebase-admin'
+// const fieldValue = admin.firestore.FieldValue
+
 // import mayExport from '../../utils/firestore-export.json'
 // import userData from '../../utils/userData.json'
 
@@ -146,6 +149,15 @@ const store = {
         }).catch((error) => {
           reject(error)
         })
+      })
+    },
+
+    deleteResortField({rootState}, fieldName) {
+      return new Promise((resolve, reject) => {
+        let docRef = RESORTS_REF.doc(rootState.currentResort.id)
+        let deleteFunction = {}
+        deleteFunction[fieldName] = fieldValue.delete()
+        console.log(deleteFunction)
       })
     },
 
