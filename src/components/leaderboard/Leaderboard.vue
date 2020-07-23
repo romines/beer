@@ -59,8 +59,8 @@ export default {
     return {
       isLoading:              true,
       showDateRangePicker:    false,
-      startDate:              this.$route.query.startDate || this.setDefaultStartDate(),
-      endDate:                this.$route.query.endDate || this.setDefaultEndDate()
+      startDate:              this.$route.query.startDate,
+      endDate:                this.$route.query.endDate
     }
   },
   computed: {
@@ -129,10 +129,13 @@ export default {
       this.$router.push({ query: { startDate: formatStart, endDate: formatEnd } }).catch(() => {})
     },
     setDefaultStartDate () {
+      let northernStartMonth = 11
+      let northerEndMonth = 4
+
       let today = moment()
-      let day = today.date()
+      let day   = today.date()
       let month = today.month()
-      let dayMonth = parseInt(month.toString() + day.toString())
+
       // Figure out if norther or southern hem
         // If no hem, return null
       // else

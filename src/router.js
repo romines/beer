@@ -154,6 +154,7 @@ const routes = [
     },
     beforeEnter: (to, from, next) => {
       if (!store.getters.currentUser.canAccessLeaderboard()) return next('/')
+      if (!store.getters.currentResort.id) return next('/resorts')
 
       store.commit('SET_LOADING_STATE', false)
       next()
