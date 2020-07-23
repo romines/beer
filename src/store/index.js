@@ -129,6 +129,26 @@ const store = {
   },
 
   actions: {
+    getResortData({commit, rootState}) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).get().then((doc) => {
+          let data = doc.data()
+          resolve(data)
+        })
+      })
+    },
+
+    // Sets generic data. Could replace a lot of the old functions below that set field-specific data
+    setResortData({commit, rootState}, payload) {
+      return new Promise((resolve, reject) => {
+        RESORTS_REF.doc(rootState.currentResort.id).update(payload).then((data) => {
+          resolve()
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+    },
+
     authenticateLeaderboard({ commit, dispatch, rootState }) {
       return new Promise((resolve, reject) => {
         let password = leaderboardConfig.auth[rootState.currentResort.id]

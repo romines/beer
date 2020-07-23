@@ -9,6 +9,7 @@ import Leaderboard from './components/leaderboard/Leaderboard'
 import LeaderboardUser from './components/leaderboard/LeaderboardUser'
 import LeaderboardTable from './components/leaderboard/LeaderboardTable'
 import Profile from './components/Profile'
+import MasterData from './components/MasterData'
 import Settings from './components/Settings'
 import UserManager from './components/settings/UserManager'
 import ResortManager from './components/settings/ResortManager'
@@ -288,8 +289,22 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (!store.getters.currentResort.id) return next('/')
       next()
-    },
+    }
   },
+  {
+    path: '/master-data',
+    component: MasterData,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      if (!store.getters.currentResort.id) return next('/')
+      if (!store.getters.currentUser.superAdmin) return next('/')
+
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    },
+  }
 ]
 
 const router = new VueRouter({ mode: 'history', routes })
@@ -354,11 +369,11 @@ router.beforeEach(async (to, from, next) => {
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
       // TODO remove this
-      // const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
+      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
 
-      // next('/resorts')
+      next('/master-data')
     }
 
   }
