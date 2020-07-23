@@ -21,6 +21,43 @@
         <input v-bind:value="value"></input>
         <button v-on:click="updateStringField(key, $event)" class="button is-primary">Update</button>
       </div>
+      <div v-if="typeof(value) === 'boolean'" class="string-container">
+        <label>{{key}}</label>
+        <input v-bind:checked="value" type="checkbox"></input>
+        <button v-on:click="updateBooleanField(key, $event)" class="button is-primary">Update</button>
+      </div>
+    </div>
+
+    <div v-for="(value, key) in resortData" class="data-container">
+      <div v-if="typeof(value) === 'object'" class="object-container">
+        <section v-on:click="setCurrentObjectKey(key)" class="header">
+          {{key}}
+        </section>
+        <section v-if="showObject(key)" class="body">
+          <div v-if="Array.isArray(value)">
+            <textarea v-bind:value="value">
+            </textarea>
+          </div>
+          <div v-else>
+            <div v-for="(val, key) in value" class="data-container">
+              <div v-if="typeof(val) === 'string'" class="string-container">
+                <label>{{key}}</label>
+                <input v-bind:value="val"></input>
+                <button v-on:click="updateStringField(key, $event)" class="button is-primary">Update</button>
+              </div>
+              <div v-if="typeof(value) === 'boolean'" class="string-container">
+                <label>{{key}}</label>
+                <input v-bind:checked="value" type="checkbox"></input>
+                <button v-on:click="updateBooleanField(key, $event)" class="button is-primary">Update</button>
+              </div>
+              {{typeof(value)}}
+              {{value}}
+            </div>
+          </div>
+          <button v-on:click="updateStringField(key, $event)" class="button is-primary">Update</button>
+        </section>
+
+      </div>
     </div>
   </div>
 
@@ -37,7 +74,8 @@ export default {
       password:                 'funnydolphin',
       userPassword:             '',
       passwordError:            false,
-      resortData:               {}
+      resortData:               {},
+      currentObjectKey:         ''
     }
   },
   computed: {
@@ -62,7 +100,14 @@ export default {
       })
     },
     updateStringField (key, $event) {
-      let value = $event.target.previousElementSibling.value    // input
+      let value = $event.target.previousElementSibling.value    // input val
+      this.updateField(key, value)
+    },
+    updateBooleanField (key, $event) {
+      let value = $event.target.previousElementSibling.checked  // input val
+      this.updateField(key, value)
+    },
+    updateField (key, value) {
       let payload = {}
       payload[key] = value
 
@@ -72,6 +117,16 @@ export default {
         console.log('ERROR SAVING DATA')
         console.log(error)
       })
+    },
+    showObject (key) {
+      return this.currentObjectKey == key
+    },
+    setCurrentObjectKey (key) {
+      if (this.showObject(key)) {
+        this.currentObjectKey = ''
+      } else {
+        this.currentObjectKey = key
+      }
     }
   }
 }
@@ -117,6 +172,25 @@ export default {
       > input {
         margin-right:               1em;
         width:                      15em;
+      }
+    }
+
+    .object-container {
+
+      border:                       1px solid #dfe0e2;
+      border-radius:                0.25em;
+      margin-bottom:                0.88em;
+
+      .header {
+        display:                    flex;
+        align-items:                center;
+        cursor:                     pointer;
+        background:                 #dfe0e2;
+        padding:                    0.88em;
+      }
+
+      .body {
+        padding:                    1.5em 2em;
       }
     }
   }
