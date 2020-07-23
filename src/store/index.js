@@ -159,7 +159,7 @@ const store = {
                 dispatch('setCurrentResort', resortId)
               })
             } else {
-              commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone })
+              commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone, seasonStart: data.seasonStart, seasonEnd: data.seasonEnd })
               resolve()
             }
           })

@@ -113,7 +113,7 @@ export default {
     }
   },
   created () {
-
+    this.setDefaultDates()
   },
   methods: {
     removeDates () {
@@ -128,23 +128,12 @@ export default {
 
       this.$router.push({ query: { startDate: formatStart, endDate: formatEnd } }).catch(() => {})
     },
-    setDefaultStartDate () {
-      let northernStartMonth = 11
-      let northerEndMonth = 4
-
-      let today = moment()
-      let day   = today.date()
-      let month = today.month()
-
-      // Figure out if norther or southern hem
-        // If no hem, return null
-      // else
-        // If current date less than season start date for current year, then default season is last year
-        // If current date is creater than season start for current year, then start date is start date for current year
-      return '11-01-2019'
-    },
-    setDefaultEndDate () {
-      return '04-30-2020'
+    setDefaultDates () {
+      if (this.startDate || this.endDate) return
+      if (!this.currentResort.seasonStart && this.currentResort.seasonEnd) return null
+      this.startDate = this.currentResort.seasonStart
+      this.endDate = this.currentResort.seasonEnd
+      this.$router.push({ query: { startDate: this.startDate, endDate: this.endDate }}).catch(() => {})
     }
   },
   watch: {
