@@ -15,8 +15,8 @@ export default {
     telluride: "fa1feb1c-0998-4821-a4b4-7ca6981dc3ed",
     thredbo: "eb99f277-bb73-45d3-bdbb-61f80b27f653"
   },
-  staging: "https://rt-leaderboards-staging-258502.appspot.com/api/v1",
-  production: "https://rt-leaderboards.appspot.com/api/v1",
+  staging: "https://rt-leaderboards-staging-258502.appspot.com/admin/v1",
+  production: "https://rt-leaderboards.appspot.com/admin/v1",
   timezones: {
     crystal_mtn: "America/Los_Angeles",
     falls_creek: "Australia/Sydney",

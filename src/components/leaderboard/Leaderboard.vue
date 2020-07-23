@@ -59,8 +59,8 @@ export default {
     return {
       isLoading:              true,
       showDateRangePicker:    false,
-      startDate:              this.$route.query.startDate,
-      endDate:                this.$route.query.endDate
+      startDate:              this.$route.query.startDate || this.setDefaultStartDate(),
+      endDate:                this.$route.query.endDate || this.setDefaultEndDate()
     }
   },
   computed: {
@@ -70,8 +70,8 @@ export default {
     },
     formattedStartDate () {
       // Takes simple date string from URL and converts to date object for use in Datepicker component
-      if (!this.$route.query.startDate) return null
-      let start = this.$route.query.startDate
+      if (!this.startDate) return null
+      let start = this.startDate
       let month = start.split('-')[0]
       let day   = start.split('-')[1]
       let year  = start.split('-')[2]
@@ -80,8 +80,8 @@ export default {
     },
     formattedEndDate () {
       // Takes simple date string from URL and converts to date object for use in Datepicker component
-      if (!this.$route.query.endDate) return null
-      let start = this.$route.query.endDate
+      if (!this.endDate) return null
+      let start = this.endDate
       let month = start.split('-')[0]
       let day   = start.split('-')[1]
       let year  = start.split('-')[2]
@@ -127,6 +127,21 @@ export default {
       let formatEnd   = moment.utc(endDate).format('MM-DD-YYYY')
 
       this.$router.push({ query: { startDate: formatStart, endDate: formatEnd } }).catch(() => {})
+    },
+    setDefaultStartDate () {
+      let today = moment()
+      let day = today.date()
+      let month = today.month()
+      let dayMonth = parseInt(month.toString() + day.toString())
+      // Figure out if norther or southern hem
+        // If no hem, return null
+      // else
+        // If current date less than season start date for current year, then default season is last year
+        // If current date is creater than season start for current year, then start date is start date for current year
+      return '11-01-2019'
+    },
+    setDefaultEndDate () {
+      return '04-30-2020'
     }
   },
   watch: {
