@@ -23,6 +23,9 @@
 
 
         <div v-if="showUserMenu" class="user-menu">
+          <span v-if="currentUser.superAdmin" class="menu-item" @click="goToMasterData()">
+            Master Data
+          </span>
           <span v-if="currentUser.canAccessResorts()" class="menu-item" @click="goToResorts()">
             Resorts
           </span>
@@ -93,6 +96,9 @@ export default {
     },
     goToResorts () {
       this.$router.replace('/resorts')
+    },
+    goToMasterData () {
+      this.$router.replace('/master-data')
     },
     goToLandingPage () {
       if (this.currentUser.superAdmin) {

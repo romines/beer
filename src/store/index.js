@@ -189,6 +189,9 @@ const store = {
             if (!data.timezone) {
               dispatch('setResortTimezone', resortId).then(() => {
                 dispatch('setCurrentResort', resortId)
+              }).catch(() => {
+                commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone, seasonStart: data.seasonStart, seasonEnd: data.seasonEnd })
+                resolve()
               })
             } else {
               commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone, seasonStart: data.seasonStart, seasonEnd: data.seasonEnd })
@@ -200,8 +203,18 @@ const store = {
     },
 
     setResortTimezone({ commit }, resortId) {
-      return RESORTS_REF.doc(resortId).update({
-        timezone: leaderboardConfig.timezones[resortId],
+      return new Promise((resolve, reject) => {
+        if (!leaderboardConfig.timezones[resortId]) {
+          reject()
+        } else {
+          RESORTS_REF.doc(resortId).update({
+            timezone: leaderboardConfig.timezones[resortId],
+          }).then(() => {
+            resolve()
+          }).catch(() => {
+            reject()
+          })
+        }
       })
     },
 
