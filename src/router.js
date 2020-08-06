@@ -368,12 +368,8 @@ router.beforeEach(async (to, from, next) => {
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
-      // TODO remove this
-      const [err2] = await promiseTo(store.dispatch('setCurrentResort', 'jackson_hole'))
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
-
-      next('/master-data')
     }
 
   }
