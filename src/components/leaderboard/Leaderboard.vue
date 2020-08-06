@@ -91,14 +91,14 @@ export default {
     queryStartDate () {
       // Date without timezones
       if (!this.startDate) return null
-      return moment(this.startDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'  // beginning of day
-      // TODO convert timezone based on resort
+      // return moment(this.startDate).format('YYYY-MM-DD') + 'T00:00:00-00:00'  // beginning of day
+      return moment(this.startDate).tz(this.currentResort.timezone).format('YYYY-MM-DDT00:00:00Z')
     },
     queryEndDate () {
       // Date without timezones
       if (!this.endDate) return null
-      return moment(this.endDate).format('YYYY-MM-DD') + 'T23:59:59-00:00'  // end of day
-      // TODO convert timezone based on resort
+      // return moment(this.endDate).format('YYYY-MM-DD') + 'T23:59:59-00:00'  // end of day
+      return moment(this.endDate).tz(this.currentResort.timezone).format('YYYY-MM-DDT23:59:59Z')
     }
   },
   beforeRouteEnter (to, from, next) {
