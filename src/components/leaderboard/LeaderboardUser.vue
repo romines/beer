@@ -33,19 +33,19 @@
           <span class="name">Total Kcals</span>
         </div>
         <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.speedAverage) }}</span>
+          <span class="metric">{{ commaSeparateNumber(convertToKph(userSummary.speedAverage)) }}</span>
           <span class="name">Avg. Speed (km/h)</span>
         </div>
         <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.speedMax) }}</span>
+          <span class="metric">{{ commaSeparateNumber(convertToKph(userSummary.speedMax)) }}</span>
           <span class="name">Max Speed (km/h)</span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceVertical) }}</span>
-          <span class="name">Total Vertical Distance (km)</span>
+          <span class="name">Total Vertical Distance (m)</span>
         </div>
         <div class="block">
-          <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceSurface) }}</span>
+          <span class="metric">{{ commaSeparateNumber(surfaceDistanceInKm) }}</span>
           <span class="name">Total Surface Distance (km)</span>
         </div>
       </section>
@@ -147,6 +147,9 @@ export default {
       if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
       if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate
       return string
+    },
+    surfaceDistanceInKm () {
+      return (this.userSummary.totalDistanceSurface / 1000).toFixed(2)
     }
   },
   created () {
@@ -184,6 +187,9 @@ export default {
     },
     backToTable () {
       this.$router.push({ name: 'LeaderboardTable', query: { startDate: this.startDate, endDate: this.endDate } })
+    },
+    convertToKph (speed) {
+      return (speed * 3.6).toFixed(2)
     }
   },
   watch: {

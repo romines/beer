@@ -146,6 +146,8 @@ export default {
       })
     },
     deleteField (fieldName) {
+      // Not working
+      // https://www.otcollect.com/collection/angularfire/page/mxeQ5NQY/how-to-delete-a-specific-field-in-firebase-firestore-document
       this.$store.dispatch('deleteResortField', fieldName).then(() => {
         this.$store.dispatch('showSuccessModal', 'Field Deleted!')
         this.getResortData()
