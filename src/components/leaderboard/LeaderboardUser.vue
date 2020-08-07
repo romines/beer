@@ -60,7 +60,7 @@
       <div v-if="resortDays.length > 0">
         <div v-for="resortDay in resortDays" class="resort-day-container">
           <section class="header" v-on:click="showResortDay(resortDay, $event)">
-            <span class="date">{{ formatDate(resortDay.date, 'll', true) }}</span> <!-- We do not want to convert this date to a specific timezone, as it is stored as beginning of day in UTC -->
+            <span class="date">{{ formatDate(resortDay.date, 'll') }}</span> <!-- We do not want to convert this date to a specific timezone, as it is stored as beginning of day in UTC -->
             <span class="tracks">{{ resortDay.tracks.length }} Runs</span>
           </section>
           <section class="body" v-if="openPanels.includes(resortDay.id)">
