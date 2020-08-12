@@ -34,19 +34,19 @@
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(convertToKph(userSummary.speedAverage)) }}</span>
-          <span class="name">Avg. Speed (km/h)</span>
+          <span class="name">Avg. Speed {{ currentResort.unitType === 'imperial' ? '(mph)' : '(km/h)' }} </span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(convertToKph(userSummary.speedMax)) }}</span>
-          <span class="name">Max Speed (km/h)</span>
+          <span class="name">Max Speed {{ currentResort.unitType === 'imperial' ? '(mph)' : '(km/h)' }} </span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(userSummary.totalDistanceVertical) }}</span>
-          <span class="name">Total Vertical Distance (m)</span>
+          <span class="name">Total Vertical Distance {{ currentResort.unitType === 'imperial' ? '(feet)' : '(m)' }} </span>
         </div>
         <div class="block">
           <span class="metric">{{ commaSeparateNumber(surfaceDistanceInKm) }}</span>
-          <span class="name">Total Surface Distance (km)</span>
+          <span class="name">Total Surface Distance {{ currentResort.unitType === 'imperial' ? '(feet)' : '(km)' }} </span>
         </div>
       </section>
     </div>
@@ -144,8 +144,10 @@ export default {
     },
     currentParams () {
       let string = '?'
-      if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
-      if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate
+      if (this.queryStartDate)                          string += '&start_date=' + this.queryStartDate
+      if (this.queryEndDate)                            string += '&end_date=' + this.queryEndDate
+      if (this.currentResort.unitType === 'imperial')   string += '&units=imperial'
+
       return string
     },
     surfaceDistanceInKm () {

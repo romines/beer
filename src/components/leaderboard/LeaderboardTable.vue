@@ -133,6 +133,9 @@ export default {
       if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
       if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate
 
+      if (this.currentResort.unitType === 'imperial') string += '&units=imperial'
+
+
       return string
     },
     showUser (user) {

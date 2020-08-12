@@ -78,7 +78,14 @@ const store = {
   },
   mutations: {
     SET_CURRENT_RESORT(state, payload) {
-      state.currentResort = payload
+      state.currentResort = {
+        id:           payload.resortId,
+        name:         payload.name,
+        timezone:     payload.timezone,
+        seasonStart:  payload.seasonStart,
+        seasonEnd:    payload.seasonEnd,
+        unitType:     payload.unitType
+      }
     },
     SET_RESORTS(state, resorts) {
       console.log('SET(ing)_RESORTS . . .')
@@ -190,11 +197,11 @@ const store = {
               dispatch('setResortTimezone', resortId).then(() => {
                 dispatch('setCurrentResort', resortId)
               }).catch(() => {
-                commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone, seasonStart: data.seasonStart, seasonEnd: data.seasonEnd })
+                commit('SET_CURRENT_RESORT', data)
                 resolve()
               })
             } else {
-              commit('SET_CURRENT_RESORT', { id: resortId, name: data.name, timezone: data.timezone, seasonStart: data.seasonStart, seasonEnd: data.seasonEnd })
+              commit('SET_CURRENT_RESORT', data)
               resolve()
             }
           })
