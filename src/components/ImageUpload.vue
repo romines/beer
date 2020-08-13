@@ -18,6 +18,7 @@
       </label>
     </div>
     <progress v-show="uploading" class="progress is-info" :value="uploadProgress" max="100" />
+    <div class="note">Preferred size 512 x 288</div>
   </div>
 </template>
 
@@ -93,6 +94,12 @@ export default {
 <style scoped>
 .file-label,
 .progress {
-  margin-top: 0.6em;
+  margin-top:           0.6em;
+}
+
+.note {
+  margin-top:           6px;
+  font-style:           italic;
+  font-size:            0.9em;
 }
 </style>
