@@ -346,6 +346,7 @@ router.beforeEach(async (to, from, next) => {
     console.log('no user in state . . .')
 
     const [err, user] = await promiseTo(store.dispatch('setCurrentUser', auth.currentUser))
+
     if (err) {
       store.commit('SET_LOADING_STATE', false)
       console.log(err.message)
