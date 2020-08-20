@@ -35,11 +35,11 @@
 
             <div class="detail message-title">
               <label>Title:</label>
-              <span v-if="currentNotification.title" class="status-note">{{currentNotification.title}}</span>
+              <span v-if="currentNotification.title || currentNotification.data.title" class="status-note">{{currentNotification.title || currentNotification.data.title }}</span>
               <span v-else>None provided</span>
             </div>
             <div class="detail message-content">
-              <label>Message:</label><span class="message-content">{{ currentNotification.data.message }}</span>
+              <label>Message:</label><span class="message-content">{{ currentNotification.data.message || currentNotification.content.default }}</span>
             </div>
           </div>
         </div>
