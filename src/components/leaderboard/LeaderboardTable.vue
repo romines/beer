@@ -1,6 +1,27 @@
 <template>
   <div class="leaderboard-table">
 
+    <div class="query-container">
+      <h2>Custom Query</h2>
+      <select name="column" v-model="customQuery.column">
+        <option disabled value="null">Select column...</option>
+        <option value="total_days_skied">Days Skied</option>
+        <option value="total_tracks">Total Tracks</option>
+        <option value="total_distance_vertical">Total Vertical</option>
+      </select>
+      <select name="operator" v-model="customQuery.operator">
+        <option disabled value="null">Select operator...</option>
+        <option value="=">equals</option>
+        <option value=">">is greater than</option>
+        <option value="<">is less than</option>
+      </select>
+      <input v-model="customQuery.value" placeholder="Value (numbers only)" type="number">
+      <div class="buttons">
+        <span v-bind:disabled="!isQueryValid" v-on:click="runCustomQuery()" class="button is-primary">Search</span>
+        <span v-on:click="removeCustomQuery()" class="button">Clear</span>
+      </div>
+    </div>
+
     <v-server-table ref="usersTable" v-bind:columns="columns" v-bind:options="options">
       <span slot="vert" slot-scope="props" class="vert">{{commaSeparateNumber(props.row.totalDistanceVertical)}}</span>
       <a slot="view" slot-scope="props" class="view-user" v-on:click="showUser(props.row)">View</a>
@@ -37,6 +58,7 @@ export default {
         operator:       null,
         value:          null
       },
+      queryIsActive:    false,
       tableData:        {},
       exportData:       [],
       columns:          ['rank', 'emailAddress', 'displayName', 'totalDaysSkied', 'totalTracks', 'vert', 'view'],
@@ -113,8 +135,11 @@ export default {
       // Hack... maps column name to query string we want. Maybe move to a function if it gets unwieldy
       if (tableData.orderBy && tableData.orderBy === 'vert') tableData.orderBy = "total_distance_vertical"
 
-      if (tableData.orderBy)  string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
-      if (tableData.orderBy)  string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
+      // Do not allow orderBy when we also have custom query
+      if (!this.queryIsActive) {
+        if (tableData.orderBy)  string += '&order_by=' + stringHelper.unCamelize(tableData.orderBy)
+        if (tableData.orderBy)  string += '&sort_order=' + (tableData.ascending ? "ASC" : "DESC")
+      }
 
       if (tableData.query) {
         if (tableData.query.displayName)   string += '&display_name=' + tableData.query.displayName
@@ -126,9 +151,9 @@ export default {
         if (tableData.page)   string += '&offset=' + tableData.page
       }
 
-      // if (this.customQuery.column)    string += '&query_column=' + this.customQuery.column
-      // if (this.customQuery.operator)  string += '&query_operator=' + this.customQuery.operator
-      // if (this.customQuery.value)     string += '&query_value=' + this.customQuery.value
+      if (this.customQuery.column)    string += '&query_column=' + this.customQuery.column
+      if (this.customQuery.operator)  string += '&query_operator=' + this.customQuery.operator
+      if (this.customQuery.value)     string += '&query_value=' + this.customQuery.value
 
       if (this.queryStartDate)  string += '&start_date=' + this.queryStartDate
       if (this.queryEndDate)    string += '&end_date=' + this.queryEndDate
@@ -142,7 +167,17 @@ export default {
       this.$router.push({ name: 'LeaderboardUser', params: { external_id: user.externalId }, query: { startDate: this.startDate, endDate: this.endDate } })
     },
     runCustomQuery () {
-      // this.$refs.usersTable.options.requestFunction({}, this.$refs.usersTable)
+      this.queryIsActive = true
+      this.getLeaderboardData()
+    },
+    removeCustomQuery () {
+      this.customQuery = {
+        column:         null,
+        operator:       null,
+        value:          null
+      }
+      this.queryIsActive = false
+      this.getLeaderboardData()
     }
   },
   watch: {
@@ -182,8 +217,13 @@ export default {
       margin-right:               0.5em;
     }
 
-    .button {
+    .buttons {
+
       margin-left:                auto;
+
+      .button {
+
+      }
     }
   }
 

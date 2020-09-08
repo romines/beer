@@ -114,8 +114,12 @@ export default {
   },
   created () {
     this.setDefaultDates()
+    this.showDateRangePicker = this.initializeDateRangePicker()
   },
   methods: {
+    initializeDateRangePicker () {
+      return this.startDate || this.endDate
+    },
     removeDates () {
       this.startDate  = null
       this.endDate    = null
