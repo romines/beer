@@ -8,9 +8,9 @@
 
       <div class="link-nav">
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
-        <router-link v-if="this.currentUser.canAccessContacts()" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
-        <router-link v-if="this.currentUser.canAccessWebcams()" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
-        <router-link v-if="this.currentUser.canAccessLeaderboard()" v-bind:to="{ name: 'Leaderboard' }">Leaderboard</router-link>
+        <router-link v-if="this.currentUser.canAccessContacts()" v-bind:to="{ name: 'Resort' }" v-bind:class="{ 'router-link-exact-active' : contactsIsActive }">Contacts</router-link>
+        <router-link v-if="this.currentUser.canAccessWebcams()" v-bind:to="{ name: 'WebcamManager' }" v-bind:class="{ 'router-link-exact-active' : webcamsIsActive }">Webcams</router-link>
+        <router-link v-if="this.currentUser.canAccessLeaderboard()" v-bind:to="{ name: 'LeaderboardTable' }" v-bind:class="{ 'router-link-exact-active' : leaderboardIsActive }">Leaderboard</router-link>
       </div>
 
       <div class="right-nav">
@@ -78,7 +78,16 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['currentUser', 'currentResort', 'resortPermissions'])
+    ...mapGetters(['currentUser', 'currentResort', 'resortPermissions']),
+    contactsIsActive () {
+      return this.$route.path.includes('/contacts')
+    },
+    webcamsIsActive () {
+      return this.$route.path.includes('/webcam-manager')
+    },
+    leaderboardIsActive () {
+      return this.$route.path.includes('/leaderboard')
+    }
   },
   methods: {
     logOut() {
