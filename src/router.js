@@ -10,6 +10,7 @@ import Settings from './components/Settings'
 import UserManager from './components/settings/UserManager'
 import ResortManager from './components/settings/ResortManager'
 import PushSettings from './components/settings/PushSettings'
+import Dashboard from './components/analytics/Dashboard'
 
 import {
   Archive,
@@ -208,6 +209,18 @@ const routes = [
     }
   },
   {
+    path: '/analytics/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      store.commit('SET_LOADING_STATE', false)
+      next()
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: Login,
@@ -304,7 +317,10 @@ router.beforeEach(async (to, from, next) => {
       // Must go after setCurrentResort
       const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
     } else {
-      next('/resorts')
+      store.dispatch('setCurrentResort', 'crystal_mtn').then(() => {
+        next('/analytics/dashboard')
+      })
+      // next('/resorts')
     }
 
   }

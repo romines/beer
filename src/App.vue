@@ -10,6 +10,7 @@
         <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
         <router-link v-if="showContacts" v-bind:to="{ name: 'Resort' }">Contacts</router-link>
         <router-link v-if="showWebcams" v-bind:to="{ name: 'WebcamManager' }">Webcams</router-link>
+        <router-link v-bind:to="{ name: 'Dashboard' }">Analytics</router-link>
       </div>
 
       <div class="right-nav">

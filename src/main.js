@@ -8,6 +8,7 @@ import App from './App.vue'
 import VueAxios from 'vue-axios'
 import axios from './api/vue-axios/axios.js'
 import globals from './globals.js'
+import VueMeta from 'vue-meta'
 
 
 import vClickOutside from 'v-click-outside'
@@ -15,6 +16,7 @@ import vClickOutside from 'v-click-outside'
 Vue.use(VueRouter)
 Vue.use(VueAxios, axios)
 Vue.use(vClickOutside)
+Vue.use(VueMeta)
 
 Vue.config.productionTip = false
 
