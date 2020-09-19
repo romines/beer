@@ -3,7 +3,7 @@
 
     DASH
 
-    <!-- <button v-on:click="doTheThing">CLICK ME</button> -->
+    <button v-on:click="doTheThing">CLICK ME</button>
 
     <p class="g-signin2" data-onsuccess="doTheThing"></p>
 
@@ -11,11 +11,12 @@
 </template>
 
 <script>
-// 
+//
 // https://developers.google.com/identity/sign-in/web/sign-in
 // https://console.developers.google.com/apis/credentials?project=crystal-mtn
 // https://ga-dev-tools.appspot.com/account-explorer/
 // https://developers.google.com/analytics/devguides/reporting/core/v4/quickstart/web-js
+// https://ga-dev-tools.appspot.com/query-explorer/
 
 
 import VueMeta from 'vue-meta'
@@ -53,7 +54,7 @@ export default {
         body: {
           reportRequests: [
             {
-              viewId: '79148021',
+              viewId: '1049541785',
               dateRanges: [
                 {
                   startDate: '7daysAgo',
@@ -62,7 +63,7 @@ export default {
               ],
               metrics: [
                 {
-                  expression: 'ga:sessions'
+                  expression: 'ga:users'
                 }
               ]
             }
