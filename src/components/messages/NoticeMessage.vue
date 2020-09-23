@@ -4,7 +4,11 @@
     <div class="rt-dropdown" v-bind:class="{ 'is-open' : isDropdownOpen }">
 
       <div class="header" v-on:click="isDropdownOpen = !isDropdownOpen">
-        <h2>Banner Message</h2>
+        <h2>Current Notice</h2>
+
+        <div class="is-active">
+          active
+        </div>
 
         <i class="fas chevron fa-chevron-up" />
         <i class="fas chevron fa-chevron-down" />
@@ -21,12 +25,12 @@
             <span>{{currentNoticeMessage.url}}</span>
           </div>
           <div class="detail">
-            <label>Before:</label>
-            <span>{{currentNoticeMessage.beforeDate}}</span>
-          </div>
-          <div class="detail">
             <label>After:</label>
             <span>{{currentNoticeMessage.afterDate}}</span>
+          </div>
+          <div class="detail">
+            <label>Before:</label>
+            <span>{{currentNoticeMessage.beforeDate}}</span>
           </div>
           <div class="detail">
             <label>Message:</label>
@@ -49,12 +53,12 @@
               <input v-model="newMessage.url" class="input">
             </div>
             <div class="detail">
-              <label>Before:</label>
-              <input v-model="newMessage.beforeDate" class="input">
-            </div>
-            <div class="detail">
               <label>After:</label>
               <input v-model="newMessage.afterDate" class="input">
+            </div>
+            <div class="detail">
+              <label>Before:</label>
+              <input v-model="newMessage.beforeDate" class="input">
             </div>
             <div class="detail">
               <label>Message:</label>
@@ -63,7 +67,7 @@
 
             <div class="button-container">
               <span v-on:click="cancelNewMessage()" class="button cancel is-secondary">Cancel</span>
-              <button v-on:click="publishNewMessage()" v-bind:disabled="!newMessageIsValid" class="button save is-primary">Save</button>
+              <button v-on:click="publishNewMessage()" v-bind:disabled="!newMessageIsValid || isSavingMessage" class="button save is-primary">Save</button>
             </div>
           </div>
           <div v-else class="no-message">
@@ -90,7 +94,8 @@ export default {
       isDropdownOpen:       false,
       showNewMessage:       false,
       newMessage:           {},
-      newMessageIsValid:    true
+      newMessageIsValid:    true,
+      isSavingMessage:      false
     }
   },
   computed: {
@@ -104,13 +109,15 @@ export default {
   },
   methods: {
     cancelNewMessage () {
-      this.showNewMessage = false
-      this.newMessage     = {}
+      this.showNewMessage   = false
+      this.newMessage       = {}
     },
     publishNewMessage () {
+      this.isSavingMessage = true
       this.$store.dispatch('createNoticeForResort', this.newMessage).then((message) => {
         this.$store.dispatch('showSuccessModal', 'Notice published!')
         this.cancelNewMessage()
+        this.isSavingMessage = false
       })
     },
     removeCurrentMessage () {
@@ -128,6 +135,16 @@ export default {
 .notice-message {
 
   .rt-dropdown {
+
+    .header {
+      .is-active {
+        margin-right:               3em;
+        background-color:           #00d1b2;
+        padding:                    0.2em 0.75em;
+        border-radius:              0.5em;
+        color:                      white;
+      }
+    }
 
     .body {
 

@@ -10,6 +10,8 @@
 
     <NoticeMessage />
 
+    <NoticeMessage />
+
     <list-push v-if="!pwMissingAppIdWarning" ref="listPush" class="list-push-container" />
     <div v-else>
       {{pwMissingAppIdWarning}}
