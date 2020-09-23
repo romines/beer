@@ -209,6 +209,73 @@ input:checked + .slider:before {
 }
 
 
+/* GENERIC HEADER/BODY */
+
+.rt-dropdown {
+  border:                       1px solid gray;
+  border-radius:                0.5em;
+  margin:                       1em 0;
+
+  &.is-open {
+    .header {
+      .fa-chevron-down {
+        display:                none;
+      }
+      .fa-chevron-up {
+        display:                inline-block;
+      }
+    }
+
+    .body {
+      display:                  block;
+    }
+  }
+
+  .header {
+    display:                    flex;
+    align-items:                center;
+    cursor:                     pointer;
+    background:                 #e1f0f6;
+    padding:                    0.5em 1em;
+
+
+
+    h2 {
+      font-size:                1.25em;
+      display:                  block;
+      width:                    100%;
+    }
+
+    .chevron {
+      margin-left:              auto;
+    }
+
+    .fa-chevron-up {
+      display:                  none;
+    }
+  }
+
+  .body {
+    display:                    none;
+    padding:                    1em;
+
+    .detail-container {
+
+      .detail {
+
+        margin:                 0.25em 0;
+
+        > label {
+          font-weight:          bold;
+          min-width:            8em;
+          display:              inline-block;
+        }
+      }
+    }
+  }
+}
+
+
 /* MISC  */
 .no-results {
   font-style:                     italic;

@@ -7,7 +7,7 @@
       <a v-on:click="goToLandingPage()"><img src="./assets/logo.png" class="logo"/></a>
 
       <div class="link-nav">
-        <router-link v-bind:to="{ name: 'PushNotifications' }">Push Notifications</router-link>
+        <router-link v-bind:to="{ name: 'PushNotifications' }">Messages</router-link>
         <router-link v-if="this.currentUser.canAccessContacts()" v-bind:to="{ name: 'Resort' }" v-bind:class="{ 'router-link-exact-active' : contactsIsActive }">Contacts</router-link>
         <router-link v-if="this.currentUser.canAccessWebcams()" v-bind:to="{ name: 'WebcamManager' }" v-bind:class="{ 'router-link-exact-active' : webcamsIsActive }">Webcams</router-link>
         <router-link v-if="this.currentUser.canAccessLeaderboard()" v-bind:to="{ name: 'LeaderboardTable' }" v-bind:class="{ 'router-link-exact-active' : leaderboardIsActive }">Leaderboard</router-link>

@@ -364,14 +364,18 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // If user is not a superAdmin, and has more than one authorizedResort, we want to send them to /resorts
-    if (!user.superAdmin && user.authorizedResortCount() === 1) {
-      const [err2] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResort()))
-      // Must go after setCurrentResort
-      const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
-    } else {
-      // Must go after setCurrentResort
-      const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
-    }
+    // if (!user.superAdmin && user.authorizedResortCount() === 1) {
+    //   const [err2] = await promiseTo(store.dispatch('setCurrentResort', user.primaryResort()))
+    //   // Must go after setCurrentResort
+    //   const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
+    // } else {
+    //   // Must go after setCurrentResort
+    //   const [err3] = await promiseTo(store.dispatch('getCurrentResortPermissions'))
+    // }
+
+    store.dispatch('setCurrentResort', 'jackson_hole').then(() => {
+      next('/')
+    })
 
   }
 

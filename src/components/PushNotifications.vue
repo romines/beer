@@ -1,12 +1,14 @@
 <template>
   <div class="push-notifications">
-    <site-header title="Push Notifications" />
+    <site-header title="Messages" />
 
     <span v-if="!pwMissingAppIdWarning && currentUser.canEditPushNotifications()" class="button is-primary new-push-button" @click="showCreatePush = !showCreatePush">New Push Notification</span>
 
     <transition name="fade">
       <create-push v-if="showCreatePush" v-on:closeCreatePush="showCreatePush = false" v-on:pushCreated="onPushCreated()" class="new-push-container" />
     </transition>
+
+    <NoticeMessage />
 
     <list-push v-if="!pwMissingAppIdWarning" ref="listPush" class="list-push-container" />
     <div v-else>
@@ -22,17 +24,19 @@ import { mapGetters } from 'vuex'
 import SiteHeader from './SiteHeader.vue'
 import CreatePush from './push-notifications/CreatePush.vue'
 import ListPush from './push-notifications/ListPush.vue'
+import NoticeMessage from './messages/NoticeMessage.vue'
 
 export default {
   components: {
     SiteHeader,
     CreatePush,
-    ListPush
+    ListPush,
+    NoticeMessage
   },
   data() {
     return {
-      showCreatePush:         false,
-      pwMissingAppIdWarning:  null
+      showCreatePush:           false,
+      pwMissingAppIdWarning:    null
     }
   },
   computed: {
