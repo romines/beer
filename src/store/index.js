@@ -9,6 +9,7 @@ import archives from './archives'
 import maps from './maps'
 import tags from './tags'
 import users from './users'
+import messages from './messages'
 import { addMissingContactDefaults, promiseTo } from './utils.js'
 import pwConfig from '../static/pwConfig.js'
 import cmsAxios from '../api/vue-axios/axios.js'
@@ -41,7 +42,8 @@ const store = {
     archives,
     maps,
     tags,
-    users
+    users,
+    messages
   },
   state: {
     resorts: [],

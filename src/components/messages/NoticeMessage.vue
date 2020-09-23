@@ -14,23 +14,27 @@
         <section v-if="messageExists" class="detail-container current-message">
           <div class="detail">
             <label>Title:</label>
-            <span>Meow</span>
-          </div>
-          <div class="detail">
-            <label>Message:</label>
-            <span>Meow</span>
+            <span>{{currentNoticeMessage.title}}</span>
           </div>
           <div class="detail">
             <label>Url:</label>
-            <span>Meow</span>
+            <span>{{currentNoticeMessage.url}}</span>
           </div>
           <div class="detail">
             <label>Before:</label>
-            <span>Meow</span>
+            <span>{{currentNoticeMessage.beforeDate}}</span>
           </div>
           <div class="detail">
             <label>After:</label>
-            <span>Meow</span>
+            <span>{{currentNoticeMessage.afterDate}}</span>
+          </div>
+          <div class="detail">
+            <label>Message:</label>
+            <span>{{currentNoticeMessage.message}}</span>
+          </div>
+
+          <div class="button-container">
+            <button v-on:click="removeCurrentMessage()" class="button remove is-danger">Remove Message</button>
           </div>
         </section>
 
@@ -38,28 +42,28 @@
           <div v-if="showNewMessage">
             <div class="detail">
               <label>Title:</label>
-              <input v-model="newMessage.title">
-            </div>
-            <div class="detail">
-              <label>Message:</label>
-              <input v-model="newMessage.message">
+              <input v-model="newMessage.title" class="input">
             </div>
             <div class="detail">
               <label>Url:</label>
-              <input v-model="newMessage.url">
+              <input v-model="newMessage.url" class="input">
             </div>
             <div class="detail">
               <label>Before:</label>
-              <input v-model="newMessage.beforeDate">
+              <input v-model="newMessage.beforeDate" class="input">
             </div>
             <div class="detail">
               <label>After:</label>
-              <input v-model="newMessage.afterDate">
+              <input v-model="newMessage.afterDate" class="input">
+            </div>
+            <div class="detail">
+              <label>Message:</label>
+              <textarea v-model="newMessage.message" class="textarea"></textarea>
             </div>
 
             <div class="button-container">
               <span v-on:click="cancelNewMessage()" class="button cancel is-secondary">Cancel</span>
-              <span class="button save is-primary">Save</span>
+              <button v-on:click="publishNewMessage()" v-bind:disabled="!newMessageIsValid" class="button save is-primary">Save</button>
             </div>
           </div>
           <div v-else class="no-message">
@@ -84,19 +88,36 @@ export default {
   data() {
     return {
       isDropdownOpen:       false,
-      messageExists:        false,
       showNewMessage:       false,
-      newMessage:           {}
+      newMessage:           {},
+      newMessageIsValid:    true
     }
   },
   computed: {
-    ...mapGetters(['currentUser', 'currentResort'])
+    ...mapGetters(['currentNoticeMessage']),
+    messageExists () {
+      return Object.keys(this.currentNoticeMessage).length > 0
+    }
   },
-  created() {},
+  created() {
+    this.$store.dispatch('getSetNoticeMessage')
+  },
   methods: {
     cancelNewMessage () {
       this.showNewMessage = false
       this.newMessage     = {}
+    },
+    publishNewMessage () {
+      this.$store.dispatch('createNoticeForResort', this.newMessage).then((message) => {
+        this.$store.dispatch('showSuccessModal', 'Notice published!')
+        this.cancelNewMessage()
+      })
+    },
+    removeCurrentMessage () {
+      this.$store.dispatch('createNoticeForResort', {}).then((message) => {
+        this.$store.dispatch('showSuccessModal', 'Notice removed!')
+        this.cancelNewMessage()
+      })
     }
   },
 }
@@ -110,14 +131,19 @@ export default {
 
     .body {
 
-      .new-message {
+      .detail-container {
+
+        input {
+          width:                    60%;
+          display:                  block;
+        }
 
         .button-container {
           margin:                   1.5em 0 0 0;
           display:                  flex;
           align-items:              center;
 
-          .cancel {
+          .cancel, .remove {
             margin-left:            auto;
           }
 
